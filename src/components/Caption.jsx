@@ -2,7 +2,7 @@ import { Typography, Box, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import {Lightbulb} from "@mui/icons-material";
 
-const Header = ({ title, subtitle }) => {
+const Caption = ({ title, subtitle }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
@@ -15,11 +15,21 @@ const Header = ({ title, subtitle }) => {
       >
         {title}
       </Typography>
-      <Typography variant="h5" color={colors.greenAccent[400]}>
+      <Typography
+        variant="h5"
+        color='black'//Нужно подкорректировать под цветовую палитру
+        sx={{
+          border: '1px solid',
+          borderColor: colors.grey[100],
+          backgroundColor: colors.grey[100],
+          borderRadius: '5px',
+          padding: '20px',
+        }}
+      >
         {subtitle}
       </Typography>
     </Box>
   );
 };
 
-export default Header;
+export default Caption;

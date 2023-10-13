@@ -5,6 +5,7 @@ import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import EmailIcon from "@mui/icons-material/Email";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import SchoolIcon from '@mui/icons-material/School';
 import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
@@ -12,30 +13,64 @@ import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
+import StudentCard from "../../components/StudentCard";
+import {VerifiedUser} from "@mui/icons-material";
+import Caption from "../../components/Caption";
 
-const Dashboard = () => {
+const StudentsMainPage = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const studentData = [
+    {
+      name: 'Павел',
+      lastName: 'Дуров',
+      age: 9,
+      discipline: ['Python'],
+      status: 'active',
+      parent: null
+  },
+    {
+      name: 'Марк',
+      lastName: 'Цукерберг',
+      age: 60,
+      discipline: ['ЕГЭ Информатика'],
+      status: 'inactive',
+      parent: null
+    },
+    {
+      name: 'Стив',
+      lastName: 'Джобс',
+      age: 10,
+      discipline: ['ОГЭ Математика', 'ОГЭ Информатика'],
+      status: 'inactive',
+      parent: {
+        name: 'Mum Jobs',
+      }
+    },
+]
 
-  return (
+
+
+    return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Мой прогресс" subtitle="Трекеры прогресса" />
-
+        <Caption title="Мои студенты"
+                subtitle="Карточки студентов - содержат информацию о дисциплинах и статусе студента.
+        для перехода в пространство студента - кликните по карточке" />
         <Box>
-          <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
-          </Button>
+          {/*<Button*/}
+          {/*  sx={{*/}
+          {/*    backgroundColor: colors.blueAccent[700],*/}
+          {/*    color: colors.grey[100],*/}
+          {/*    fontSize: "14px",*/}
+          {/*    fontWeight: "bold",*/}
+          {/*    padding: "10px 20px",*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  <DownloadOutlinedIcon sx={{ mr: "10px" }} />*/}
+          {/*  Download Reports*/}
+          {/*</Button>*/}
         </Box>
       </Box>
 
@@ -54,17 +89,11 @@ const Dashboard = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <StatBox
-            title="12,361"
-            subtitle="Emails Sent"
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <EmailIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
+          <StudentCard personalInfo={studentData[0]} icon={
+            <SchoolIcon
+              sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+            />
+          }/>
         </Box>
         <Box
           gridColumn="span 3"
@@ -73,17 +102,11 @@ const Dashboard = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <StatBox
-            title="431,225"
-            subtitle="Sales Obtained"
-            progress="0.50"
-            increase="+21%"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
+          <StudentCard personalInfo={studentData[1]} icon={
+            <SchoolIcon
+              sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+            />
+          }/>
         </Box>
         <Box
           gridColumn="span 3"
@@ -92,17 +115,11 @@ const Dashboard = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <StatBox
-            title="32,441"
-            subtitle="New Clients"
-            progress="0.30"
-            increase="+5%"
-            icon={
-              <PersonAddIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
+          <StudentCard personalInfo={studentData[2]} icon={
+            <SchoolIcon
+              sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+            />
+          }/>
         </Box>
         <Box
           gridColumn="span 3"
@@ -183,9 +200,7 @@ const Dashboard = () => {
               Recent Transactions
             </Typography>
           </Box>
-          {mockTransactions.map((transaction, i) => (
             <Box
-              key={`${transaction.txId}-${i}`}
               display="flex"
               justifyContent="space-between"
               alignItems="center"
@@ -198,22 +213,19 @@ const Dashboard = () => {
                   variant="h5"
                   fontWeight="600"
                 >
-                  {transaction.txId}
                 </Typography>
                 <Typography color={colors.grey[100]}>
-                  {transaction.user}
                 </Typography>
               </Box>
-              <Box color={colors.grey[100]}>{transaction.date}</Box>
+              <Box color={colors.grey[100]}></Box>
               <Box
                 backgroundColor={colors.greenAccent[500]}
                 p="5px 10px"
                 borderRadius="4px"
               >
-                ${transaction.cost}
               </Box>
             </Box>
-          ))}
+          ))
         </Box>
 
         {/* ROW 3 */}
@@ -281,4 +293,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default StudentsMainPage;
