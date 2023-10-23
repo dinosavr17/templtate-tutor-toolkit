@@ -1,16 +1,16 @@
-.board {
-  min-width: 290px;
-  width: 290px;
-  height: 100%;
-  overflow-y: auto;
-  flex-basis: 290px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  
-  
-  color: #17394d;
-}
+/*.board {*/
+/*  min-width: 290px;*/
+/*  width: 290px;*/
+/*  height: 100%;*/
+/*  overflow-y: auto;*/
+/*  flex-basis: 290px;*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  gap: 20px;*/
+/*  */
+/*  */
+/*  color: #17394d;*/
+/*}*/
 .board-inner{
   background-color: rgb(223 227 230 / 55%);
   padding: 15px;

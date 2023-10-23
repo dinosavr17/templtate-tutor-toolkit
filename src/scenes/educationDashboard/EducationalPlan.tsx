@@ -8,15 +8,40 @@ import CustomInput from "../../eduComponents/CustomInput/CustomInput.tsx";
 import { ICard, IBoard } from "../../Interfaces/Kanban";
 // @ts-ignore
 import { fetchBoardList, updateLocalStorageBoards } from "../../Helper/APILayers.ts";
-import {Box, IconButton, Typography, useTheme} from "@mui/material";
-import SchoolIcon from "@mui/icons-material/School";
-import TrafficIcon from "@mui/icons-material/Traffic";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
+import {Box, colors, IconButton, Typography, useTheme} from "@mui/material";
+// @ts-ignore
+import styled from "styled-components";
 import { tokens } from "../../theme";
 
+const PageTitle = styled.div`
+  padding: 5px 0px;
+  box-shadow: 0 1px 20px rgba(56, 40, 40, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  background: transparent;
+  box-shadow: none;
+  display: inline-block;
+  font-size: 15px;
+  margin-left: 15px;
+  line-height: 36px;
+  margin-right: 8px;
+`
+const ModulesContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 70vw;
+  gap: 10px;
+`
+const AddModuleButton = styled.div`
+ margin: 15px;
+  flex-basis: 290px;
+  min-width: 290px;
+`
 export const EducationalPlan = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+   const colors = tokens(theme.palette.mode);
   const [boards, setBoards] = useState<IBoard[]>([]);
   useEffect(() => {
     fetchData();
@@ -31,23 +56,24 @@ export const EducationalPlan = () => {
     cardId: 0,
   });
 
-  const addboardHandler = (name: string) => {
-    const tempBoardsList = [...boards];
-    tempBoardsList.push({
-      id: Date.now() + Math.random() * 2,
-      title: name,
-      cards: [],
+  const handleAddBoard = (name: string) => {
+    setBoards((prevBoards) => {
+      const tempBoardsList = [...prevBoards];
+      tempBoardsList.push({
+        id: Date.now() + Math.random() * 2,
+        title: name,
+        cards: [],
+      });
+      return tempBoardsList;
     });
-    setBoards(tempBoardsList);
   };
 
-  const removeBoard = (boardId: number) => {
-    const boardIndex = boards.findIndex((item: IBoard) => item.id === boardId);
-    if (boardIndex < 0) return;
 
-    const tempBoardsList = [...boards];
-    tempBoardsList.splice(boardIndex, 1);
-    setBoards(tempBoardsList);
+  const removeBoard = (moduleId: number) => {
+    setBoards((prevBoards) => {
+      const filteredBoards = prevBoards.filter((item: IBoard) => item.id !== moduleId);
+      return filteredBoards;
+    });
   };
 
   const addCardHandler = (boardId: number, title: string) => {
@@ -145,14 +171,13 @@ export const EducationalPlan = () => {
   }, [boards]);
   return (
     <Box m="20px">
-      <div className="app-nav">
+      <PageTitle style={{color: colors.blueAccent[100]}}>
         <h1>Образовательный план</h1>
-      </div>
+      </PageTitle>
+
       <Box  display="grid"
-            gridTemplateColumns="repeat(12, 1fr)"
-            gridAutoRows="500px"
-            gap="20px">
-        <div>
+            gridTemplateColumns="repeat(12, 0.5fr)">
+        <ModulesContainer>
           {boards.map((item) => (
             <Board
               key={item.id}
@@ -165,20 +190,19 @@ export const EducationalPlan = () => {
               updateCard={updateCard}
             />
           ))}
-          <div className="app-boards-last">
+          <AddModuleButton>
             <CustomInput
               displayClass="app-boards-add-board"
               editClass="app-boards-add-board-edit"
-              placeholder="Enter Board Name"
-              text="Add Board"
-              buttonText="Add Board"
-              onSubmit={addboardHandler}
+              placeholder="Введите название модуля"
+              text="Добавить модуль"
+              buttonText="Добавить модуль"
+              onSubmit={handleAddBoard}
             />
-          </div>
-        </div>
+          </AddModuleButton>
+        </ModulesContainer>
       </Box>
     </Box>
   );
 }
-
 export default EducationalPlan;

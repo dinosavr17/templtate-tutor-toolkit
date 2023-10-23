@@ -1,5 +1,5 @@
 // @ts-ignore
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 // @ts-ignore
 import { AlignLeft, CheckSquare, Clock, MoreHorizontal } from "react-feather";
 // @ts-ignore
@@ -13,6 +13,9 @@ import Dropdown from "../Dropdown/Dropdown.tsx";
 import "./Card.css";
 // @ts-ignore
 import CardInfo from "./CardInfo/CardInfo.tsx";
+// @ts-ignore
+import Portal, {createContainer} from "../Board/Portal.ts";
+import styled from "styled-components";
 interface CardProps {
   card: ICard;
   boardId: number;
@@ -21,23 +24,49 @@ interface CardProps {
   onDragEnter: (boardId: number, cardId: number) => void;
   updateCard: (boardId: number, cardId: number, card: ICard) => void;
 }
+const ModalOverlay = styled.div`
+  background: rgba(255, 255, 255, 0.4);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 1030;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
 function Card(props: CardProps) {
   const { card, boardId, removeCard, onDragEnd, onDragEnter, updateCard } =
     props;
   const { id, title, desc, date, tasks, labels } = card;
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isMounted, setMounted] = useState(false);
+  const MODAL_CONTAINER_ID = 'card-details-container-id';
+
+  useEffect(() => {
+    createContainer({ id: MODAL_CONTAINER_ID });
+    setMounted(true);
+  }, []);
 
   return (
     <>
+      {isMounted && (
+          <Portal id={MODAL_CONTAINER_ID}>
       {showModal && (
+          <ModalOverlay>
         <CardInfo
           onClose={() => setShowModal(false)}
           card={card}
           boardId={boardId}
           updateCard={updateCard}
         />
+          </ModalOverlay>
       )}
+          </Portal>
+          )}
       <div
         className="card"
         key={card.id}
@@ -45,6 +74,7 @@ function Card(props: CardProps) {
         onDragEnd={() => onDragEnd(boardId, id)}
         onDragEnter={() => onDragEnter(boardId, id)}
         onClick={() => setShowModal(true)}
+        style={{color: 'black'}}
       >
         <div className="card-top">
           <div className="card-top-labels">
@@ -70,7 +100,7 @@ function Card(props: CardProps) {
             )}
           </div>
         </div>
-        <div className="card-title">{title}</div>
+        <div className="card-title" style={{color: 'black'}}>{title}</div>
         <div>
           <p title={desc}>
             <AlignLeft />

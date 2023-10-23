@@ -16,7 +16,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import StudentsMainPage from "./scenes/studentsMain";
-import {EducationalPlan} from "./scenes/educationDashboard/EducationalPlan"
+import {EducationalPlan} from "./scenes/educationDashboard/EducationalPlan.tsx"
 
 function App() {
   const [theme, colorMode] = useMode();
