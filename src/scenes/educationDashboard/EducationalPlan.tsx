@@ -35,7 +35,6 @@ const ModulesContainer = styled.div`
   gap: 10px;
 `
 const AddModuleButton = styled.div`
- margin: 15px;
   flex-basis: 290px;
   min-width: 290px;
 `

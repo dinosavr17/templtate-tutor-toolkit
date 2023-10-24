@@ -61,6 +61,10 @@ export const tokens = (mode) => ({
         modalOverlay: {
           100: 'rgba(255, 255, 255, 0.4)'
         },
+        //Темная тема
+        educationalModule : {
+
+        },
         blueAccent: {
           100: "#e1e2fe",
           200: "#c3c6fd",
@@ -136,6 +140,9 @@ export const tokens = (mode) => ({
           200: "#f57c00",
           400: "#ffffff",
         },
+        educationalModule: {
+
+        }, ///Светлая тема
         modalOverlay: {
           100: 'rgba(51,51,51,0.4)'
 }

@@ -24,6 +24,7 @@ import { tokens } from "../../theme";
 
 interface BoardProps {
   board: IBoard;
+  key: string;
   addCard: (boardId: number, title: string) => void;
   removeBoard: (boardId: number) => void;
   removeCard: (boardId: number, cardId: number) => void;
@@ -39,7 +40,6 @@ const EducationalModule = styled.div`
   flex-basis: 290px;
   display: flex;
   flex-direction: column;
-  margin: 15px;
 `;
 
 const ModuleContent = styled.div`
@@ -78,8 +78,8 @@ margin: 0 10px;
 const AlertOverlay = styled.div`
   background: rgba(73, 71, 71, 0.4);
   position: fixed;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   backdrop-filter: blur(10px);
   z-index: 1030;
   top: 0;
@@ -147,6 +147,7 @@ const Board = (props: BoardProps) => {
     onDragEnd,
     onDragEnter,
     updateCard,
+      key,
   } = props;
   const [alertVisible, setAlertVisible] = useState(false);
   return (
@@ -155,6 +156,7 @@ const Board = (props: BoardProps) => {
         <Header>
           <Title style={{color: colors.blueAccent[900]}}>
             {board?.title}
+            {props.key}
             <CardsQuantity>{board?.cards?.length || 0}</CardsQuantity>
             <RemoveIcon onClick={() => setAlertVisible(true)}><DeleteOutlineOutlinedIcon/></RemoveIcon>
           </Title>
