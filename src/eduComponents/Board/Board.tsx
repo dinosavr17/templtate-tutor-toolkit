@@ -62,21 +62,25 @@ const Title = styled.p`
   gap: 5px;
   align-items: center;
   width: 100%;
-`
+`;
+
 const RemoveIcon = styled.span`
 margin: 0 10px;
   display: flex;
   justify-items: center;
   align-items: center;
-`
+`;
+
 const CardsQuantity = styled.span`
 margin: 0 10px;
-`
+`;
+
 const AlertOverlay = styled.div`
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(73, 71, 71, 0.4);
   position: fixed;
   width: 100%;
   height: 100%;
+  backdrop-filter: blur(10px);
   z-index: 1030;
   top: 0;
   left: 0;
@@ -84,33 +88,46 @@ const AlertOverlay = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 1.5em;
+
   :first-child > :first-child {
     font-size: 2em;
   }
-`
+`;
+
 const AlertTitle = styled.div`
   font-size: 1.5em;
-`
+`;
+
 const AlertButtonWrapper = styled.div`
   display: flex;
   flex-direction: row;
-  margin: 10px;
+  margin: 30px 0 0 0;
   font-size: 1.5em;
   justify-content: flex-end;
   & > button {
     margin: 10px;
   }
-`
+`;
+
 const AlertButton = styled.button`
   display: flex;
   flex-direction: row;
   margin: 10px;
   font-size: 1.5em;
+`;
+
+const CardsWrapper = styled.div`
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
 `
 
 
 const Board = (props: BoardProps) => {
-  const alertRef = useRef(null);
   const [isMounted, setMounted] = useState(false);
   const MODAL_CONTAINER_ID = 'modal-container-id';
 
@@ -121,6 +138,7 @@ const Board = (props: BoardProps) => {
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  console.log(theme.palette.mode, 'тема');
   const {
     board,
     addCard,
@@ -143,7 +161,10 @@ const Board = (props: BoardProps) => {
           {isMounted && (
           <Portal id={MODAL_CONTAINER_ID}>
             {alertVisible &&
-          <AlertOverlay>
+          <AlertOverlay
+              style={(theme.palette.mode === 'dark')?
+                  {backgroundColor: 'rgba(255, 255, 255, 0.4)'} : {backgroundColor:  'rgba(73, 71, 71, 0.4)'}}
+          >
               <Alert
                   severity="warning"
                   sx={{
@@ -152,22 +173,35 @@ const Board = (props: BoardProps) => {
                     zIndex: '1030',
                     flexDirection: 'column',
                     position: 'relative',
+                    backgroundColor: colors.alertOrange[100],
                   }}>
                 <AlertTitle>
-                Вы уверены, что хотите удалить модуль?
+                Вы действительно хотите удалить модуль?
+                  <br/>
+                  Это необратимое действие
                 </AlertTitle>
                   <AlertButtonWrapper>
                     <Button
-                        variant="outlined" color="error"
+                        variant="outlined"
+                        color="warning"
+                        sx={{
+                         borderColor: colors.alertOrange[200],
+                          fontWeight: 400,
+                        }}
                     onClick={() => {
                   removeBoard(board?.id);
                   setAlertVisible(false);
                 }}>
-                  Да
+                      Да
                     </Button>
                 <Button
                     variant="outlined" color="success"
-                    onClick={() => setAlertVisible(false)}>
+                    onClick={() => setAlertVisible(false)}
+                    sx={{
+                      borderColor: colors.greenAccent[1000],
+                      fontWeight: 400,
+                    }}
+                >
                   Нет
                 </Button>
                   </AlertButtonWrapper>
@@ -177,7 +211,7 @@ const Board = (props: BoardProps) => {
           </Portal>
               )}
         </Header>
-        <div className="board-cards custom-scroll">
+        <CardsWrapper className="custom-scroll">
           {board?.cards?.map((item) => (
             <Card
               key={item.id}
@@ -196,7 +230,7 @@ const Board = (props: BoardProps) => {
             editClass="board-add-card-edit"
             onSubmit={(value: string) => addCard(board?.id, value)}
           />
-        </div>
+        </CardsWrapper>
       </ModuleContent>
     </EducationalModule>
   );

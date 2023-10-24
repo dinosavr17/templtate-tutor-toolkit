@@ -1,5 +1,6 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
+import {colors} from "@mui/material";
 
 // color design tokens export
 export const tokens = (mode) => ({
@@ -37,6 +38,7 @@ export const tokens = (mode) => ({
           700: "#2e7c67",
           800: "#1e5245",
           900: "#0f2922",
+          1000: colors.green,
         },
         redAccent: {
           100: "#f8dcdb",
@@ -48,6 +50,16 @@ export const tokens = (mode) => ({
           700: "#832f2c",
           800: "#58201e",
           900: "#2c100f",
+        },
+        //Для темной темы
+        alertOrange: {
+          100: "#333333",
+          200: "#f57c00",
+          300: "#757575",
+          400: "#ffffff"
+        },
+        modalOverlay: {
+          100: 'rgba(255, 255, 255, 0.4)'
         },
         blueAccent: {
           100: "#e1e2fe",
@@ -94,6 +106,7 @@ export const tokens = (mode) => ({
           700: "#94e2cd",
           800: "#b7ebde",
           900: "#dbf5ee",
+          1000: colors.green,
         },
         redAccent: {
           100: "#2c100f",
@@ -117,6 +130,15 @@ export const tokens = (mode) => ({
           800: "#c3c6fd",
           900: "#e1e2fe",
         },
+        alertOrange: {
+          ///Для светлой темы
+          100: "#fff4e5",
+          200: "#f57c00",
+          400: "#ffffff",
+        },
+        modalOverlay: {
+          100: 'rgba(51,51,51,0.4)'
+}
       }),
 });
 
@@ -131,6 +153,9 @@ export const themeSettings = (mode) => {
             // palette values for dark mode
             primary: {
               main: colors.primary[500],
+            },
+            alertOrange: {
+              main: colors.alertOrange[900],
             },
             secondary: {
               main: colors.greenAccent[500],

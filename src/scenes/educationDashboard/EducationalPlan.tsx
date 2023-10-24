@@ -31,7 +31,7 @@ const ModulesContainer = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  width: 70vw;
+  width: 85vw;
   gap: 10px;
 `
 const AddModuleButton = styled.div`
