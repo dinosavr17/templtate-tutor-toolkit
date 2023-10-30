@@ -18,11 +18,13 @@ import Portal, {createContainer} from "../Board/Portal.ts";
 import styled from "styled-components";
 interface CardProps {
   card: ICard;
-  boardId: number;
-  removeCard: (boardId: number, cardId: number) => void;
-  onDragEnd: (boardId: number, cardId: number) => void;
-  onDragEnter: (boardId: number, cardId: number) => void;
-  updateCard: (boardId: number, cardId: number, card: ICard) => void;
+  boardId: string;
+  removeCard: (boardId: string, cardId: string) => void;
+  onDragEnd: (boardId: string, cardId: string) => void;
+  onDragEnter: (boardId: string, cardId: string) => void;
+  updateCard: (boardId: string, cardId: string, card: ICard) => void;
+  provided: any;
+  snapshot: any
 }
 const ModalOverlay = styled.div`
   background: rgba(255, 255, 255, 0.4);
@@ -38,7 +40,7 @@ const ModalOverlay = styled.div`
 `
 
 function Card(props: CardProps) {
-  const { card, boardId, removeCard, onDragEnd, onDragEnter, updateCard } =
+  const { card, boardId, removeCard, onDragEnd, onDragEnter, updateCard, provided, snapshot } =
     props;
   const { id, title, desc, date, tasks, labels } = card;
   const [showDropdown, setShowDropdown] = useState(false);
@@ -74,7 +76,20 @@ function Card(props: CardProps) {
         onDragEnd={() => onDragEnd(boardId, id)}
         onDragEnter={() => onDragEnter(boardId, id)}
         onClick={() => setShowModal(true)}
-        style={{color: 'black'}}
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        style={{
+          userSelect: "none",
+          padding: 16,
+          margin: "0 0 8px 0",
+          minHeight: "50px",
+          backgroundColor: snapshot.isDragging
+              ? "#76abda"
+              : "#afb8d0",
+          color: "white",
+          ...provided.draggableProps.style
+        }}
       >
         <div className="card-top">
           <div className="card-top-labels">
@@ -120,6 +135,7 @@ function Card(props: CardProps) {
             </p>
           )}
         </div>
+          {provided.placeholder}
       </div>
     </>
   );

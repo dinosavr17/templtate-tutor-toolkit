@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 // @ts-ignore
 import React from 'react'
 
@@ -19,27 +19,30 @@ import styled from "styled-components";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {useTheme} from "@mui/material";
 import { tokens } from "../../theme";
+import { Draggable } from "react-beautiful-dnd";
 
 
 
 interface BoardProps {
   board: IBoard;
-  key: string;
-  addCard: (boardId: number, title: string) => void;
-  removeBoard: (boardId: number) => void;
-  removeCard: (boardId: number, cardId: number) => void;
-  onDragEnd: (boardId: number, cardId: number) => void;
-  onDragEnter: (boardId: number, cardId: number) => void;
-  updateCard: (boardId: number, cardId: number, card: ICard) => void;
+  addCard: (boardId: string, title: string) => void;
+  removeBoard: (boardId: string) => void;
+  removeCard: (boardId: string, cardId: string) => void;
+  onDragEnd: (boardId: string, cardId: string) => void;
+  onDragEnter: (boardId: string, cardId: string) => void;
+  updateCard: (boardId: string, cardId: string, card: ICard) => void;
+  provided: any;
+  snapshot: any;
 }
 
 const EducationalModule = styled.div`
   min-width: 270px;
   width: 290px;
   overflow: visible;
-  flex-basis: 290px;
+  //flex-basis: 290px;
   display: flex;
   flex-direction: column;
+  overflow: visible;
 `;
 
 const ModuleContent = styled.div`
@@ -109,13 +112,6 @@ const AlertButtonWrapper = styled.div`
   }
 `;
 
-const AlertButton = styled.button`
-  display: flex;
-  flex-direction: row;
-  margin: 10px;
-  font-size: 1.5em;
-`;
-
 const CardsWrapper = styled.div`
   background-color: #f8f8f8;
   padding: 10px;
@@ -123,7 +119,8 @@ const CardsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow-y: auto;
+  //overflow-y: auto;
+  overflow: visible;
 `
 
 
@@ -147,16 +144,16 @@ const Board = (props: BoardProps) => {
     onDragEnd,
     onDragEnter,
     updateCard,
-      key,
+   provided
   } = props;
   const [alertVisible, setAlertVisible] = useState(false);
   return (
-    <EducationalModule>
+    <EducationalModule ref={provided?.innerRef} {...provided?.droppableProps}>
+
       <ModuleContent key={board?.id} style={{backgroundColor: colors.blueAccent[100]}}>
         <Header>
           <Title style={{color: colors.blueAccent[900]}}>
             {board?.title}
-            {props.key}
             <CardsQuantity>{board?.cards?.length || 0}</CardsQuantity>
             <RemoveIcon onClick={() => setAlertVisible(true)}><DeleteOutlineOutlinedIcon/></RemoveIcon>
           </Title>
@@ -191,7 +188,7 @@ const Board = (props: BoardProps) => {
                           fontWeight: 400,
                         }}
                     onClick={() => {
-                  removeBoard(board?.id);
+                  removeBoard(board?.id.toString());
                   setAlertVisible(false);
                 }}>
                       Да
@@ -214,8 +211,17 @@ const Board = (props: BoardProps) => {
               )}
         </Header>
         <CardsWrapper className="custom-scroll">
-          {board?.cards?.map((item) => (
+          {board?.cards?.map((item, index) => (
+              <Draggable
+                  key={item.id}
+                  draggableId={item.id}
+                  index={index}
+              >
+                {(provided, snapshot) => {
+                  return (
             <Card
+               provided={provided}
+               snapshot={snapshot}
               key={item.id}
               card={item}
               boardId={board.id}
@@ -224,16 +230,19 @@ const Board = (props: BoardProps) => {
               onDragEnd={onDragEnd}
               updateCard={updateCard}
             />
+                      )}}
+              </Draggable>
           ))}
           <CustomInput
-            text="+ Add Card"
-            placeholder="Enter Card Title"
+            text="+ Добавить Тему"
+            placeholder="Введите название темы"
             displayClass="board-add-card"
             editClass="board-add-card-edit"
             onSubmit={(value: string) => addCard(board?.id, value)}
           />
         </CardsWrapper>
       </ModuleContent>
+      {provided.placeholder}
     </EducationalModule>
   );
 }
