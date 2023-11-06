@@ -49,8 +49,8 @@ const CustomInput = (props: CustomInputProps) => {
             autoFocus
           />
           <div className="custom-input-edit-footer">
-            <button type="submit">{buttonText || "Add"}</button>
-            <button onClick={() => setIsCustomInput(false)} className="closeIcon" >X</button>
+            <button type="submit">{buttonText || "Добавить"}</button>
+            <button onClick={() => setIsCustomInput(false)} className="closeIcon" ></button>
           </div>
         </form>
       ) : (

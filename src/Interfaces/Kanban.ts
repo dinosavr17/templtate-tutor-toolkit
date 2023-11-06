@@ -4,13 +4,13 @@ export interface ILabel {
 }
 
 export interface ITask {
-  id: number;
+  id: string;
   completed: boolean;
   text: string;
 }
 
 export interface ICard {
-  id: number;
+  id: string;
   title: string;
   labels: ILabel[];
   date: string;
@@ -19,7 +19,7 @@ export interface ICard {
 }
 
 export interface IBoard {
-  id: number;
+  id: string;
   title: string;
   cards: ICard[];
 }
