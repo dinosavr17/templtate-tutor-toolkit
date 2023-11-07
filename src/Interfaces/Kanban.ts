@@ -16,6 +16,17 @@ export interface ICard {
   date: string;
   tasks: ITask[];
   desc?: string;
+  result: {
+    draggableId: string,
+    source: {
+      boardId: string,
+      index: number,
+    },
+    destination: {
+      boardId: string | null,
+      index: number | null,
+    },
+  }
 }
 
 export interface IBoard {

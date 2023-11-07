@@ -88,6 +88,17 @@ export const EducationalPlan = () => {
       date: "",
       tasks: [],
       desc: "",
+      result: {
+      draggableId: (Date.now() + Math.random() * 2).toString(),
+          source: {
+        boardId: boardId,
+            index: boardIndex,
+      },
+      destination: {
+        boardId:  null,
+        index: null,
+      },
+    }
     });
     setBoards(tempBoardsList);
   };
@@ -121,87 +132,52 @@ export const EducationalPlan = () => {
     setBoards(tempBoardsList);
   };
 
-  const onDragEnd = (boardId: string, cardId: string) => {
-    const sourceBoardIndex = boards.findIndex(
-      (item: IBoard) => item.id === boardId,
-    );
-    console.log(sourceBoardIndex, 'Доски1');
-    if (sourceBoardIndex < 0) return;
+  const onDragEnd = (result) => {
+    const { destination, source, draggableId } = result;
+    console.log(result, 'result');
+    if (!destination) {
+      return;
+    }
 
-    const sourceCardIndex = boards[sourceBoardIndex]?.cards?.findIndex(
-      (item) => item.id === cardId,
-    );
-    if (sourceCardIndex < 0) return;
-
-    const targetBoardIndex = boards.findIndex(
-      (item: IBoard) => item.id === targetCard.boardId,
-    );
-    if (targetBoardIndex < 0) return;
-
-    const targetCardIndex = boards[targetBoardIndex]?.cards?.findIndex(
-      (item) => item.id === targetCard.cardId,
-    );
-    if (targetCardIndex < 0) return;
-
+    if (
+        destination.droppableId === source.droppableId &&
+        destination.index === source.index
+    ) {
+      return;
+    }
     const tempBoardsList = [...boards];
-    const sourceCard = tempBoardsList[sourceBoardIndex].cards[sourceCardIndex];
-    tempBoardsList[sourceBoardIndex].cards.splice(sourceCardIndex, 1);
-    tempBoardsList[targetBoardIndex].cards.splice(
-      targetCardIndex,
-      0,
-      sourceCard,
-    );
-    console.log(tempBoardsList, 'Доски');
-    setBoards(tempBoardsList);
+    const targetBoard = tempBoardsList.find((board) => board.id === source.droppableId );
+      const targetCard = targetBoard?.cards.find((card) => card.id === draggableId);
+   if ((source.index !== destination.index) && (destination.droppableId === source.droppableId)) {
+     const switchingCard = targetBoard.cards[destination.index];
+     targetBoard.cards[destination.index] = targetCard;
+     targetBoard.cards[source.index] = switchingCard;
+     updateLocalStorageBoards(tempBoardsList);
+   } else if (destination.droppableId !== source.droppableId) {
+     const switchingBoard = tempBoardsList.find((board) => board.id === destination.droppableId );
+     const shiftArrayFromIndex = (arr, startIndex) => {
+       if (startIndex < 0 || startIndex > arr.length) {
+         return arr;
+       }
+      arr.splice(destination.index, 0, targetCard);
+       targetBoard.cards.splice(source.index, 1);
+     };
+     shiftArrayFromIndex(switchingBoard.cards, destination.index);
+     updateLocalStorageBoards(tempBoardsList);
 
-    setTargetCard({
-      boardId: '0',
-      cardId: '0',
-    });
-  };
+   }
+  }
 
 
-  //   const sourceCardIndex = boards[sourceBoardIndex]?.cards?.findIndex(
-  //     (item) => item.id === cardId,
-  //   );
-  //   if (sourceCardIndex < 0) return;
-  //
-  //   const targetBoardIndex = boards.findIndex(
-  //     (item: IBoard) => item.id === targetCard.boardId,
-  //   );
-  //   if (targetBoardIndex < 0) return;
-  //
-  //   const targetCardIndex = boards[targetBoardIndex]?.cards?.findIndex(
-  //     (item) => item.id === targetCard.cardId,
-  //   );
-  //   if (targetCardIndex < 0) return;
-  //
-  //   const tempBoardsList = [...boards];
-  //   const sourceCard = tempBoardsList[sourceBoardIndex].cards[sourceCardIndex];
-  //   tempBoardsList[sourceBoardIndex].cards.splice(sourceCardIndex, 1);
-  //   tempBoardsList[targetBoardIndex].cards.splice(
-  //     targetCardIndex,
-  //     0,
-  //     sourceCard,
-  //   );
-  //   setBoards(tempBoardsList);
-  //
-  //   setTargetCard({
-  //     boardId: 0,
-  //     cardId: 0,
-  //   });
-  // };
+
   const onDragEnter = (boardId: string, cardId: string) => {
-    if (targetCard.cardId === cardId) return;
-    setTargetCard({
-      boardId: boardId,
-      cardId: cardId,
-    });
   };
 
   useEffect(() => {
     updateLocalStorageBoards(boards);
+    console.log('update');
   }, [boards]);
+
   return (
     <Box m="20px">
       <PageTitle style={{color: colors.blueAccent[100]}}>
@@ -225,9 +201,10 @@ export const EducationalPlan = () => {
                           addCard={addCardHandler}
                           removeBoard={() => removeBoard(item.id)}
                           removeCard={removeCard}
-                          onDragEnd={onDragEnd}
+                          // onDragEnd={onDragEnd}
                           onDragEnter={onDragEnter}
                           updateCard={updateCard}
+                          droppableId={item.id}
                       />
                   )}
                 </Droppable>
