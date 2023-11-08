@@ -33,6 +33,7 @@ interface BoardProps {
   updateCard: (boardId: string, cardId: string, card: ICard) => void;
   provided: any;
   snapshot: any;
+  droppableId: any;
 }
 
 const EducationalModule = styled.div`
@@ -226,8 +227,8 @@ const Board = (props: BoardProps) => {
               card={item}
               boardId={board.id}
               removeCard={removeCard}
-              onDragEnter={onDragEnter}
-              onDragEnd={onDragEnd}
+              // onDragEnter={onDragEnter}
+              // onDragEnd={onDragEnd}
               updateCard={updateCard}
             />
                       )}}

@@ -20,7 +20,11 @@ interface CardProps {
   card: ICard;
   boardId: string;
   removeCard: (boardId: string, cardId: string) => void;
-  onDragEnd: (boardId: string, cardId: string) => void;
+  onDragEnd: (
+      boardId: string,
+      cardId: string,
+  ) => void;
+
   onDragEnter: (boardId: string, cardId: string) => void;
   updateCard: (boardId: string, cardId: string, card: ICard) => void;
   provided: any;
@@ -73,8 +77,8 @@ function Card(props: CardProps) {
         className="card"
         key={card.id}
         draggable
-        onDragEnd={() => onDragEnd(boardId, id)}
-        onDragEnter={() => onDragEnter(boardId, id)}
+        onDragEnd={onDragEnd}
+        // onDragEnter={onDragEnter(boardId, card?.id)}
         onClick={() => setShowModal(true)}
         ref={provided.innerRef}
         {...provided.draggableProps}
