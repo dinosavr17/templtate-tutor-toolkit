@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 // @ts-ignore
 import React from 'react'
 
@@ -47,9 +47,13 @@ const EducationalModule = styled.div`
 `;
 
 const ModuleContent = styled.div`
-   background-color: rgb(223 227 230 / 55%);
+   //background-color: rgb(223 227 230 / 55%);
   padding: 15px;
   border-radius: 3px;
+  //flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
 `;
 
 const Header = styled.div`
@@ -81,21 +85,57 @@ margin: 0 10px;
 
 const AlertOverlay = styled.div`
   background: rgba(73, 71, 71, 0.4);
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
+  
+  @media (min-width: 320px) {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    align-items: flex-start;
+    & > :first-child {
+      top: 300px;
+      margin: 0 50px;
+      width: 60%;
+    }
+  }
+  @media (min-width: 400px) {
+    & > :first-child {
+      margin: 0 50px;
+    }
+  }
+  @media (min-width: 500px) {
+    & > :first-child {
+      margin: 0 60px;
+    }
+  }
+  @media (min-width: 800px) {
+    & > :first-child {
+      margin: 0 80px;
+    }
+  }
+    
+  @media (min-width: 1024px) {
+    & > :first-child {
+      width: 70%;
+      margin: 0 30px;
+    }
+  }
+  @media (min-width: 1200px) {
+    & > :first-child {
+      width: 60%;
+      margin: 0 120px;
+    }
+  }
   backdrop-filter: blur(10px);
   z-index: 1030;
   top: 0;
   left: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5em;
+  font-size: 2em;
 
   :first-child > :first-child {
     font-size: 2em;
-  }
+    overflow: visible;
+  } //Восклицательный знак
 `;
 
 const AlertTitle = styled.div`
@@ -120,19 +160,30 @@ const CardsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-grow: 1;
   //overflow-y: auto;
-  overflow: visible;
+  //overflow: visible;
 `
 
 
 const Board = (props: BoardProps) => {
   const [isMounted, setMounted] = useState(false);
   const MODAL_CONTAINER_ID = 'modal-container-id';
-
+  const [cardHeight, setCardHeight] = useState(0);
+  const [boardHeight, setBoardHeight] = useState(0);
+  const activeBoard = useRef<HTMLDivElement>(null)
   useEffect(() => {
     createContainer({ id: MODAL_CONTAINER_ID });
     setMounted(true);
+    console.log(provided.snapshot, 'someprops');
   }, []);
+  useEffect(() => {
+    console.log(cardHeight);
+  }, [cardHeight]);
+  useEffect(() => {
+   setBoardHeight(activeBoard?.current?.offsetHeight);
+
+  }, [activeBoard]);
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -145,15 +196,20 @@ const Board = (props: BoardProps) => {
     onDragEnd,
     onDragEnter,
     updateCard,
+      snapshot,
    provided
   } = props;
   const [alertVisible, setAlertVisible] = useState(false);
   return (
-    <EducationalModule ref={provided?.innerRef} {...provided?.droppableProps}>
+    <EducationalModule key={board?.id} {...props} ref={provided?.innerRef} {...provided?.droppableProps} style={{
+      backgroundColor: colors.educationalPlan.educationalModule,
+         height: snapshot.isDraggingOver? `${boardHeight}` + `${cardHeight}`
+          : 'inherit'
+    }}>
 
-      <ModuleContent key={board?.id} style={{backgroundColor: colors.blueAccent[100]}}>
+      <ModuleContent key={board?.id} >
         <Header>
-          <Title style={{color: colors.blueAccent[900]}}>
+          <Title style={{color: colors.educationalPlan.textColor}}>
             {board?.title}
             <CardsQuantity>{board?.cards?.length || 0}</CardsQuantity>
             <RemoveIcon onClick={() => setAlertVisible(true)}><DeleteOutlineOutlinedIcon/></RemoveIcon>
@@ -168,8 +224,6 @@ const Board = (props: BoardProps) => {
               <Alert
                   severity="warning"
                   sx={{
-                    width: '50%',
-                    height: '20%',
                     zIndex: '1030',
                     flexDirection: 'column',
                     position: 'relative',
@@ -211,7 +265,11 @@ const Board = (props: BoardProps) => {
           </Portal>
               )}
         </Header>
-        <CardsWrapper className="custom-scroll">
+        <CardsWrapper className="custom-scroll" ref={activeBoard} style={{
+          backgroundColor: snapshot.isDraggingOver? `${colors.educationalPlan.cardsWrapper}` : 'inherit',
+          flexGrow: snapshot.isDraggingOver? '3' : 'inherit',
+          height: snapshot.isDraggingOver? `${boardHeight}` + `${cardHeight}` : 'initial'
+        }}>
           {board?.cards?.map((item, index) => (
               <Draggable
                   key={item.id}
@@ -227,13 +285,13 @@ const Board = (props: BoardProps) => {
               card={item}
               boardId={board.id}
               removeCard={removeCard}
-              // onDragEnter={onDragEnter}
-              // onDragEnd={onDragEnd}
               updateCard={updateCard}
+               setCardHeight={setCardHeight}
             />
                       )}}
               </Draggable>
           ))}
+          {provided.placeholder}
           <CustomInput
             text="+ Добавить Тему"
             placeholder="Введите название темы"
@@ -243,7 +301,6 @@ const Board = (props: BoardProps) => {
           />
         </CardsWrapper>
       </ModuleContent>
-      {provided.placeholder}
     </EducationalModule>
   );
 }

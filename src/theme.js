@@ -62,8 +62,12 @@ export const tokens = (mode) => ({
           100: 'rgba(255, 255, 255, 0.4)'
         },
         //Темная тема
-        educationalModule : {
-
+        educationalPlan : {
+          educationalModule: "#0C325B",
+          cardsWrapper: "#daf0f6",
+          card: "#8ecbe5",
+          activeCard: "#56adce",
+          textColor: "#e1e2fe"
         },
         blueAccent: {
           100: "#e1e2fe",
@@ -140,9 +144,18 @@ export const tokens = (mode) => ({
           200: "#f57c00",
           400: "#ffffff",
         },
-        educationalModule: {
-
-        }, ///Светлая тема
+        educationalPlan : {
+          // educationalModule: "#e1e2fe",
+          // cardsWrapper: "#e1e2fe",
+          // card: "#e1e2fe",
+          // activeCard: "#e1e2fe",
+          educationalModule: "#8ecbe5",
+          cardsWrapper: "#eee",
+          card: "#daf0f6",
+          activeCard: "#92c6f1",
+          textColor: "#151632"
+        },
+         ///Светлая тема
         modalOverlay: {
           100: 'rgba(51,51,51,0.4)'
 }

@@ -1,5 +1,5 @@
 // @ts-ignore
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 // @ts-ignore
 import { AlignLeft, CheckSquare, Clock, MoreHorizontal } from "react-feather";
 // @ts-ignore
@@ -16,6 +16,9 @@ import CardInfo from "./CardInfo/CardInfo.tsx";
 // @ts-ignore
 import Portal, {createContainer} from "../Board/Portal.ts";
 import styled from "styled-components";
+import {ref} from "yup";
+import {useTheme} from "@mui/material";
+import { tokens } from "../../theme";
 interface CardProps {
   card: ICard;
   boardId: string;
@@ -28,7 +31,8 @@ interface CardProps {
   onDragEnter: (boardId: string, cardId: string) => void;
   updateCard: (boardId: string, cardId: string, card: ICard) => void;
   provided: any;
-  snapshot: any
+  snapshot: any;
+  setCardHeight: any;
 }
 const ModalOverlay = styled.div`
   background: rgba(255, 255, 255, 0.4);
@@ -44,19 +48,38 @@ const ModalOverlay = styled.div`
 `
 
 function Card(props: CardProps) {
-  const { card, boardId, removeCard, onDragEnd, onDragEnter, updateCard, provided, snapshot } =
+  const { card,
+      boardId,
+      removeCard,
+      onDragEnd,
+      onDragEnter,
+      updateCard,
+      provided,
+      snapshot,
+      setCardHeight
+  } =
     props;
   const { id, title, desc, date, tasks, labels } = card;
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isMounted, setMounted] = useState(false);
   const MODAL_CONTAINER_ID = 'card-details-container-id';
-
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
   useEffect(() => {
     createContainer({ id: MODAL_CONTAINER_ID });
     setMounted(true);
   }, []);
-
+    const activeCardRef = useRef<HTMLDivElement>(null)
+  const setRef = (ref) => {
+        if (isMounted) {
+            activeCardRef.current = ref;
+            if (activeCardRef.current) {
+                setCardHeight(activeCardRef.current.offsetHeight);
+            }
+        }
+      provided.innerRef(ref);
+  }
   return (
     <>
       {isMounted && (
@@ -77,10 +100,12 @@ function Card(props: CardProps) {
         className="card"
         key={card.id}
         draggable
+        // ref={activeCardRef}
         onDragEnd={onDragEnd}
         // onDragEnter={onDragEnter(boardId, card?.id)}
         onClick={() => setShowModal(true)}
-        ref={provided.innerRef}
+        // ref={setRef(this)}
+        ref={(node) => {setRef(node)}}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
         style={{
@@ -89,8 +114,8 @@ function Card(props: CardProps) {
           margin: "0 0 8px 0",
           minHeight: "50px",
           backgroundColor: snapshot.isDragging
-              ? "#76abda"
-              : "#afb8d0",
+              ? `${colors.educationalPlan.activeCard}`
+              : `${colors.educationalPlan.card}`,
           color: "white",
           ...provided.draggableProps.style
         }}
