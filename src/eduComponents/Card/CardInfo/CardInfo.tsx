@@ -13,18 +13,33 @@ import "./CardInfo.css";
 import { ICard, ILabel, ITask } from "../../../Interfaces/Kanban.ts";
 // @ts-ignore
 import Chip from "../../Common/Chip.tsx";
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
+import styled from "styled-components";
+
 interface CardInfoProps {
   onClose: () => void;
   card: ICard;
   boardId: number;
   updateCard: (boardId: number, cardId: number, card: ICard) => void;
 }
+const ModuleContent = styled.div`
+   //background-color: rgb(223 227 230 / 55%);
+  padding: 15px;
+  border-radius: 3px;
+  //flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+`;
 function CardInfo(props: CardInfoProps) {
   const { onClose, card, boardId, updateCard } = props;
   const [selectedColor, setSelectedColor] = useState("");
   const [cardValues, setCardValues] = useState<ICard>({
     ...card,
   });
+  //Поля которые нужно добавить в карточку сложность, длительность по оценке репетитора (Дни часы минуты)
+  // статус:  не начато, пройдено, повторение
 
   const updateTitle = (value: string) => {
     setCardValues({ ...cardValues, title: value });
@@ -124,7 +139,7 @@ function CardInfo(props: CardInfoProps) {
         <div className="cardinfo-box">
           <div className="cardinfo-box-title">
             <Type />
-            <p>Title</p>
+            <p>Название темы</p>
           </div>
           <CustomInput
             defaultValue={cardValues.title}
@@ -136,8 +151,28 @@ function CardInfo(props: CardInfoProps) {
 
         <div className="cardinfo-box">
           <div className="cardinfo-box-title">
+            <ContentPasteOutlinedIcon/>
+            <p>Статус</p>
+          </div>
+        </div>
+
+        <div className="cardinfo-box">
+          <div className="cardinfo-box-title">
+            <StarBorderIcon />
+            <p>Сложность</p>
+          </div>
+          {/*<CustomInput*/}
+          {/*    defaultValue={cardValues.desc}*/}
+          {/*    text={cardValues.desc || "Add a Description"}*/}
+          {/*    placeholder="Enter description"*/}
+          {/*    onSubmit={updateDesc}*/}
+          {/*/>*/}
+        </div>
+
+        <div className="cardinfo-box">
+          <div className="cardinfo-box-title">
             <List />
-            <p>Description</p>
+            <p>Описание</p>
           </div>
           <CustomInput
             defaultValue={cardValues.desc}
@@ -150,7 +185,7 @@ function CardInfo(props: CardInfoProps) {
         <div className="cardinfo-box">
           <div className="cardinfo-box-title">
             <Calendar />
-            <p>Date</p>
+            <p>Длительность</p>
           </div>
           <input
             type="date"
@@ -163,7 +198,7 @@ function CardInfo(props: CardInfoProps) {
         <div className="cardinfo-box">
           <div className="cardinfo-box-title">
             <Tag />
-            <p>Labels</p>
+            <p>Категории</p>
           </div>
           <div className="cardinfo-box-labels">
             {cardValues.labels?.map((item, index) => (
@@ -181,8 +216,8 @@ function CardInfo(props: CardInfoProps) {
             ))}
           </ul>
           <CustomInput
-            text="Add Label"
-            placeholder="Enter label text"
+            text="Добавить категорию"
+            placeholder="Введите название категории"
             onSubmit={(value: string) =>
               addLabel({ color: selectedColor, text: value })
             }
