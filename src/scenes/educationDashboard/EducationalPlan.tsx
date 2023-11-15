@@ -33,14 +33,15 @@ const PageTitle = styled.div`
 const ModulesContainer = styled.div`
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
   overflow-x: auto;
   width: 80vw;
+  flex-wrap: wrap;
+  width: 80vw;
   gap: 10px;
+  padding: 0 40px;
   padding: 40px 40px;
   height: 70vh;
-`;
-
+`
 const AddModuleButton = styled.div`
   flex-basis: 290px;
   min-width: 290px;
