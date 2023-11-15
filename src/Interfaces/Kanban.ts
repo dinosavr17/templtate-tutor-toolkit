@@ -12,6 +12,7 @@ export interface ITask {
 export interface ICard {
   id: string;
   title: string;
+  type?: string;
   labels: ILabel[];
   date: string;
   tasks: ITask[];
@@ -33,4 +34,5 @@ export interface IBoard {
   id: string;
   title: string;
   cards: ICard[];
+  type?: string;
 }

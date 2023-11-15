@@ -32,8 +32,9 @@ const ModulesContainer = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  width: 85vw;
+  width: 80vw;
   gap: 10px;
+  padding: 0 40px;
 `
 const AddModuleButton = styled.div`
   flex-basis: 290px;
@@ -43,6 +44,7 @@ export const EducationalPlan = () => {
   const theme = useTheme();
    const colors = tokens(theme.palette.mode);
   const [boards, setBoards] = useState<IBoard[]>([]);
+  const [type, setType] = useState('');
   useEffect(() => {
     fetchData();
   }, []);
@@ -133,7 +135,8 @@ export const EducationalPlan = () => {
   };
 
   const onDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source, draggableId, type } = result;
+    console.log(type, 'resultType')
     console.log(result, 'result');
     if (!destination) {
       return;
@@ -145,28 +148,51 @@ export const EducationalPlan = () => {
     ) {
       return;
     }
-    const tempBoardsList = [...boards];
-    const targetBoard = tempBoardsList.find((board) => board.id === source.droppableId );
+      console.log('card');
+      const tempBoardsList = [...boards];
+      const targetBoard = tempBoardsList.find((board) => board.id === source.droppableId);
+    if (type === 'task') {
       const targetCard = targetBoard?.cards.find((card) => card.id === draggableId);
-   if ((source.index !== destination.index) && (destination.droppableId === source.droppableId)) {
-     const switchingCard = targetBoard.cards[destination.index];
-     targetBoard.cards[destination.index] = targetCard;
-     targetBoard.cards[source.index] = switchingCard;
-     updateLocalStorageBoards(tempBoardsList);
-   } else if (destination.droppableId !== source.droppableId) {
-     const switchingBoard = tempBoardsList.find((board) => board.id === destination.droppableId );
-     const shiftArrayFromIndex = (arr, startIndex) => {
-       if (startIndex < 0 || startIndex > arr.length) {
-         return arr;
-       }
-      arr.splice(destination.index, 0, targetCard);
-       targetBoard.cards.splice(source.index, 1);
-     };
-     shiftArrayFromIndex(switchingBoard.cards, destination.index);
-     updateLocalStorageBoards(tempBoardsList);
-
-   }
-  }
+      if ((source.index !== destination.index) && (destination.droppableId === source.droppableId)) {
+        const switchingCard = targetBoard.cards[destination.index];
+        targetBoard.cards[destination.index] = targetCard;
+        targetBoard.cards[source.index] = switchingCard;
+        setBoards(tempBoardsList);
+      } else if (destination.droppableId !== source.droppableId) {
+        const switchingBoard = tempBoardsList.find((board) => board.id === destination.droppableId);
+        const shiftArrayFromIndex = (arr, startIndex) => {
+          if (startIndex < 0 || startIndex > arr.length) {
+            return arr;
+          }
+          arr.splice(destination.index, 0, targetCard);
+          targetBoard.cards.splice(source.index, 1);
+        };
+        shiftArrayFromIndex(switchingBoard.cards, destination.index);
+      }
+    } else if (type === 'column') {
+      if (source.index !== destination.index) {
+        console.log('not equal');
+        const activeBoard = tempBoardsList.find((board) => tempBoardsList.indexOf(board) === source.index);
+        console.log(activeBoard, 'activeBoard');
+        const switchingBoard = tempBoardsList[destination.index];
+        tempBoardsList[destination.index] = activeBoard;
+        tempBoardsList[source.index] = switchingBoard;
+        console.log( tempBoardsList[destination.index], tempBoardsList[source.index], tempBoardsList);
+       setBoards(tempBoardsList);
+        // updateLocalStorageBoards(tempBoardsList);
+      }
+    }
+    updateLocalStorageBoards(boards);
+    // } else if (type === 'column') {
+    //   if (source.index !== destination.index) {
+    //   const activeBoard = tempBoardsList.find((board) => tempBoardsList.indexOf(board) === source.index);
+    //   console.log(activeBoard, 'activeBoard');
+    //   const switchingBoard = tempBoardsList[destination.index];
+    //   tempBoardsList[destination.index] = activeBoard;
+    //   tempBoardsList[source.index] = switchingBoard;
+    //   }
+    //   updateLocalStorageBoards(tempBoardsList);
+    }
 
 
 
@@ -179,51 +205,63 @@ export const EducationalPlan = () => {
   }, [boards]);
 
   return (
-    <Box m="20px">
-      <PageTitle style={{color: colors.blueAccent[100]}}>
-        <h1>Образовательный план</h1>
-      </PageTitle>
+      <Box m="20px">
+        <PageTitle style={{ color: colors.blueAccent[100] }}>
+          <h1>Образовательный план</h1>
+        </PageTitle>
 
-      <Box  display="grid"
-            gridTemplateColumns="repeat(12, 0.5fr)">
-        <DragDropContext
-            onDragEnd={onDragEnd}
-        >
-        <ModulesContainer>
-            {boards.map((item, index) => (
-                <Droppable droppableId={item.id} key={item.id}>
-                  {(provided, snapshot) => (
-                      <Board
-                          provided={provided}
-                          snapshot={snapshot}
-                          key={item.id}
-                          board={item}
-                          addCard={addCardHandler}
-                          removeBoard={() => removeBoard(item.id)}
-                          removeCard={removeCard}
-                          // onDragEnd={onDragEnd}
-                          onDragEnter={onDragEnter}
-                          updateCard={updateCard}
-                          droppableId={item.id}
+        <Box display="grid" gridTemplateColumns="repeat(12, 0.5fr)">
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="all-columns" direction="horizontal" type="column">
+              {(provided) => (
+                  <ModulesContainer {...provided.droppableProps} ref={provided.innerRef}>
+                    {boards.map((item, index) => (
+                        <Draggable key={item.id} draggableId={item.id} index={index}>
+                          {(provided) => (
+                              <div
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  ref={provided.innerRef}
+                              >
+                                <Droppable droppableId={item.id} key={item.id} type="task">
+                                  {(provided, snapshot) => (
+                                      <Board
+                                          provided={provided}
+                                          snapshot={snapshot}
+                                          key={item.id}
+                                          board={item}
+                                          addCard={addCardHandler}
+                                          removeBoard={() => removeBoard(item.id)}
+                                          removeCard={removeCard}
+                                          onDragEnter={onDragEnter}
+                                          updateCard={updateCard}
+                                          droppableId={item.id}
+                                          index={index}
+                                      />
+                                  )}
+                                </Droppable>
+                              </div>
+                          )}
+                        </Draggable>
+                          /*{provided.placeholder}*/
+                    ))}
+                    {provided.placeholder}
+                    <AddModuleButton>
+                      <CustomInput
+                          displayClass="app-boards-add-board"
+                          editClass="app-boards-add-board-edit"
+                          placeholder="Введите название модуля"
+                          text="Добавить модуль"
+                          buttonText="Добавить модуль"
+                          onSubmit={handleAddBoard}
                       />
-                  )}
-                </Droppable>
-            ))}
-
-          <AddModuleButton>
-            <CustomInput
-              displayClass="app-boards-add-board"
-              editClass="app-boards-add-board-edit"
-              placeholder="Введите название модуля"
-              text="Добавить модуль"
-              buttonText="Добавить модуль"
-              onSubmit={handleAddBoard}
-            />
-          </AddModuleButton>
-        </ModulesContainer>
-        </DragDropContext>
+                    </AddModuleButton>
+                  </ModulesContainer>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </Box>
       </Box>
-    </Box>
   );
-}
+};
 export default EducationalPlan;
