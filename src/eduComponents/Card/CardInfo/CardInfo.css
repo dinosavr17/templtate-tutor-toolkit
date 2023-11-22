@@ -7,6 +7,7 @@
   width: fit-content;
   max-width: 650px;
   height: fit-content;
+  color: black;
 }
 
 .cardinfo-box {
@@ -68,7 +69,7 @@
 }
 
 .cardinfo-box ul .li-active {
-  box-shadow: 0 0 0 3px yellow; 
+  box-shadow: 0 0 0 3px yellow;
   border: 2px solid red;
   padding: 8px;
 }

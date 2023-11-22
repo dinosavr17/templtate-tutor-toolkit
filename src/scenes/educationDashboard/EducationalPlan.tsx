@@ -27,19 +27,24 @@ const PageTitle = styled.div`
   margin-left: 15px;
   line-height: 36px;
   margin-right: 8px;
-`
+`;
+
 const ModulesContainer = styled.div`
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   width: 80vw;
   gap: 10px;
-  padding: 0 40px;
-`
+  padding: 40px 40px;
+  height: 70vh;
+`;
+
 const AddModuleButton = styled.div`
   flex-basis: 290px;
   min-width: 290px;
-`
+`;
+
 export const EducationalPlan = () => {
   const theme = useTheme();
    const colors = tokens(theme.palette.mode);
@@ -213,8 +218,9 @@ export const EducationalPlan = () => {
         <Box display="grid" gridTemplateColumns="repeat(12, 0.5fr)">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="all-columns" direction="horizontal" type="column">
-              {(provided) => (
-                  <ModulesContainer {...provided.droppableProps} ref={provided.innerRef}>
+              {(provided, snapshot) => (
+                  <ModulesContainer {...provided.droppableProps} ref={provided.innerRef}
+                                    style={{backgroundColor: snapshot.isDraggingOver? colors.educationalPlan.boardsWrapper : 'initial'}}>
                     {boards.map((item, index) => (
                         <Draggable key={item.id} draggableId={item.id} index={index}>
                           {(provided) => (

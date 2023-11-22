@@ -67,7 +67,8 @@ export const tokens = (mode) => ({
           cardsWrapper: "#daf0f6",
           card: "#8ecbe5",
           activeCard: "#56adce",
-          textColor: "#e1e2fe"
+          textColor: "#e1e2fe",
+          boardsWrapper: "#cce8ff",
         },
         blueAccent: {
           100: "#e1e2fe",
@@ -153,7 +154,8 @@ export const tokens = (mode) => ({
           cardsWrapper: "#eee",
           card: "#daf0f6",
           activeCard: "#92c6f1",
-          textColor: "#151632"
+          textColor: "#151632",
+          boardsWrapper: "#cce8ff",
         },
          ///Светлая тема
         modalOverlay: {
