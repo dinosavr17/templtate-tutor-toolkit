@@ -36,6 +36,8 @@ const ModulesContainer = styled.div`
   overflow-x: auto;
   width: 80vw;
   flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   width: 80vw;
   gap: 10px;
   padding: 0 40px;
@@ -53,7 +55,6 @@ export const EducationalPlan = ({uniquePlan}) => {
   const [boards, setBoards] = useState<IBoard[]>([]);
   const [type, setType] = useState('');
   useEffect(() => {
-    console.log(uniquePlan, 'upladddn');
     fetchData();
   }, []);
 
@@ -190,6 +191,15 @@ export const EducationalPlan = ({uniquePlan}) => {
       }
     }
     updateLocalStorageBoards(boards);
+    // } else if (type === 'column') {
+    //   if (source.index !== destination.index) {
+    //   const activeBoard = tempBoardsList.find((board) => tempBoardsList.indexOf(board) === source.index);
+    //   console.log(activeBoard, 'activeBoard');
+    //   const switchingBoard = tempBoardsList[destination.index];
+    //   tempBoardsList[destination.index] = activeBoard;
+    //   tempBoardsList[source.index] = switchingBoard;
+    //   }
+    //   updateLocalStorageBoards(tempBoardsList);
     }
 
 

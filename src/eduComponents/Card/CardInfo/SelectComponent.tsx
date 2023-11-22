@@ -41,7 +41,7 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
     };
 }
 
-export default function MultipleSelectChip() {
+export function MultipleSelectChip() {
     const theme = useTheme();
     const [personName, setPersonName] = React.useState<string[]>([]);
 
@@ -95,3 +95,34 @@ export default function MultipleSelectChip() {
         </div>
     );
 }
+
+const SelectComponent = () => {
+    const [age, setAge] = React.useState('');
+
+    const handleChange = (event: SelectChangeEvent) => {
+        setAge(event.target.value as string);
+    };
+
+    return (
+        <Box sx={{ minWidth: 120, color: 'black' }}>
+            <div style={{borderColor: '#eee'}}>
+            <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={age}
+                    label="Age"
+                    onChange={handleChange}
+                >
+                    <MenuItem value={10}>Ten</MenuItem>
+                    <MenuItem value={20}>Twenty</MenuItem>
+                    <MenuItem value={30}>Thirty</MenuItem>
+                </Select>
+            </FormControl>
+            </div>
+        </Box>
+    );
+};
+
+export default SelectComponent
