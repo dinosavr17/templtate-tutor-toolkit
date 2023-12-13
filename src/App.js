@@ -18,6 +18,8 @@ import Calendar from "./scenes/calendar/calendar";
 import StudentsMainPage from "./scenes/studentsMain";
 import {EducationalPlan} from "./scenes/educationDashboard/EducationalPlan.tsx"
 import Example from "./eduComponents/Example";
+import Register from "./Authentification/Register";
+import Login from "./Authentification/LoginPage";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -46,6 +48,8 @@ function App() {
               <Route path="/geography" element={<Geography />} />
               <Route path="/edu" element={<EducationalPlan />} />
               <Route path="/eduNewNew" element={<Example/>} />
+              <Route path="/register" element={<Register/>} />
+              <Route path="/login" element={<Login/>} />
             </Routes>
           </main>
         </div>
