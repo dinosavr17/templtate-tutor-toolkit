@@ -9,8 +9,28 @@ body,
   width: 100%;
   font-family: "Source Sans Pro", sans-serif;
 }
+@font-face {
+  font-family: 'Bryndan Write';
+  src: url('./fonts/bryndan_write.eot'); /* IE 9 Compatibility Mode */
+  src: url('./fonts/bryndan_write.eot?#iefix') format('embedded-opentype'), /* IE < 9 */
+  url('./fonts/bryndan_write.woff2') format('woff2'), /* Super Modern Browsers */
+  url('./fonts/bryndan_write.woff') format('woff'), /* Firefox >= 3.6, any other modern browser */
+  url('./fonts/bryndan_write.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('./fonts/bryndan_write.svg#bryndan_write') format('svg'); /* Chrome < 4, Legacy iOS */
+}
+.registration {
+  height: 100%;
+  width: 100%;
+  font-family: "Source Sans Pro", sans-serif;
+  /*background-color: #151632;*/
+  background-image: linear-gradient(218deg,  #151632, #304080, #4774d5, #4ab8f3)
+}
 
 .app {
+  display: flex;
+  position: relative;
+}
+.app_registration {
   display: flex;
   position: relative;
 }
