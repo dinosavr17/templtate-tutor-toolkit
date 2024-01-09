@@ -89,6 +89,7 @@ export const EducationalPlan = () => {
 
     const tempBoardsList = [...boards];
     tempBoardsList[boardIndex].cards.push({
+      difficulty: "",
       id: (Date.now() + Math.random() * 2).toString(),
       title,
       labels: [],
@@ -153,7 +154,6 @@ export const EducationalPlan = () => {
     ) {
       return;
     }
-      console.log('card');
       const tempBoardsList = [...boards];
       const targetBoard = tempBoardsList.find((board) => board.id === source.droppableId);
     if (type === 'task') {
@@ -184,19 +184,9 @@ export const EducationalPlan = () => {
         tempBoardsList[source.index] = switchingBoard;
         console.log( tempBoardsList[destination.index], tempBoardsList[source.index], tempBoardsList);
        setBoards(tempBoardsList);
-        // updateLocalStorageBoards(tempBoardsList);
       }
     }
     updateLocalStorageBoards(boards);
-    // } else if (type === 'column') {
-    //   if (source.index !== destination.index) {
-    //   const activeBoard = tempBoardsList.find((board) => tempBoardsList.indexOf(board) === source.index);
-    //   console.log(activeBoard, 'activeBoard');
-    //   const switchingBoard = tempBoardsList[destination.index];
-    //   tempBoardsList[destination.index] = activeBoard;
-    //   tempBoardsList[source.index] = switchingBoard;
-    //   }
-    //   updateLocalStorageBoards(tempBoardsList);
     }
 
 
@@ -219,8 +209,10 @@ export const EducationalPlan = () => {
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="all-columns" direction="horizontal" type="column">
               {(provided, snapshot) => (
-                  <ModulesContainer {...provided.droppableProps} ref={provided.innerRef}
-                                    style={{backgroundColor: snapshot.isDraggingOver? colors.educationalPlan.boardsWrapper : 'initial'}}>
+                  <ModulesContainer
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      style={{backgroundColor: snapshot.isDraggingOver? colors.educationalPlan.boardsWrapper : 'initial'}}>
                     {boards.map((item, index) => (
                         <Draggable key={item.id} draggableId={item.id} index={index}>
                           {(provided) => (

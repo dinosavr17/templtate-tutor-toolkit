@@ -17,6 +17,7 @@ export interface ICard {
   date: string;
   tasks: ITask[];
   desc?: string;
+  difficulty: string;
   result: {
     draggableId: string,
     source: {

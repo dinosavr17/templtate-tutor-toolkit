@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import AppIcon from "../../asserts/images/app_icon.png"
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -79,9 +80,10 @@ const Sidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                {/*<Typography variant="h3" color={colors.grey[100]}>*/}
-                {/*  ADMINIS*/}
-                {/*</Typography>*/}
+                <img src={AppIcon} style={{height: '40px', width: '40px'}}/>
+                <Typography variant="h4" color={colors.grey[100]}>
+                  Tutor Toolkit
+                </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
                 </IconButton>
