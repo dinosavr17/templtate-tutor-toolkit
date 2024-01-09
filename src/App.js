@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
@@ -18,20 +18,43 @@ import Calendar from "./scenes/calendar/calendar";
 import StudentsMainPage from "./scenes/studentsMain";
 import {EducationalPlan} from "./scenes/educationDashboard/EducationalPlan.tsx"
 import Example from "./eduComponents/Example";
+import Register from "./Authentification/Register.jsx";
+import Login from "./Authentification/LoginPage";
+import RequireAuth from "./RequireAuth";
+import PlansStorage from "./scenes/educationDashboard/PlansStorage";
+import Prelogin from "./Authentification/PreloginPage";
+import PreloginPage from "./Authentification/PreloginPage";
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
+  const [entryPages, setEntryPages] = useState(false);
+  useEffect(() => {
+   if (window.location.pathname !== '/register' && window.location.pathname !== '/login' && window.location.pathname !== '/prelogin') {
+     setEntryPages(true);
+   }
+   else {
+     setEntryPages(false);
+   }
+  }, [])
 
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className="app">
-          <Sidebar isSidebar={isSidebar} />
-          <main className="content">
-            <Topbar setIsSidebar={setIsSidebar} />
+        <div className={!entryPages? 'app_registration' : 'app' }>
+          {entryPages &&
+          <Sidebar isSidebar={isSidebar}/>
+          }
+          <main className={!entryPages? 'registration' : 'content'}>
+            {entryPages &&
+            <Topbar setIsSidebar={setIsSidebar}/>
+            }
             <Routes>
+              <Route path="/prelogin" element={<PreloginPage/>} />
+              <Route path="/register" element={<Register/>} />
+              <Route path="/login" element={<Login/>} />
+              {/*<Route  element={<RequireAuth/>}>*/}
               <Route path="/main" element={<StudentsMainPage />} />
               <Route path="/" element={<Dashboard />} />
               <Route path="/team" element={<Team />} />
@@ -44,8 +67,9 @@ function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/geography" element={<Geography />} />
-              <Route path="/edu" element={<EducationalPlan />} />
+              <Route path="/edu" element={<PlansStorage />} />
               <Route path="/eduNewNew" element={<Example/>} />
+              {/*</Route>*/}
             </Routes>
           </main>
         </div>

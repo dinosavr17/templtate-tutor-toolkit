@@ -83,7 +83,7 @@ const CardsQuantity = styled.span`
 margin: 0 10px;
 `;
 
-const AlertOverlay = styled.div`
+export const AlertOverlay = styled.div`
   background: rgba(73, 71, 71, 0.4);
   
   @media (min-width: 320px) {
@@ -138,11 +138,11 @@ const AlertOverlay = styled.div`
   } //Восклицательный знак
 `;
 
-const AlertTitle = styled.div`
+export const AlertTitle = styled.div`
   font-size: 1.5em;
 `;
 
-const AlertButtonWrapper = styled.div`
+export const AlertButtonWrapper = styled.div`
   display: flex;
   flex-direction: row;
   margin: 30px 0 0 0;
@@ -153,7 +153,7 @@ const AlertButtonWrapper = styled.div`
   }
 `;
 
-const CardsWrapper = styled.div`
+export const CardsWrapper = styled.div`
   background-color: #f8f8f8;
   padding: 10px;
   border-radius: 5px;
