@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import tutor from "../asserts/images/teacher_login.png";
 import student from "../asserts/images/student_login.png";
+import login_img from "../asserts/images/login.png";
 import lottie from "lottie-web";
 import appLogo from "../asserts/images/Logo.png";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
@@ -49,13 +50,6 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
-
-    const emailRef = useRef();
-    const errRef = useRef();
-
-    const [username, setUsername] = useState('');
-    // const [password, setPassword] = useState('');
-    const [errMsg, setErrMsg] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -72,16 +66,13 @@ const Login = () => {
 
     const [password, setPassword] = useState('');
     const [domain, setDomain] = useState('@gmail.com');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [role, setRole] = useState('student');
 
 
     const handleSubmit = async (e) => {
 
         try {
-            const response = await axios.post('http://158.160.18.51:8000/account/token/',
-                JSON.stringify({ username, password }),
+            const response = await axios.post('api/account/token/',
+                JSON.stringify({ email: email+domain, password: password, }),
                 {
 
                     headers: {
@@ -91,30 +82,29 @@ const Login = () => {
                     withCredentials: true
                 }
             );
-            // console.log(JSON.stringify(response?.data));
-            // console.log(JSON.stringify(response));
+            console.log(JSON.stringify(response?.data));
+            console.log(JSON.stringify(response));
             const accessToken = response?.data?.access;
             console.log('token', accessToken);
             localStorage.setItem("userData", JSON.stringify({
                 accessToken: accessToken
             }))
-            setAuth({username,password, accessToken});
-            login(accessToken,username)
-            setUsername('');
-            setPassword('');
-            navigate(from, { replace: true });
+            setAuth({email,password, accessToken});
+            // login(accessToken,username)
+            // setUsername('');
+            // setPassword('');
+            // navigate(from, { replace: true });
         } catch (err) {
             if (!err?.response) {
-                setErrMsg('No Server Response');
+                // setErrMsg('No Server Response');
                 console.log(err);
             } else if (err.response?.status === 400) {
-                setErrMsg('Missing Username or Password');
+                // setErrMsg('Missing Username or Password');
             } else if (err.response?.status === 401) {
-                setErrMsg('Unauthorized');
+                // setErrMsg('Unauthorized');
             } else {
-                setErrMsg('Login Failed');
+                // setErrMsg('Login Failed');
             }
-            errRef.current.focus();
         }
     }
     const renderStatusContent = () => {
@@ -155,58 +145,17 @@ const Login = () => {
     };
 
     return (
-        // <section className="register_section">
-        //     <div className="register_logo">
-        //         {/*<img style={{width:'150px', height: '150px'}} className="registerLogo" src={registerLogo} alt='logo'/>*/}
-        //     </div>
-        //     <div className="card">
-        //         <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-        //         <h1 className="login_title">Войти в AuctionMaster</h1>
-        //         <form className="login_form" onSubmit={handleSubmit}>
-        //             <input className='login_input'
-        //                    type="text"
-        //                    placeholder="Корпоративная почта"
-        //                    id="username"
-        //                    ref={emailRef}
-        //                    autoComplete="off"
-        //                    onChange={(e) => setUsername(e.target.value)}
-        //                    value={username}
-        //                    required
-        //             />
-        //
-        //             <input className="login_input"
-        //                    placeholder="Пароль"
-        //                    type="password"
-        //                    id="password"
-        //                    onChange={(e) => setPassword(e.target.value)}
-        //                    value={password}
-        //                    required
-        //             />
-        //             <button className="login_btn">Войти</button>
-        //         </form>
-        //         <p>
-        //             Нет аккаунта?<br />
-        //             <span className="line">
-        //                     {/*put router link here*/}
-        //                 <a href="register">Зарегистрироваться</a>
-        //                 </span>
-        //         </p>
-        //     </div>
-        // </section>
         <AuthorizationWrapper>
             <MainWrapper>
                 <RegistrationCard>
                     <RegistrationImageBlock>
-                        {role === 'tutor'
-                            ? <img style={{marginRight: '-40px'}} src={tutor}/>
-                            : <img src={student}/>
-                        }
+                        <img src={login_img}/>
                     </RegistrationImageBlock>
                     <RegistrationFormWrapper className='card'>
                         <RegistrationLabel>
                             <LogoWrapper>
                                 <img src={appLogo}/>
-                                <span style={{fontSize: '16px'}}>{ role === 'tutor'? 'Войти как преподаватель' : 'Войти как студент'}</span>
+                                <span style={{fontSize: '16px'}}>Войти</span>
                             </LogoWrapper>
                         </RegistrationLabel>
                         <RegistrationForm onSubmit={handleSubmit}>
@@ -280,33 +229,18 @@ const Login = () => {
                         </RegistrationForm>
                         <div>
                             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                                {/*<RegisterButton*/}
-                                {/*    color="inherit"*/}
-                                {/*    disabled={activeStep === 0}*/}
-                                {/*    onClick={handleBack}*/}
-                                {/*>*/}
-                                {/*    Назад*/}
-                                {/*</RegisterButton>*/}
                                 <Box sx={{ flex: '1 auto' }} />
                                     <RegisterButton onClick={() => {
                                         handleSubmit();
                                     }}>Войти
                                     </RegisterButton>
                             </Box>
-                            {role === 'tutor'
-                                ? <p>
+                            <p>
                                     Еще не зарегистрированы?<br/>
                                     <span className="line">
                                 <a href="register">Зарегистрироваться</a>
                         </span>
-                                </p>
-                                : <p>
-                                    Еще не зарегистрированы?<br/>
-                                    <span className="line">
-                                <a href="register">Подключиться к преподавателю</a>
-                        </span>
-                                </p>
-                            }
+                            </p>
                         </div>
                         {isMounted &&
                         <Portal id={MODAL_CONTAINER_ID}>

@@ -54,7 +54,7 @@ function App() {
               <Route path="/prelogin" element={<PreloginPage/>} />
               <Route path="/register" element={<Register/>} />
               <Route path="/login" element={<Login/>} />
-              {/*<Route  element={<RequireAuth/>}>*/}
+              <Route  element={<RequireAuth/>}>
               <Route path="/main" element={<StudentsMainPage />} />
               <Route path="/" element={<Dashboard />} />
               <Route path="/team" element={<Team />} />
@@ -69,7 +69,7 @@ function App() {
               <Route path="/geography" element={<Geography />} />
               <Route path="/edu" element={<PlansStorage />} />
               <Route path="/eduNewNew" element={<Example/>} />
-              {/*</Route>*/}
+              </Route>
             </Routes>
           </main>
         </div>

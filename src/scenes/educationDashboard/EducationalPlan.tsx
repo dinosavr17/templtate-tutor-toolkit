@@ -5,7 +5,8 @@ import Board from "../../eduComponents/Board/Board.tsx";
 import "./Dashboard.css";
 // @ts-ignore
 import CustomInput from "../../eduComponents/CustomInput/CustomInput.tsx";
-import { ICard, IBoard } from "../../Interfaces/Kanban";
+// @ts-ignore
+import { ICard, IBoard } from "../../Interfaces/Kanban.ts";
 // @ts-ignore
 import { fetchBoardList, updateLocalStorageBoards } from "../../Helper/APILayers.ts";
 import {Box, colors, IconButton, Typography, useTheme} from "@mui/material";
@@ -45,17 +46,18 @@ const AddModuleButton = styled.div`
   min-width: 290px;
 `;
 
-export const EducationalPlan = () => {
+export const EducationalPlan = ({uniquePlan}) => {
   const theme = useTheme();
    const colors = tokens(theme.palette.mode);
   const [boards, setBoards] = useState<IBoard[]>([]);
   const [type, setType] = useState('');
   useEffect(() => {
+    console.log(uniquePlan, 'upladddn');
     fetchData();
   }, []);
 
   async function fetchData() {
-    const boards: IBoard[] = await fetchBoardList();
+    const boards: IBoard[] = uniquePlan;
     setBoards(boards);
   }
   const [targetCard, setTargetCard] = useState({
@@ -196,7 +198,7 @@ export const EducationalPlan = () => {
 
   useEffect(() => {
     updateLocalStorageBoards(boards);
-    console.log('update');
+    console.log('update', uniquePlan);
   }, [boards]);
 
   return (
