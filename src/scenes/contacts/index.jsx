@@ -4,30 +4,86 @@ import { tokens } from "../../theme";
 import { mockDataContacts } from "../../data/mockData";
 import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
+import axios from "../../api/axios";
+import {useEffect, useState} from "react";
 
 const Contacts = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+      getUsers();
+      console.log(users, users);
+  }, []);
+    const getUsers = async (e) => {
+
+        try {
+            const response = await axios.get('api/education_plan/get_users_data',
+                {
+
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': 'http://localhost:3000',
+                        'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+                    },
+                    withCredentials: true
+                }
+            );
+            console.log(response?.data);
+            setUsers(response?.data?.plans);
+
+        } catch (err) {
+            if (!err?.response) {
+                // setLoadingStatus('error');
+            }
+        }
+    };
+    // discipline
+    //     :
+    //     "Матан"
+    // first_name
+    //     :
+    //     "Иван"
+    // id
+    //     :
+    //     1
+    // last_name
+    //     :
+    //     "Иванов"
+    // status
+    //     :
+    //     "active"
+    const handleCellEditCommit = (params) => {
+        const updatedUsers = users.map(user => {
+            if (user.id === params.id) {
+                return { ...user, status: params.value };
+            }
+            return user;
+        });
+
+        setUsers(updatedUsers);
+    };
+
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
-    { field: "registrarId", headerName: "Registrar ID" },
+    { field: "first_name", headerName: "Имя" },
     {
-      field: "name",
-      headerName: "Name",
+      field: "last_name",
+      headerName: "Фамилия",
       flex: 1,
       cellClassName: "name-column--cell",
     },
     {
-      field: "age",
-      headerName: "Age",
-      type: "number",
+      field: "discipline",
+      headerName: "Дисциплина",
+      // type: "number",
       headerAlign: "left",
       align: "left",
     },
     {
-      field: "phone",
-      headerName: "Phone Number",
+      field: "status",
+      headerName: "Статус",
       flex: 1,
     },
     {
@@ -35,28 +91,13 @@ const Contacts = () => {
       headerName: "Email",
       flex: 1,
     },
-    {
-      field: "address",
-      headerName: "Address",
-      flex: 1,
-    },
-    {
-      field: "city",
-      headerName: "City",
-      flex: 1,
-    },
-    {
-      field: "zipCode",
-      headerName: "Zip Code",
-      flex: 1,
-    },
   ];
 
   return (
     <Box m="20px">
       <Header
-        title="CONTACTS"
-        subtitle="List of Contacts for Future Reference"
+        title="Студенты"
+        subtitle="Список студентов со статусами"
       />
       <Box
         m="40px 0 0 0"
@@ -91,9 +132,10 @@ const Contacts = () => {
         }}
       >
         <DataGrid
-          rows={mockDataContacts}
+          rows={users}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
+          onCellEditCommit={handleCellEditCommit}
         />
       </Box>
     </Box>

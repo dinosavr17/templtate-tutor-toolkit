@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FullCalendar, { formatDate } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -13,6 +13,7 @@ import {
   useTheme,
 } from "@mui/material";
 import Header from "../../components/Header";
+import '@fullcalendar/core/locales-all'
 import { tokens } from "../../theme";
 
 const Calendar = () => {
@@ -20,8 +21,14 @@ const Calendar = () => {
   const colors = tokens(theme.palette.mode);
   const [currentEvents, setCurrentEvents] = useState([]);
 
+  useEffect(() => {
+    // Load events from localStorage on component mount
+    const savedEvents = JSON.parse(localStorage.getItem("calendarEvents")) || [];
+    setCurrentEvents(savedEvents);
+  }, []);
+
   const handleDateClick = (selected) => {
-    const title = prompt("Please enter a new title for your event");
+    const title = prompt("Введите название");
     const calendarApi = selected.view.calendar;
     calendarApi.unselect();
 
@@ -39,7 +46,7 @@ const Calendar = () => {
   const handleEventClick = (selected) => {
     if (
       window.confirm(
-        `Are you sure you want to delete the event '${selected.event.title}'`
+        `Вы действительно хотите отменить занятие?'${selected.event.title}'`
       )
     ) {
       selected.event.remove();
@@ -48,7 +55,7 @@ const Calendar = () => {
 
   return (
     <Box m="20px">
-      <Header title="Calendar" subtitle="Full Calendar Interactive Page" />
+      <Header title="Календарь занятий" subtitle="При отмене и переносе можно прислать уведомление на почту" />
 
       <Box display="flex" justifyContent="space-between">
         {/* CALENDAR SIDEBAR */}
@@ -58,7 +65,7 @@ const Calendar = () => {
           p="15px"
           borderRadius="4px"
         >
-          <Typography variant="h5">Events</Typography>
+          <Typography variant="h5">События</Typography>
           <List>
             {currentEvents.map((event) => (
               <ListItem
@@ -77,7 +84,7 @@ const Calendar = () => {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
-                      })}
+                      }).toLocaleString('ru')}
                     </Typography>
                   }
                 />
@@ -109,17 +116,19 @@ const Calendar = () => {
             select={handleDateClick}
             eventClick={handleEventClick}
             eventsSet={(events) => setCurrentEvents(events)}
+            locale="ru" // Specify the locale to use
+            weekends={false}
             initialEvents={[
-              {
-                id: "12315",
-                title: "All-day event",
-                date: "2022-09-14",
-              },
-              {
-                id: "5123",
-                title: "Timed event",
-                date: "2022-09-28",
-              },
+              // {
+              //   id: "12315",
+              //   title: "All-day event",
+              //   date: "2022-09-14",
+              // },
+              // {
+              //   id: "5123",
+              //   title: "Урок с Пашей",
+              //   date: "2022-09-28",
+              // },
             ]}
           />
         </Box>

@@ -54,7 +54,7 @@ function App() {
               <Route path="/prelogin" element={<PreloginPage/>} />
               <Route path="/register" element={<Register/>} />
               <Route path="/login" element={<Login/>} />
-              <Route  element={<RequireAuth/>}>
+              <Route element={<RequireAuth/>}>
               <Route path="/main" element={<StudentsMainPage />} />
               <Route path="/" element={<Dashboard />} />
               <Route path="/team" element={<Team />} />

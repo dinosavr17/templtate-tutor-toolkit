@@ -4,18 +4,18 @@ export const formatDate = (value: string) => {
   if (!date) return "";
 
   const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    "Янв",
+    "Фев",
+    "Мар",
+    "Апр",
+    "Май",
+    "Июн",
+    "Июл",
+    "Авг",
+    "Сент",
+    "Окт",
+    "Нояб",
+    "Дек",
   ];
 
   const day = date.getDate();

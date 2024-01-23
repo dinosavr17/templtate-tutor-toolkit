@@ -195,6 +195,7 @@ function CardInfo(props: CardInfoProps) {
             defaultValue={cardValues.date}
             min={new Date().toISOString().substr(0, 10)}
             onChange={(event) => updateDate(event.target.value)}
+            lang="ru"
           />
         </div>
 
