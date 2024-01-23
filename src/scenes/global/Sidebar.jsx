@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import AppIcon from "../../asserts/images/app_icon.png"
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -79,9 +80,10 @@ const Sidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                {/*<Typography variant="h3" color={colors.grey[100]}>*/}
-                {/*  ADMINIS*/}
-                {/*</Typography>*/}
+                <img src={AppIcon} style={{height: '40px', width: '40px'}}/>
+                <Typography variant="h4" color={colors.grey[100]}>
+                  Tutor Toolkit
+                </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
                 </IconButton>
@@ -117,6 +119,13 @@ const Sidebar = () => {
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+            <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 20px" }}
+            >
+              Основное
+            </Typography>
             <Item
               title="Прогресс"
               to="/"
@@ -131,42 +140,34 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
             <Item
-              title="Управление студентами"
-              to="/team"
+              title="Образовательный план"
+              to="/edu"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Contacts Information"
+              title="Список студентов"
               to="/contacts"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Invoices Balances"
-              to="/invoices"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            {/*<Item*/}
+            {/*  title="Invoices Balances"*/}
+            {/*  to="/invoices"*/}
+            {/*  icon={<ReceiptOutlinedIcon />}*/}
+            {/*  selected={selected}*/}
+            {/*  setSelected={setSelected}*/}
+            {/*/>*/}
 
             <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Pages
+              Дополнительное
             </Typography>
             <Item
               title="Добавить студента"
@@ -182,49 +183,49 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="FAQ Page"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            {/*<Item*/}
+            {/*  title="FAQ Page"*/}
+            {/*  to="/faq"*/}
+            {/*  icon={<HelpOutlineOutlinedIcon />}*/}
+            {/*  selected={selected}*/}
+            {/*  setSelected={setSelected}*/}
+            {/*/>*/}
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Charts
-            </Typography>
-            <Item
-              title="Bar Chart"
-              to="/bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Pie Chart"
-              to="/pie"
-              icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Line Chart"
-              to="/line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Geography Chart"
-              to="/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            {/*<Typography*/}
+            {/*  variant="h6"*/}
+            {/*  color={colors.grey[300]}*/}
+            {/*  sx={{ m: "15px 0 5px 20px" }}*/}
+            {/*>*/}
+            {/*  Charts*/}
+            {/*</Typography>*/}
+            {/*<Item*/}
+            {/*  title="Bar Chart"*/}
+            {/*  to="/bar"*/}
+            {/*  icon={<BarChartOutlinedIcon />}*/}
+            {/*  selected={selected}*/}
+            {/*  setSelected={setSelected}*/}
+            {/*/>*/}
+            {/*<Item*/}
+            {/*  title="Pie Chart"*/}
+            {/*  to="/pie"*/}
+            {/*  icon={<PieChartOutlineOutlinedIcon />}*/}
+            {/*  selected={selected}*/}
+            {/*  setSelected={setSelected}*/}
+            {/*/>*/}
+            {/*<Item*/}
+            {/*  title="Line Chart"*/}
+            {/*  to="/line"*/}
+            {/*  icon={<TimelineOutlinedIcon />}*/}
+            {/*  selected={selected}*/}
+            {/*  setSelected={setSelected}*/}
+            {/*/>*/}
+            {/*<Item*/}
+            {/*  title="Geography Chart"*/}
+            {/*  to="/geography"*/}
+            {/*  icon={<MapOutlinedIcon />}*/}
+            {/*  selected={selected}*/}
+            {/*  setSelected={setSelected}*/}
+            {/*/>*/}
           </Box>
         </Menu>
       </ProSidebar>

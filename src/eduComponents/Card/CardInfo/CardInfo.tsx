@@ -16,6 +16,8 @@ import Chip from "../../Common/Chip.tsx";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
 import styled from "styled-components";
+// @ts-ignore
+import SelectComponent from "./SelectComponent.tsx";
 
 interface CardInfoProps {
   onClose: () => void;
@@ -161,6 +163,7 @@ function CardInfo(props: CardInfoProps) {
             <StarBorderIcon />
             <p>Сложность</p>
           </div>
+          <SelectComponent/>
           {/*<CustomInput*/}
           {/*    defaultValue={cardValues.desc}*/}
           {/*    text={cardValues.desc || "Add a Description"}*/}
@@ -192,6 +195,7 @@ function CardInfo(props: CardInfoProps) {
             defaultValue={cardValues.date}
             min={new Date().toISOString().substr(0, 10)}
             onChange={(event) => updateDate(event.target.value)}
+            lang="ru"
           />
         </div>
 

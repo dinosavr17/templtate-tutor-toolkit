@@ -39,9 +39,10 @@ const BarChart = ({ isDashboard = false }) => {
           },
         },
       }}
-      keys={["hot dog", "burger", "sandwich", "kebab", "fries", "donut"]}
-      indexBy="country"
-      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+      keys={["Мотивация", "Внимательность", "Самостоятельность"]}
+      indexBy="date"
+      margin={{ top: 50, right: 140, bottom: 50, left: 60 }}
+      groupMode='grouped'
       padding={0.3}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
@@ -101,14 +102,14 @@ const BarChart = ({ isDashboard = false }) => {
           anchor: "bottom-right",
           direction: "column",
           justify: false,
-          translateX: 120,
+          translateX: 110,
           translateY: 0,
-          itemsSpacing: 2,
+          itemsSpacing: 1,
           itemWidth: 100,
           itemHeight: 20,
           itemDirection: "left-to-right",
           itemOpacity: 0.85,
-          symbolSize: 20,
+          symbolSize: 14,
           effects: [
             {
               on: "hover",

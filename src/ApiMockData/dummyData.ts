@@ -1,21 +1,19 @@
 import { IBoard } from "../Interfaces/Kanban";
 
+// @ts-ignore
 export const ApiMockResponse: IBoard[] = [
   {
     id: '1651319512266.7095',
-    title: "Discover",
+    title: "Алгебра",
     cards: [
       {
         id: '1651319552926.0933',
-        title: "Task1",
+        title: "Задание 1",
         labels: [{color: "#cf61a1", text: "Urgent"}],
         date: "2022-05-05",
         tasks: [
-          {id: '1651319625559.8025', completed: true, text: "Task1_subtask1"},
-          {id: '1651319629650.8945', completed: true, text: "Task1_subtask2"},
-          {id: '1651319633774.9905', completed: true, text: "Task1_subtask3"},
         ],
-        desc: "Task1 Detail Description",
+        desc: "Задание 1 Detail Description",
         result: {
           draggableId: '1651319552926.0933',
           source: {
@@ -30,7 +28,7 @@ export const ApiMockResponse: IBoard[] = [
       },
       {
         id: '1651319568365.593',
-        title: "Task2",
+        title: "Задание 2",
         labels: [{ color: "#1ebffa", text: "Frontend" }],
         date: "",
         tasks: [],
@@ -50,15 +48,14 @@ export const ApiMockResponse: IBoard[] = [
   },
   {
     id: '1651319523126.113',
-    title: "Doing",
+    title: "Планиметрия",
     cards: [
       {
         id: '1651319672685.5078',
-        title: "Task3",
+        title: "Задание 3",
         labels: [{ color: "#9975bd", text: "Database" }],
         date: "",
         tasks: [
-          { id: '1651319728301.3855', completed: false, text: "restore db" },
         ],
         result: {
           draggableId: '1651319672685.5078',
@@ -76,11 +73,11 @@ export const ApiMockResponse: IBoard[] = [
   },
   {
     id: '1651319530017.122',
-    title: "In-Review",
+    title: "Стереометрия",
     cards: [
       {
         id: '1651319677070.0732',
-        title: "Task4",
+        title: "Задание 4",
         labels: [{ color: "#8da377", text: "figma" }],
         date: "2022-05-06",
         tasks: [],
@@ -100,16 +97,14 @@ export const ApiMockResponse: IBoard[] = [
   },
   {
     id: '1651319535931.4182',
-    title: "Completed",
+    title: "Тригонометрия",
     cards: [
       {
         id: '1651319680948.0479',
-        title: "Task5",
+        title: "Задание 5",
         labels: [{ color: "#4fcc25", text: "Payment API" }],
         date: "2022-05-04",
         tasks: [
-          { id: '1651319820180.9648', completed: false, text: "GraphQl" },
-          { id: '1651319833779.3252', completed: true, text: "Restful API" },
         ],
         result: {
           draggableId: '1651319680948.0479',
@@ -126,3 +121,124 @@ export const ApiMockResponse: IBoard[] = [
     ],
   },
 ];
+export const ApiMockResponse2: IBoard[] = [
+  {
+    id: '1651319512266.7095',
+    title: "Объекты и массивы",
+    cards: [
+      {
+        id: '1651319552926.0933',
+        title: "Task",
+        labels: [{color: "#cf61a1", text: "Urgent"}],
+        date: "2022-05-05",
+        tasks: [
+        ],
+        desc: "Задание 1 Detail Description",
+        result: {
+          draggableId: '1651319552926.0933',
+          source: {
+            boardId: '1651319512266.7095',
+            index: 0,
+          },
+          destination: {
+            boardId: null,
+            index: null,
+          },
+        },
+      },
+      {
+        id: '1651319568365.593',
+        title: "Задание 2",
+        labels: [{ color: "#1ebffa", text: "Frontend" }],
+        date: "",
+        tasks: [],
+        result: {
+          draggableId: '1651319568365.593',
+          source: {
+            boardId: '1651319512266.7095',
+            index: 1,
+          },
+          destination: {
+            boardId: null,
+            index: null,
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: '1651319523126.113',
+    title: "Ассинхронность",
+    cards: [
+      {
+        id: '1651319672685.5078',
+        title: "Задание 3",
+        labels: [{ color: "#9975bd", text: "Database" }],
+        date: "",
+        tasks: [
+        ],
+        result: {
+          draggableId: '1651319672685.5078',
+          source: {
+            boardId: '1651319523126.113',
+            index: 0,
+          },
+          destination: {
+            boardId: null,
+            index: null,
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: '1651319530017.122',
+    title: "React",
+    cards: [
+      {
+        id: '1651319677070.0732',
+        title: "Задание 4",
+        labels: [{ color: "#8da377", text: "figma" }],
+        date: "2022-05-06",
+        tasks: [],
+        result: {
+          draggableId: '1651319677070.0732',
+          source: {
+            boardId: '1651319530017.122',
+            index: 0,
+          },
+          destination: {
+            boardId: null,
+            index: null,
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: '1651319535931.4182',
+    title: "CSS",
+    cards: [
+      {
+        id: '1651319680948.0479',
+        title: "Задание 5",
+        labels: [{ color: "#4fcc25", text: "Payment API" }],
+        date: "2022-05-04",
+        tasks: [
+        ],
+        result: {
+          draggableId: '1651319680948.0479',
+          source: {
+            boardId: '1651319535931.4182',
+            index: 1,
+          },
+          destination: {
+            boardId: null,
+            index: null,
+          },
+        },
+      },
+    ],
+  },
+];
+

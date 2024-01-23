@@ -1,11 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import EducationalPlan from "./EducationalPlan.tsx";
 import axios from "../../api/axios"
-import {CircularProgress} from "@mui/material";
+import {Box, CircularProgress, useTheme} from "@mui/material";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import Portal, {createContainer} from "../../eduComponents/Board/Portal.ts";
 import styled from "styled-components";
+import StudentCard from "../../components/StudentCard";
+import SchoolIcon from "@mui/icons-material/School";
+import {tokens} from "../../theme";
+import StatBox from "../../components/StatBox";
+import TrafficIcon from "@mui/icons-material/Traffic";
 
 const StatusOverlay = styled.div`
   background: rgba(73, 71, 71, 0.4);
@@ -26,17 +31,47 @@ const StatusContainer = styled.div`
 
 
 const PlansStorage = () => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
     const [loadingStatus, setLoadingStatus] = useState('unset');
     const [isMounted, setMounted] = useState(false);
     const MODAL_CONTAINER_ID = 'modal-container-id';
     const [statusShown, setStatusShown] = useState(false);
     const [uniqueId, setUniqueId] = useState('');
     const [uniquePlan, setUniquePlan] = useState({});
+    const studentData = [
+        {
+            name: 'Павел',
+            lastName: 'Дуров',
+            age: 9,
+            discipline: ['Python'],
+            status: 'active',
+            parent: null
+        },
+        {
+            name: 'Марк',
+            lastName: 'Цукерберг',
+            age: 60,
+            discipline: ['ЕГЭ Информатика'],
+            status: 'inactive',
+            parent: null
+        },
+        {
+            name: 'Стив',
+            lastName: 'Джобс',
+            age: 10,
+            discipline: ['ОГЭ Математика', 'ОГЭ Информатика'],
+            status: 'inactive',
+            parent: {
+                name: 'Mum Jobs',
+            }
+        },
+    ]
     useEffect(() => {
         console.log('uniquePlan updated:', uniquePlan);
     }, [uniquePlan]);
     useEffect(() => {
-        // getPlans();
+        getPlans();
         getUsers();
         createContainer({id: MODAL_CONTAINER_ID});
         setMounted(true);
@@ -127,7 +162,89 @@ const PlansStorage = () => {
 
     return (
         <div>
-            <button onClick={getPlanById}>Иванов Петя</button>
+            {/*<Box*/}
+            {/*    gridColumn="span 3"*/}
+            {/*    backgroundColor={colors.primary[400]}*/}
+            {/*    display="flex"*/}
+            {/*    alignItems="center"*/}
+            {/*    justifyContent="center"*/}
+            {/*    onClick={getPlanById}*/}
+            {/*>*/}
+            {/*    <StudentCard personalInfo={studentData[0]} icon={*/}
+            {/*        <SchoolIcon*/}
+            {/*            sx={{ color: colors.greenAccent[600], fontSize: "26px" }}*/}
+            {/*        />*/}
+            {/*    }/>*/}
+            {/*</Box>*/}
+            <Box
+                display="grid"
+                gridTemplateColumns="repeat(12, 1fr)"
+                gridAutoRows="140px"
+                gap="20px"
+                margin="20px"
+            >
+                {/* ROW 1 */}
+                <Box
+                    gridColumn="span 3"
+                    backgroundColor={colors.primary[400]}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    onClick={getPlanById}
+                >
+                    <StudentCard personalInfo={studentData[0]} icon={
+                        <SchoolIcon
+                            sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                        />
+                    }/>
+                </Box>
+                <Box
+                    gridColumn="span 3"
+                    backgroundColor={colors.primary[400]}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                >
+                    <StudentCard personalInfo={studentData[1]} icon={
+                        <SchoolIcon
+                            sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                        />
+                    }/>
+                </Box>
+                <Box
+                    gridColumn="span 3"
+                    backgroundColor={colors.primary[400]}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                >
+                    <StudentCard personalInfo={studentData[2]} icon={
+                        <SchoolIcon
+                            sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                        />
+                    }/>
+                </Box>
+                {/*<Box*/}
+                {/*    gridColumn="span 3"*/}
+                {/*    backgroundColor={colors.primary[400]}*/}
+                {/*    display="flex"*/}
+                {/*    alignItems="center"*/}
+                {/*    justifyContent="center"*/}
+                {/*>*/}
+                {/*    <StatBox*/}
+                {/*        title="1,325,134"*/}
+                {/*        subtitle="Traffic Received"*/}
+                {/*        progress="0.80"*/}
+                {/*        increase="+43%"*/}
+                {/*        icon={*/}
+                {/*            <TrafficIcon*/}
+                {/*                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}*/}
+                {/*            />*/}
+                {/*        }*/}
+                {/*    />*/}
+                {/*</Box>*/}
+            </Box>
+            {/*<button onClick={getPlanById}>Иванов Петя</button>*/}
             {/*<EducationalPlan uniquePlan={() => {getPlanById()}}/>*/}
             {loadingStatus === 'success' &&
             <EducationalPlan uniquePlan={uniquePlan}/>

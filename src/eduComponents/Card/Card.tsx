@@ -154,7 +154,7 @@ function Card(props: CardProps) {
           {date && (
             <p className="card-footer-item">
               <Clock className="card-footer-icon" />
-              {formatDate(date)}
+              {formatDate(date).toLocaleString('ru')}
             </p>
           )}
           {tasks && tasks?.length > 0 && (
