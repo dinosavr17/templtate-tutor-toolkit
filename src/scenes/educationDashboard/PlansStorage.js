@@ -71,7 +71,7 @@ const PlansStorage = () => {
         console.log('uniquePlan updated:', uniquePlan);
     }, [uniquePlan]);
     useEffect(() => {
-        getPlans();
+        // getPlans();
         getUsers();
         createContainer({id: MODAL_CONTAINER_ID});
         setMounted(true);

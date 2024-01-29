@@ -15,6 +15,7 @@ import {
 import Header from "../../components/Header";
 import '@fullcalendar/core/locales-all'
 import { tokens } from "../../theme";
+import ruLocale from '@fullcalendar/core/locales/ru';
 
 const Calendar = () => {
   const theme = useTheme();
@@ -116,7 +117,7 @@ const Calendar = () => {
             select={handleDateClick}
             eventClick={handleEventClick}
             eventsSet={(events) => setCurrentEvents(events)}
-            locale="ru" // Specify the locale to use
+            locale={ruLocale}
             weekends={false}
             initialEvents={[
               // {

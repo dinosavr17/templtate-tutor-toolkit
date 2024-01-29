@@ -25,6 +25,22 @@ import AlertTitle from '@mui/material/AlertTitle';
 export const MainWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  //background-image: linear-gradient(218deg,  #151632, #304080, #4774d5, #4ab8f3);
+  height: 100%;
+  @media (min-width: 320px) {
+    justify-content: flex-start;
+    margin-top: 60px;
+  }
+  @media (min-width: 768px) {
+    justify-content: center;
+    margin-top: -120px;
+  }
+  @media (min-width: 1024px) {
+    margin: -140px 20px 0 20px;
+  }
+  @media (min-width: 1440px) {
+    margin: -140px 120px 0 120px;
+  }
 `;
 export const PaginationWrapper = styled.div`
   //margin: 40px 80px;
