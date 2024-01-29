@@ -23,7 +23,7 @@ body,
   width: 100%;
   font-family: "Source Sans Pro", sans-serif;
   /*background-color: #151632;*/
-  background-image: linear-gradient(218deg,  #151632, #304080, #4774d5, #4ab8f3)
+  background-image: linear-gradient(218deg,  #151632, #304080, #4774d5, #4ab8f3);
 }
 
 .app {
@@ -33,6 +33,8 @@ body,
 .app_registration {
   display: flex;
   position: relative;
+  background-image: linear-gradient(218deg,  #151632, #304080, #4774d5, #4ab8f3);
+  height: 100vh;
 }
 
 ::-webkit-scrollbar {
