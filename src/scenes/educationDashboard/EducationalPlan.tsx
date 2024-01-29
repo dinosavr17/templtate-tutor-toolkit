@@ -59,8 +59,8 @@ export const EducationalPlan = ({uniquePlan}) => {
   }, []);
 
   async function fetchData() {
-    // const boards: IBoard[] = uniquePlan;
-    const boards: IBoard[] = await fetchBoardList();
+    const boards: IBoard[] = uniquePlan?.modules;
+    // const boards: IBoard[] = await fetchBoardList();
     setBoards(boards);
   }
   const [targetCard, setTargetCard] = useState({

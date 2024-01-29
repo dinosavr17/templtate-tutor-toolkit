@@ -22,21 +22,19 @@ import Register from "./Authentification/Register.jsx";
 import Login from "./Authentification/LoginPage";
 import RequireAuth from "./RequireAuth";
 import PlansStorage from "./scenes/educationDashboard/PlansStorage";
-import Prelogin from "./Authentification/PreloginPage";
 import PreloginPage from "./Authentification/PreloginPage";
+import { useAuth } from "../src/context/AuthContext";
+
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
+  const { isSidebarVisible } = useAuth();
   const [entryPages, setEntryPages] = useState(false);
   useEffect(() => {
-   if (window.location.pathname !== '/register' && window.location.pathname !== '/login' && window.location.pathname !== '/prelogin') {
-     setEntryPages(true);
-   }
-   else {
-     setEntryPages(false);
-   }
-  }, [])
+    console.log('userData', isSidebarVisible);
+    setEntryPages(!!isSidebarVisible);
+  }, [isSidebarVisible]);
 
   return (
     <ColorModeContext.Provider value={colorMode}>
