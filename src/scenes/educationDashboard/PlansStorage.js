@@ -91,7 +91,7 @@ const PlansStorage = () => {
                 }
             );
             console.log(response?.data);
-            setUniqueId(response?.data?.plans[0].id);
+            setUniqueId(response?.data?.plans[1].id);
 
         } catch (err) {
             if (!err?.response) {
@@ -112,13 +112,14 @@ const PlansStorage = () => {
                     'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
                 },
             })
+            console.log(response?.data, 'объект с планами');
             // // console.log(response, 'resp');
             // if (response.status === 201) {
             //     setLoadingStatus('success');
             // }
             // else setLoadingStatus('error');
             setLoadingStatus('success');
-            setUniquePlan(response?.data?.modules);
+            setUniquePlan(response?.data);
 
         } catch (err) {
             setLoadingStatus('error');

@@ -51,6 +51,20 @@ export const PrelogoWrapper = styled.div`
 const PreloginWrapper = styled.div`
   width: 100vw;
   height: 100%;
+  //@media (min-width: 320px) {
+  //  justify-content: flex-start;
+  //  margin-top: 60px;
+  //}
+  //@media (min-width: 768px) {
+  //  justify-content: center;
+  //  margin-top: -120px;
+  //}
+  //@media (min-width: 1024px) {
+  //  margin: -140px 20px 0 20px;
+  //}
+  //@media (min-width: 1440px) {
+  //  margin: -140px 120px 0 120px;
+  //}
 `;
 
 const PreloginBlock = styled.div `

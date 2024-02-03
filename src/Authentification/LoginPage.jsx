@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import useAuth from '../hooks/useAuth';
 import axios from '../api/axios'
+import { useAuth } from '../../src/context/AuthContext';
 
 import {Link, useNavigate, useLocation, Navigate} from 'react-router-dom';
 import {
@@ -21,7 +21,7 @@ import login_img from "../asserts/images/login.png";
 import lottie from "lottie-web";
 import appLogo from "../asserts/images/Logo.png";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
-import Portal from "../../src/eduComponents/Board/Portal.ts";
+import Portal, {createContainer} from "../../src/eduComponents/Board/Portal.ts";
 import {
     MainWrapper,
     PaginationWrapper,
@@ -45,7 +45,7 @@ import AlertTitle from "@mui/material/AlertTitle";
 
 
 const Login = () => {
-    const {setAuth,login} = useAuth();
+    const { user, login } = useAuth();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -66,9 +66,15 @@ const Login = () => {
 
     const [password, setPassword] = useState('');
     const [domain, setDomain] = useState('@gmail.com');
+    useEffect(() => {
+        createContainer({id: MODAL_CONTAINER_ID});
+        setMounted(true);
+    }, [])
 
 
     const handleSubmit = async (e) => {
+        setStatusShown(true);
+        setLoadingStatus('loading');
 
         try {
             const response = await axios.post('api/account/token/',
@@ -86,24 +92,17 @@ const Login = () => {
             console.log(JSON.stringify(response));
             const accessToken = response?.data?.access;
             console.log('token', accessToken);
-            localStorage.setItem("userData", JSON.stringify({
-                accessToken: accessToken
-            }))
-            setAuth({email,password, accessToken});
-            // login(accessToken,username)
-            // setUsername('');
-            // setPassword('');
-            // navigate(from, { replace: true });
+            // localStorage.setItem("userData", JSON.stringify({
+            //     accessToken: accessToken
+            // }))
+            login({ email, password, accessToken });
+            setLoadingStatus('success');
+            // setAuth({email,password, accessToken});
+            navigate('/edu');
         } catch (err) {
+            setLoadingStatus('error');
             if (!err?.response) {
-                // setErrMsg('No Server Response');
                 console.log(err);
-            } else if (err.response?.status === 400) {
-                // setErrMsg('Missing Username or Password');
-            } else if (err.response?.status === 401) {
-                // setErrMsg('Unauthorized');
-            } else {
-                // setErrMsg('Login Failed');
             }
         }
     }
@@ -135,7 +134,7 @@ const Login = () => {
                     severity="error"
                 >
                     <AlertTitle>Ошибка</AlertTitle>
-                    Произошла ошибка во время регистрации
+                    Произошла ошибка во время авторизации
                     — <strong> Попробуйте еще раз!</strong>
                 </Alert>
             },
