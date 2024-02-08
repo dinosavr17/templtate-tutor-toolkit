@@ -40,14 +40,14 @@ function App() {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className={!entryPages? 'app_registration' : 'app' }>
-          {entryPages &&
+        <div className='app'>
+          {/*{entryPages &&*/}
           <Sidebar isSidebar={isSidebar}/>
-          }
-          <main className={!entryPages? 'registration' : 'content'}>
-            {entryPages &&
+          {/*}*/}
+          <main className='content'>
+            {/*{entryPages &&*/}
             <Topbar setIsSidebar={setIsSidebar}/>
-            }
+            {/*}*/}
             <Routes>
               <Route path="/prelogin" element={<PreloginPage/>} />
               <Route path="/register" element={<Register/>} />
