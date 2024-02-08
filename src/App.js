@@ -23,31 +23,31 @@ import Login from "./Authentification/LoginPage";
 import RequireAuth from "./RequireAuth";
 import PlansStorage from "./scenes/educationDashboard/PlansStorage";
 import PreloginPage from "./Authentification/PreloginPage";
-import { useAuth } from "../src/context/AuthContext";
 
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
-  const { isSidebarVisible } = useAuth();
-  const [entryPages, setEntryPages] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
-    console.log('userData', isSidebarVisible);
-    setEntryPages(!!isSidebarVisible);
-  }, [isSidebarVisible]);
+    if (localStorage.getItem('userData')) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className='app'>
-          {/*{entryPages &&*/}
+          {isLoggedIn &&
           <Sidebar isSidebar={isSidebar}/>
-          {/*}*/}
+          }
           <main className='content'>
-            {/*{entryPages &&*/}
+            {isLoggedIn &&
             <Topbar setIsSidebar={setIsSidebar}/>
-            {/*}*/}
+            }
             <Routes>
               <Route path="/prelogin" element={<PreloginPage/>} />
               <Route path="/register" element={<Register/>} />
