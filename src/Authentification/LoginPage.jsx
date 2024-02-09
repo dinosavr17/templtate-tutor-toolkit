@@ -41,8 +41,6 @@ import {
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
-// Now you can use these styled components in your code.
-
 
 const Login = () => {
     const { user, login } = useAuth();
@@ -92,13 +90,9 @@ const Login = () => {
             console.log(JSON.stringify(response));
             const accessToken = response?.data?.access;
             console.log('token', accessToken);
-            // localStorage.setItem("userData", JSON.stringify({
-            //     accessToken: accessToken
-            // }))
             login({ email, password, accessToken });
             setLoadingStatus('success');
-            // setAuth({email,password, accessToken});
-            navigate('/edu');
+            window.location.href = '/edu';
         } catch (err) {
             setLoadingStatus('error');
             if (!err?.response) {
