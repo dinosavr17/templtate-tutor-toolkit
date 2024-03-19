@@ -7,8 +7,8 @@ const StudentCard = ({ personalInfo, icon }) => {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Box width="100%" m="0 30px">
-      <Box display="flex" justifyContent="space-between">
+    <Box width="100%" m="20px">
+      <Box display="flex" justifyContent="flex-start">
         <Box>
           {icon}
           <Typography
@@ -16,16 +16,13 @@ const StudentCard = ({ personalInfo, icon }) => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            {personalInfo.name}&#160;{personalInfo.lastName}
+            {personalInfo.first_name}&#160;{personalInfo.last_name}
           </Typography>
         </Box>
-        {/*<Box>*/}
-        {/*  <ProgressCircle progress={progress} />*/}
-        {/*</Box>*/}
       </Box>
-      <Box display="flex" justifyContent="space-between" mt="2px">
-        <Typography variant="h5" sx={{ color: colors.greenAccent[500] }}>
-          {personalInfo.discipline.map((subject) => subject)}
+      <Box display="flex" justifyContent="space-between" mt="2px" sx={{flexDirection: 'column'}}>
+        <Typography variant="h4" sx={{ color: colors.blueAccent[300] }}>
+            {personalInfo.discipline}
         </Typography>
         <Typography
           variant="h5"
