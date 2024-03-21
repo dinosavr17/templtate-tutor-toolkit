@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import EducationalPlan from "./EducationalPlan.tsx";
 import axios from "../../api/axios";
-import { Box, CircularProgress, Grid, useTheme } from "@mui/material";
+import { Box, CircularProgress, useTheme } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import Portal, { createContainer } from "../../eduComponents/Board/Portal.ts";
@@ -90,6 +90,7 @@ const PlansStorage = () => {
        if (uniqueId !== '') {
            getPlanById(uniqueId)
        }
+       console.log(uniqueId);
     }, [uniqueId]);
 
     useEffect(() => {
@@ -109,7 +110,10 @@ const PlansStorage = () => {
                 withCredentials: true
             });
             setStudentsList(response?.data?.plans);
-            setUniqueId(response?.data?.plans[0].id);
+            if (uniqueId === '') {
+                console.log(uniqueId, 'текущий активный пользователь');
+                setUniqueId(response?.data?.plans[0].id);
+            }
         } catch (err) {
             if (!err?.response) {
                 setLoadingStatus('error');

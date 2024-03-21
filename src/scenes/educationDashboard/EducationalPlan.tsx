@@ -14,6 +14,10 @@ import {Box, colors, IconButton, Typography, useTheme} from "@mui/material";
 import styled from "styled-components";
 import { tokens } from "../../theme";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import axios from '../../api/axios'
+// @ts-ignore
+import dayjs from 'dayjs';
+import CloseIcon from '@mui/icons-material/Close';
 
 const PageTitle = styled.div`
   padding: 5px 0px;
@@ -68,11 +72,32 @@ export const EducationalPlan = ({uniquePlan}) => {
     cardId: '0',
   });
 
-  const handleAddBoard = (name: string) => {
+  const handleAddBoard = async (name: string) => {
+      try {
+        const response = await axios.post('api/education_plan/module/',
+          JSON.stringify(
+            {
+              title: name,
+              plan_id: uniquePlan.id
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true
+          }
+        );
+        const boards: IBoard[] = uniquePlan?.modules;
+        setBoards(boards);
+
+        console.log(response, 'resp');
+      } catch (err) {
+      }
     setBoards((prevBoards) => {
       const tempBoardsList = [...prevBoards];
       tempBoardsList.push({
-        id: (Date.now() + Math.random() * 2).toString(),
+        id: uniquePlan.id,
         title: name,
         cards: [],
       });
@@ -88,7 +113,32 @@ export const EducationalPlan = ({uniquePlan}) => {
     });
   };
 
-  const addCardHandler = (boardId: string, title: string) => {
+  const addCardHandler = async (boardId: string, title: string) => {
+    try {
+      const response = await axios.post('api/education_plan/card/',
+        JSON.stringify(
+          {
+            title: title,
+            module_id: boardId,
+            result_time: dayjs().toISOString(),
+            index: 0,
+            labels: [],
+
+          }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+          },
+          withCredentials: true
+        }
+      );
+      const boards: IBoard[] = uniquePlan?.modules;
+      setBoards(boards);
+
+      console.log(response, 'resp');
+    } catch (err) {
+    }
     const boardIndex = boards.findIndex((item: IBoard) => item.id === boardId);
     if (boardIndex < 0) return;
 

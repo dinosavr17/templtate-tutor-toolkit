@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 
 import "./CustomInput.css";
+import CloseIcon from '@mui/icons-material/Close';
 interface CustomInputProps {
   text: string;
   onSubmit: (value: string) => void;
@@ -50,7 +51,7 @@ const CustomInput = (props: CustomInputProps) => {
           />
           <div className="custom-input-edit-footer">
             <button type="submit">{buttonText || "Добавить"}</button>
-            <button onClick={() => setIsCustomInput(false)} className="closeIcon" ></button>
+            <button onClick={() => setIsCustomInput(false)} className="closeIcon" ><CloseIcon/></button>
           </div>
         </form>
       ) : (
