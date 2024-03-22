@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import EducationalPlan from "./EducationalPlan.tsx";
 import axios from "../../api/axios";
-import { Box, CircularProgress, useTheme } from "@mui/material";
+import {Box, CircularProgress, Select, useTheme} from "@mui/material";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import Portal, { createContainer } from "../../eduComponents/Board/Portal.ts";
@@ -14,6 +14,10 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import "./Dashboard.css";
+import MultipleSelectChip from "../../shared/MultipleSelect";
+import Switch from "@mui/material/Switch";
+import {IOSSwitch} from "../../shared/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 
 
@@ -32,6 +36,10 @@ const StatusOverlay = styled.div`
 `;
 const StatusContainer = styled.div`
   margin: 0 40px;
+`;
+const FiltersContainer = styled.div`
+  display: flex;
+  flex-direction: row;
 `;
 const CardContainer = styled.div`
   margin-right: 20px;
@@ -78,8 +86,6 @@ const PlansStorage = () => {
         infinite: true,
         slidesToShow: 3,
         slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 2000,
         pauseOnHover: true,
         nextArrow: <SampleNextArrow  />,
         prevArrow: <SamplePrevArrow />
@@ -172,6 +178,20 @@ const PlansStorage = () => {
         <div>
             <Box margin="20px">
                <SliderContainer>
+                   <FiltersContainer>
+                   <MultipleSelectChip names={studentsList.reduce((acc, student) => {
+                       acc.push(student.first_name + ' ' + student.last_name);
+                       return acc;
+                   }, [])} label='ФИО'/>
+                       <MultipleSelectChip names={studentsList.reduce((acc, student) => {
+                           acc.push(student.discipline);
+                           return acc;
+                       }, [])} label='Дисциплина'/>
+                       <FormControlLabel
+                           control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} defaultChecked />}
+                           label="Скрыть неактивных студентов"
+                       />
+                   </FiltersContainer>
                 <Slider {...settings}>
                     {studentsList.map((student, index) => (
                         <div key={index}>
