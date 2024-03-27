@@ -106,7 +106,21 @@ export const EducationalPlan = ({uniquePlan}) => {
   };
 
 
-  const removeBoard = (moduleId: string) => {
+  const removeBoard = async (moduleId: string) => {
+    try {
+      const response = await axios.delete(`api/education_plan/module/${moduleId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true
+          }
+      );
+      const boards: IBoard[] = uniquePlan?.modules;
+      setBoards(boards);
+    } catch (err) {
+    }
     setBoards((prevBoards) => {
       const filteredBoards = prevBoards.filter((item: IBoard) => item.id !== moduleId);
       return filteredBoards;
@@ -120,10 +134,9 @@ export const EducationalPlan = ({uniquePlan}) => {
           {
             title: title,
             module_id: boardId,
-            result_time: dayjs().toISOString(),
+            result_time: 'P4DT12H30M5S',
             index: 0,
             labels: [],
-
           }),
         {
           headers: {
@@ -153,9 +166,9 @@ export const EducationalPlan = ({uniquePlan}) => {
       desc: "",
       result: {
       draggableId: (Date.now() + Math.random() * 2).toString(),
-          source: {
+        source: {
         boardId: boardId,
-            index: boardIndex,
+          index: boardIndex,
       },
       destination: {
         boardId:  null,
@@ -166,7 +179,22 @@ export const EducationalPlan = ({uniquePlan}) => {
     setBoards(tempBoardsList);
   };
 
-  const removeCard = (boardId: string, cardId: string) => {
+  const removeCard = async (boardId: string, cardId: string) => {
+    try {
+      const response = await axios.delete(`api/education_plan/card/${cardId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true
+          }
+      );
+      const boards: IBoard[] = uniquePlan?.modules;
+      setBoards(boards);
+    } catch (err) {
+    }
+
     const boardIndex = boards.findIndex((item: IBoard) => item.id === boardId);
     if (boardIndex < 0) return;
 
