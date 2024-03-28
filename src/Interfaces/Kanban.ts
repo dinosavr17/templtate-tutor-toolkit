@@ -15,8 +15,8 @@ export interface ICard {
   type?: string;
   labels: ILabel[];
   date: string;
-  tasks: ITask[];
-  desc?: string;
+  // tasks: ITask[];
+  description?: string;
   difficulty: string;
   result: {
     draggableId: string,

@@ -1,6 +1,6 @@
 // @ts-ignore
 import React, { useEffect, useState } from "react";
-import { Calendar, CheckSquare, List, Tag, Trash, Type } from "react-feather";
+import { Calendar, CheckSquare, List, Tag, Type } from "react-feather";
 // @ts-ignore
 import { colorsList } from "../../../Helper/Util.ts";
 // @ts-ignore
@@ -10,7 +10,7 @@ import CustomInput from "../../CustomInput/CustomInput.tsx";
 
 import "./CardInfo.css";
 // @ts-ignore
-import { ICard, ILabel, ITask } from "../../../Interfaces/Kanban.ts";
+import {IBoard, ICard, ILabel, ITask} from "../../../Interfaces/Kanban.ts";
 // @ts-ignore
 import Chip from "../../Common/Chip.tsx";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -18,6 +18,8 @@ import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
 import styled from "styled-components";
 // @ts-ignore
 import SelectComponent from "./SelectComponent.tsx";
+import axios from '../../../api/axios'
+import {expandTagDescription} from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
 interface CardInfoProps {
   onClose: () => void;
@@ -26,10 +28,8 @@ interface CardInfoProps {
   updateCard: (boardId: number, cardId: number, card: ICard) => void;
 }
 const ModuleContent = styled.div`
-   //background-color: rgb(223 227 230 / 55%);
   padding: 15px;
   border-radius: 3px;
-  //flex-grow: 1;
   display: flex;
   flex-direction: column;
   height: fit-content;
@@ -43,19 +43,85 @@ function CardInfo(props: CardInfoProps) {
   //Поля которые нужно добавить в карточку сложность, длительность по оценке репетитора (Дни часы минуты)
   // статус:  не начато, пройдено, повторение
 
-  const updateTitle = (value: string) => {
+  // data   {title
+  //   description
+  //   date_start
+  //   date_end
+  //   plan_time
+  //   result_time
+  //   status
+  // }
+
+  const updateTitle = async(value: string) => {
+    try {
+      const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
+        JSON.stringify(
+          {
+            title: value,
+          }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+          },
+          withCredentials: true
+        }
+      );
+
+      console.log(response, 'resp');
+    } catch (err) {
+    }
+
     setCardValues({ ...cardValues, title: value });
   };
 
-  const updateDesc = (value: string) => {
-    setCardValues({ ...cardValues, desc: value });
+  const updateDesc = async(value: string) => {
+    try {
+      const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
+        JSON.stringify(
+          {
+            description: value,
+          }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+          },
+          withCredentials: true
+        }
+      );
+
+      console.log(response, 'resp');
+    } catch (err) {
+    }
+    setCardValues({ ...cardValues, description: value });
   };
 
-  const addLabel = (label: ILabel) => {
+  const addLabel = async(label: ILabel) => {
     const index = cardValues.labels.findIndex(
       (item) => item.text === label.text,
     );
-    if (index > -1) return; //if label text already exist then return
+    if (index > -1) return;
+    try {
+      const response = await axios.post('api/education_plan/label/',
+        JSON.stringify(
+          {
+            title: label.text,
+            color: label.color
+          }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+          },
+          withCredentials: true
+        }
+      );
+
+      console.log(response, 'resp');
+    } catch (err) {
+    }
+
 
     setSelectedColor("");
     setCardValues({
@@ -97,19 +163,19 @@ function CardInfo(props: CardInfoProps) {
     });
   };
 
-  const updateTask = (id: number, value: boolean) => {
-    const tasks = [...cardValues.tasks];
-
-    const index = tasks.findIndex((item) => item.id === id);
-    if (index < 0) return;
-
-    tasks[index].completed = Boolean(value);
-
-    setCardValues({
-      ...cardValues,
-      tasks,
-    });
-  };
+  // const updateTask = (id: number, value: boolean) => {
+  //   const tasks = [...cardValues.tasks];
+  //
+  //   const index = tasks.findIndex((item) => item.id === id);
+  //   if (index < 0) return;
+  //
+  //   tasks[index].completed = Boolean(value);
+  //
+  //   setCardValues({
+  //     ...cardValues,
+  //     tasks,
+  //   });
+  // };
 
   const calculatePercent = () => {
     if (!cardValues.tasks?.length) return 0;
@@ -146,8 +212,20 @@ function CardInfo(props: CardInfoProps) {
           <CustomInput
             defaultValue={cardValues.title}
             text={cardValues.title}
-            placeholder="Enter Title"
+            placeholder="Введите название"
             onSubmit={updateTitle}
+          />
+        </div>
+        <div className="cardinfo-box">
+          <div className="cardinfo-box-title">
+            <List />
+            <p>Описание</p>
+          </div>
+          <CustomInput
+            defaultValue={cardValues.desc}
+            text={cardValues.description || "Добавьте описание"}
+            placeholder="Добавьте описание"
+            onSubmit={updateDesc}
           />
         </div>
 
@@ -170,19 +248,6 @@ function CardInfo(props: CardInfoProps) {
           {/*    placeholder="Enter description"*/}
           {/*    onSubmit={updateDesc}*/}
           {/*/>*/}
-        </div>
-
-        <div className="cardinfo-box">
-          <div className="cardinfo-box-title">
-            <List />
-            <p>Описание</p>
-          </div>
-          <CustomInput
-            defaultValue={cardValues.desc}
-            text={cardValues.desc || "Add a Description"}
-            placeholder="Enter description"
-            onSubmit={updateDesc}
-          />
         </div>
 
         <div className="cardinfo-box">
@@ -242,21 +307,21 @@ function CardInfo(props: CardInfoProps) {
               }}
             />
           </div>
-          <div className="cardinfo-box-task-list">
-            {cardValues.tasks?.map((item) => (
-              <div key={item.id} className="cardinfo-box-task-checkbox">
-                <input
-                  type="checkbox"
-                  defaultChecked={item.completed}
-                  onChange={(event) =>
-                    updateTask(item.id, event.target.checked)
-                  }
-                />
-                <p className={item.completed ? "completed" : ""}>{item.text}</p>
-                <Trash onClick={() => removeTask(item.id)} />
-              </div>
-            ))}
-          </div>
+          {/*<div className="cardinfo-box-task-list">*/}
+          {/*  {cardValues.tasks?.map((item) => (*/}
+          {/*    <div key={item.id} className="cardinfo-box-task-checkbox">*/}
+          {/*      <input*/}
+          {/*        type="checkbox"*/}
+          {/*        defaultChecked={item.completed}*/}
+          {/*        onChange={(event) =>*/}
+          {/*          updateTask(item.id, event.target.checked)*/}
+          {/*        }*/}
+          {/*      />*/}
+          {/*      <p className={item.completed ? "completed" : ""}>{item.text}</p>*/}
+          {/*      <Trash onClick={() => removeTask(item.id)} />*/}
+          {/*    </div>*/}
+          {/*  ))}*/}
+          {/*</div>*/}
           <CustomInput
             text={"Add a Task"}
             placeholder="Enter task"

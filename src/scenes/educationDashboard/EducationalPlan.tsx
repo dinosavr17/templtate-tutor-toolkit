@@ -17,6 +17,8 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import axios from '../../api/axios'
 // @ts-ignore
 import dayjs from 'dayjs';
+// @ts-ignore
+import Portal, { createContainer } from "../../eduComponents/Board/Portal.ts";
 import CloseIcon from '@mui/icons-material/Close';
 
 const PageTitle = styled.div`
@@ -56,9 +58,13 @@ const AddModuleButton = styled.div`
 export const EducationalPlan = ({uniquePlan}) => {
   const theme = useTheme();
    const colors = tokens(theme.palette.mode);
+  const MODAL_CONTAINER_ID = 'modal-container-id';
+  const [isMounted, setMounted] = useState(false);
+  const [cardModalActive, setCardModalActive] = useState<boolean>(false);
   const [boards, setBoards] = useState<IBoard[]>([]);
   const [type, setType] = useState('');
   useEffect(() => {
+    setMounted(true);
     fetchData();
   }, []);
 
@@ -351,6 +357,18 @@ export const EducationalPlan = ({uniquePlan}) => {
             </Droppable>
           </DragDropContext>
         </Box>
+        {isMounted &&
+            <Portal id={MODAL_CONTAINER_ID}>
+              {cardModalActive &&
+                  // <StatusOverlay>
+                  //     <StatusContainer style={{ display: 'flex' }}>
+                  //       {renderStatusContent()}
+                  //     </StatusContainer>
+                  // </StatusOverlay>
+                <div></div>
+              }
+            </Portal>
+        }
       </Box>
   );
 };
