@@ -10,7 +10,7 @@ import CustomInput from "../../CustomInput/CustomInput.tsx";
 
 import "./CardInfo.css";
 // @ts-ignore
-import {IBoard, ICard, ILabel, ITask} from "../../../Interfaces/Kanban.ts";
+import {IBoard, ICard, ILabel, ITask, StatusColors} from "../../../Interfaces/Kanban.ts";
 // @ts-ignore
 import Chip from "../../Common/Chip.tsx";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -20,6 +20,8 @@ import styled from "styled-components";
 import SelectComponent from "./SelectComponent.tsx";
 import axios from '../../../api/axios'
 import {expandTagDescription} from "@reduxjs/toolkit/dist/query/endpointDefinitions";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import {IOSSwitch} from "../../../shared/Switch";
 
 interface CardInfoProps {
   onClose: () => void;
@@ -40,6 +42,12 @@ function CardInfo(props: CardInfoProps) {
   const [cardValues, setCardValues] = useState<ICard>({
     ...card,
   });
+  const statusColors: StatusColors = {
+    'not_started': { dark: '#7F8C8D', light: '#BDC3C7' }, // Серый
+    'in_progress': { dark: '#2ECC71', light: '#1bcd2a' }, // Зеленый
+    'done': { dark: '#F1C40F', light: '#ecb529' }, // Желтый
+    'to_repeat': { dark: '#3498DB', light: '#4496d9' } // Голубой
+  };
   //Поля которые нужно добавить в карточку сложность, длительность по оценке репетитора (Дни часы минуты)
   // статус:  не начато, пройдено, повторение
 
@@ -234,6 +242,13 @@ function CardInfo(props: CardInfoProps) {
             <ContentPasteOutlinedIcon/>
             <p>Статус</p>
           </div>
+          <FormControlLabel
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+            control={<IOSSwitch sx={{marginLeft: '10px'}} lightColor={statusColors[cardValues.status].light} darkColour={statusColors[cardValues.status].dark}  />}
+            label={''}
+          />
         </div>
 
         <div className="cardinfo-box">
