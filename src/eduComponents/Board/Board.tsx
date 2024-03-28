@@ -226,7 +226,7 @@ const Board = (props: BoardProps) => {
                   sx={{
                     zIndex: '1030',
                     flexDirection: 'column',
-                    position: 'relative',
+                    // position: 'relative',
                     backgroundColor: colors.alertOrange[100],
                   }}>
                 <AlertTitle>

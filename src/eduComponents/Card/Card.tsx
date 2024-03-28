@@ -4,7 +4,7 @@ import React, {useEffect, useState, useRef} from "react";
 import { AlignLeft, CheckSquare, Clock, MoreHorizontal } from "react-feather";
 // @ts-ignore
 import { formatDate } from "../../Helper/Util.ts";
-import { ICard } from "../../Interfaces/Kanban";
+import {ICard, StatusColors} from "../../Interfaces/Kanban";
 // @ts-ignore
 import Chip from "../Common/Chip.tsx";
 // @ts-ignore
@@ -16,9 +16,10 @@ import CardInfo from "./CardInfo/CardInfo.tsx";
 // @ts-ignore
 import Portal, {createContainer} from "../Board/Portal.ts";
 import styled from "styled-components";
-import {ref} from "yup";
-import {useTheme} from "@mui/material";
+import {Switch, useTheme} from "@mui/material";
 import { tokens } from "../../theme";
+import {IOSSwitch} from "../../shared/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
 interface CardProps {
   card: ICard;
   boardId: string;
@@ -45,6 +46,12 @@ const ModalOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+const CardBody = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-items: flex-start;
+  
 `
 
 function Card(props: CardProps) {
@@ -59,7 +66,8 @@ function Card(props: CardProps) {
       setCardHeight
   } =
     props;
-  const { id, title, desc, date, tasks, labels } = card;
+  const { id, title, description, date, labels, status } = card;
+  console.log(card, 'данные карточки');
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isMounted, setMounted] = useState(false);
@@ -80,6 +88,12 @@ function Card(props: CardProps) {
         }
       provided.innerRef(ref);
   }
+  const statusColors: StatusColors = {
+    'not_started': { dark: '#7F8C8D', light: '#BDC3C7' }, // Серый
+    'in_progress': { dark: '#2ECC71', light: '#1bcd2a' }, // Зеленый
+    'done': { dark: '#F1C40F', light: '#ecb529' }, // Желтый
+    'to_repeat': { dark: '#3498DB', light: '#4496d9' } // Голубой
+  };
   return (
     <>
       {isMounted && (
@@ -133,34 +147,37 @@ function Card(props: CardProps) {
               setShowDropdown(true);
             }}
           >
-            <MoreHorizontal />
+            <MoreHorizontal style={{color: colors.blueAccent[500]}}/>
             {showDropdown && (
               <Dropdown
                 class="board-dropdown"
                 onClose={() => setShowDropdown(false)}
+                style={{zIndex: 999}}
               >
-                <p onClick={() => removeCard(boardId, id)}>Delete Card</p>
+                <p style={{color: 'black'}} onClick={() => removeCard(boardId, id)}>Удалить тему</p>
               </Dropdown>
             )}
           </div>
         </div>
         <div className="card-title" style={{color: 'black'}}>{title}</div>
-        <div>
-          <p title={desc}>
-            <AlignLeft />
+        {/*<AlignLeft />*/}
+        <CardBody>
+          <p style={{color: 'black'}} title={description}>
+            {description}
           </p>
-        </div>
+          <FormControlLabel
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+            control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} lightColor={statusColors[status].light} darkColour={statusColors[status].dark}  />}
+            label={''}
+          />
+        </CardBody>
         <div className="card-footer">
           {date && (
             <p className="card-footer-item">
               <Clock className="card-footer-icon" />
               {formatDate(date).toLocaleString('ru')}
-            </p>
-          )}
-          {tasks && tasks?.length > 0 && (
-            <p className="card-footer-item">
-              <CheckSquare className="card-footer-icon" />
-              {tasks?.filter((item) => item.completed)?.length}/{tasks?.length}
             </p>
           )}
         </div>

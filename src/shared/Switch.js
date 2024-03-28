@@ -86,9 +86,10 @@ const Android12Switch = styled(Switch)(({ theme }) => ({
     },
 }));
 
-export const IOSSwitch = styled((props) => (
+export const IOSSwitch = styled(({ lightColor, darkColor, ...props }) => (
     <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
-))(({ theme }) => ({
+))(({ theme, lightColor, darkColor }) => ({
+    // Стили вашего Switch компонента
     width: 42,
     height: 26,
     padding: 0,
@@ -100,7 +101,7 @@ export const IOSSwitch = styled((props) => (
             transform: 'translateX(16px)',
             color: '#fff',
             '& + .MuiSwitch-track': {
-                backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : '#65C466',
+                backgroundColor: theme.palette.mode === 'dark' ? darkColor : lightColor,
                 opacity: 1,
                 border: 0,
             },

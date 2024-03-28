@@ -242,18 +242,12 @@ function CardInfo(props: CardInfoProps) {
             <p>Сложность</p>
           </div>
           <SelectComponent/>
-          {/*<CustomInput*/}
-          {/*    defaultValue={cardValues.desc}*/}
-          {/*    text={cardValues.desc || "Add a Description"}*/}
-          {/*    placeholder="Enter description"*/}
-          {/*    onSubmit={updateDesc}*/}
-          {/*/>*/}
         </div>
 
         <div className="cardinfo-box">
           <div className="cardinfo-box-title">
             <Calendar />
-            <p>Длительность</p>
+            <p>Дата начала</p>
           </div>
           <input
             type="date"
