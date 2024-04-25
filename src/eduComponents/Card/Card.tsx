@@ -4,7 +4,7 @@ import React, {useEffect, useState, useRef} from "react";
 import { AlignLeft, CheckSquare, Clock, MoreHorizontal } from "react-feather";
 // @ts-ignore
 import { formatDate } from "../../Helper/Util.ts";
-import {ICard, StatusColors} from "../../Interfaces/Kanban";
+import {ICard, StatusColors} from "../../Interfaces/EducationPlanFields";
 // @ts-ignore
 import Chip from "../Common/Chip.tsx";
 // @ts-ignore

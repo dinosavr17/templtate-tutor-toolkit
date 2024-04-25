@@ -9,7 +9,6 @@ import SchoolIcon from '@mui/icons-material/School';
 import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
@@ -285,7 +284,6 @@ const StudentsMainPage = () => {
             Geography Based Traffic
           </Typography>
           <Box height="200px">
-            <GeographyChart isDashboard={true} />
           </Box>
         </Box>
       </Box>

@@ -1,6 +1,6 @@
 // @ts-ignore
 import {ApiMockResponse, ApiMockResponse2} from "../ApiMockData/dummyData.ts";
-import { IBoard } from "../Interfaces/Kanban";
+import { IBoard } from "../Interfaces/EducationPlanFields";
 
 const LocalStorageKeyName = "kanban-boards";
 //Data Layer

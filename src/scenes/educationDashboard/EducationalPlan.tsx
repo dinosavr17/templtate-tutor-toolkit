@@ -6,7 +6,7 @@ import "./Dashboard.css";
 // @ts-ignore
 import CustomInput from "../../eduComponents/CustomInput/CustomInput.tsx";
 // @ts-ignore
-import { ICard, IBoard } from "../../Interfaces/Kanban.ts";
+import { ICard, IBoard } from "../../Interfaces/EducationPlanFields.ts";
 // @ts-ignore
 import { fetchBoardList, updateLocalStorageBoards } from "../../Helper/APILayers.ts";
 import {Box, colors, IconButton, Typography, useTheme} from "@mui/material";

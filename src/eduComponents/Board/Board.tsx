@@ -14,7 +14,7 @@ import Button from '@mui/material/Button';
 // @ts-ignore
 import Portal, {createContainer} from "./Portal.ts";
 import "./Board.css";
-import { IBoard, ICard } from "../../Interfaces/Kanban";
+import { IBoard, ICard } from "../../Interfaces/EducationPlanFields";
 import styled from "styled-components";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {useTheme} from "@mui/material";

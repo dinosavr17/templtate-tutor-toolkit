@@ -17,6 +17,8 @@ export type StatusColors = {
     light: string;
 }
 };
+export type TopicDifficulty = 'easy' | 'medium' | 'hard' | 'not_selected';
+export type TopicDifficultyText = 'легкая' | 'средняя' | 'сложная' | 'не выбрана';
 
 export interface ICard {
   id: string;

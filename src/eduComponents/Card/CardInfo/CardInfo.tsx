@@ -10,7 +10,15 @@ import CustomInput from "../../CustomInput/CustomInput.tsx";
 
 import "./CardInfo.css";
 // @ts-ignore
-import {IBoard, ICard, ILabel, ITask, StatusColors} from "../../../Interfaces/Kanban.ts";
+import {
+  IBoard,
+  ICard,
+  ILabel,
+  ITask,
+  StatusColors,
+  TopicDifficulty,
+  TopicDifficultyText, TopicStatus
+} from "../../../Interfaces/EducationPlanFields.ts";
 // @ts-ignore
 import Chip from "../../Common/Chip.tsx";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -21,6 +29,8 @@ import SelectComponent from "./SelectComponent.tsx";
 import axios from '../../../api/axios';
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {IOSSwitch} from "../../../shared/Switch";
+import {SelectChangeEvent} from "@mui/material/Select";
+import {Topic} from "@mui/icons-material";
 
 interface CardInfoProps {
   onClose: () => void;
@@ -103,6 +113,54 @@ function CardInfo(props: CardInfoProps) {
     }
     setCardValues({ ...cardValues, description: value });
   };
+  const handleStatusChange = async () => {
+    let newStatus: TopicStatus;
+
+    // Определяем следующий статус в зависимости от текущего
+    switch (cardValues.status) {
+      case 'not_started':
+        newStatus = 'in_progress';
+        break;
+      case 'in_progress':
+        newStatus = 'done';
+        break;
+      case 'done':
+        newStatus = 'to_repeat';
+        break;
+      case 'to_repeat':
+        newStatus = 'not_started';
+        break;
+      default:
+        newStatus = 'not_started'; // Если текущий статус неизвестен, возвращаем статус "не начато"
+    }
+
+    try {
+      const response = await axios.patch(
+          `api/education_plan/card/${cardValues.id}/`,
+          JSON.stringify({
+            status: newStatus,
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true,
+          }
+      );
+
+      console.log(response, 'resp');
+
+      // Обновляем состояние карточки после успешного запроса
+      setCardValues({
+        ...cardValues,
+        status: newStatus,
+      });
+    } catch (err) {
+      console.error('Ошибка при обновлении статуса:', err);
+    }
+  };
+
 
   const addLabel = async(label: ILabel) => {
     const index = cardValues.labels.findIndex(
@@ -209,6 +267,38 @@ function CardInfo(props: CardInfoProps) {
 
   const calculatedPercent = calculatePercent();
 
+  const difficultyData = {
+    selectLabel: 'Сложность',
+    difficultyValue: ['easy', 'medium', 'hard', 'not_selected'] as TopicDifficulty[],
+    difficultyLabel: ['Легкая', 'Средняя', 'Сложная', 'Не выбрана'] as TopicDifficultyText[],
+  }
+  const [currentDifficulty, setCurrentDifficulty] = React.useState(cardValues.difficulty? cardValues.difficulty : difficultyData.difficultyValue[3]);
+  const handleDifficultyChange = (event: SelectChangeEvent) => {
+    setCurrentDifficulty(event.target.value as string);
+    const updateDifficulty = async(value: string) => {
+      try {
+        const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
+            JSON.stringify(
+                {
+                  difficulty: value,
+                }),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+              },
+              withCredentials: true
+            }
+        );
+
+        console.log(response, 'resp');
+      } catch (err) {
+      }
+      setCardValues({ ...cardValues, difficulty: value });
+    };
+    updateDifficulty(event.target.value);
+  };
+
   return (
     <Modal onClose={onClose}>
       <div className="cardinfo">
@@ -244,7 +334,7 @@ function CardInfo(props: CardInfoProps) {
           </div>
           <FormControlLabel
             onClick={(event) => {
-              event.stopPropagation();
+             handleStatusChange();
             }}
             control={<IOSSwitch sx={{marginLeft: '10px'}} lightColor={statusColors[cardValues.status].light} darkColour={statusColors[cardValues.status].dark}  />}
             label={''}
@@ -256,7 +346,7 @@ function CardInfo(props: CardInfoProps) {
             <StarBorderIcon />
             <p>Сложность</p>
           </div>
-          <SelectComponent/>
+          <SelectComponent data={difficultyData} handleChange={handleDifficultyChange} selectValue={currentDifficulty}/>
         </div>
 
         <div className="cardinfo-box">

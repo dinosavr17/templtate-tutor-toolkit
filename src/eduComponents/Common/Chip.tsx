@@ -1,5 +1,5 @@
 import { X } from "react-feather";
-import { ILabel } from "../../Interfaces/Kanban";
+import { ILabel } from "../../Interfaces/EducationPlanFields";
 interface ChipProps {
   item: ILabel;
   removeLabel?: (label: ILabel) => void;

@@ -1,4 +1,4 @@
-import { IBoard } from "../Interfaces/Kanban";
+import { IBoard } from "../Interfaces/EducationPlanFields";
 
 // @ts-ignore
 export const ApiMockResponse: IBoard[] = [

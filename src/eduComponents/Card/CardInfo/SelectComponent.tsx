@@ -96,28 +96,25 @@ export function MultipleSelectChip() {
     );
 }
 
-const SelectComponent = () => {
-    const [age, setAge] = React.useState('');
-
-    const handleChange = (event: SelectChangeEvent) => {
-        setAge(event.target.value as string);
-    };
+const SelectComponent = ({data, handleChange, selectValue}) => {
 
     return (
         <Box sx={{ minWidth: 120, color: 'black' }}>
             <div style={{borderColor: '#eee'}}>
             <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Сложность</InputLabel>
+                <InputLabel id="demo-simple-select-label">{data.selectLabel}</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={age}
+                    value={selectValue}
                     label="Сложность"
                     onChange={handleChange}
                 >
-                    <MenuItem value={10}>Легко</MenuItem>
-                    <MenuItem value={20}>Средне</MenuItem>
-                    <MenuItem value={30}>Сложно</MenuItem>
+                    {data.difficultyValue.map((value, index) => (
+                        <MenuItem key={value} value={value}>
+                            {data.difficultyLabel[index]}
+                        </MenuItem>
+                    ))}
                 </Select>
             </FormControl>
             </div>

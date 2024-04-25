@@ -10,7 +10,7 @@ import CustomInput from "../../CustomInput/CustomInput.tsx";
 
 import "./CardInfo.css";
 // @ts-ignore
-import { ICard, ILabel, ITask } from "../../../Interfaces/Kanban.ts";
+import { ICard, ILabel, ITask } from "../../../Interfaces/EducationPlanFields.ts";
 // @ts-ignore
 import Chip from "../../Common/Chip.tsx";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
