@@ -336,7 +336,7 @@ function CardInfo(props: CardInfoProps) {
             onClick={(event) => {
              handleStatusChange();
             }}
-            control={<IOSSwitch sx={{marginLeft: '10px'}} lightColor={statusColors[cardValues.status].light} darkColour={statusColors[cardValues.status].dark}  />}
+            control={<IOSSwitch sx={{marginLeft: '10px'}} lightColor={statusColors[cardValues.status].light} darkColour={statusColors[cardValues.status].dark} status={cardValues.status} />}
             label={''}
           />
         </div>
