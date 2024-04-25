@@ -25,7 +25,7 @@ import AlertTitle from '@mui/material/AlertTitle';
 export const MainWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  //background-image: linear-gradient(218deg,  #151632, #304080, #4774d5, #4ab8f3);
+  background-image: linear-gradient(218deg,  #151632, #304080, #4774d5, #4ab8f3);
   height: 100%;
   @media (min-width: 320px) {
     justify-content: flex-start;

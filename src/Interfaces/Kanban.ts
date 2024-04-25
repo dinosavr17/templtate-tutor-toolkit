@@ -2,7 +2,7 @@ import {dark, light} from "@mui/material/styles/createPalette";
 
 export interface ILabel {
   color: string;
-  text: string;
+  title: string;
 }
 
 export interface ITask {

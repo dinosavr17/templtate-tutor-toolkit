@@ -18,8 +18,7 @@ import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
 import styled from "styled-components";
 // @ts-ignore
 import SelectComponent from "./SelectComponent.tsx";
-import axios from '../../../api/axios'
-import {expandTagDescription} from "@reduxjs/toolkit/dist/query/endpointDefinitions";
+import axios from '../../../api/axios';
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {IOSSwitch} from "../../../shared/Switch";
 
@@ -107,14 +106,15 @@ function CardInfo(props: CardInfoProps) {
 
   const addLabel = async(label: ILabel) => {
     const index = cardValues.labels.findIndex(
-      (item) => item.text === label.text,
+      (item) => item.title === label.title,
     );
     if (index > -1) return;
     try {
       const response = await axios.post('api/education_plan/label/',
         JSON.stringify(
           {
-            title: label.text,
+            title: label.title,
+            card_id: card.id,
             color: label.color
           }),
         {
@@ -297,7 +297,7 @@ function CardInfo(props: CardInfoProps) {
             text="Добавить категорию"
             placeholder="Введите название категории"
             onSubmit={(value: string) =>
-              addLabel({ color: selectedColor, text: value })
+              addLabel({ color: selectedColor, title: value })
             }
           />
         </div>

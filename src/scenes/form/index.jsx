@@ -72,7 +72,7 @@ const Form = () => {
       console.log(response, 'resp');
       if (response.status === 201) {
         const {status, tutor, discipline, invite_code} = response.data;
-          setPersonalLink(`http://localhost:3000/register/?status=${status}&firstName=${tutor.first_name}&lastName=${tutor.last_name}&discipline=${discipline}&inviteCode=${invite_code}`);
+          setPersonalLink(`http://localhost:3000/register/?inviteCode=${invite_code}`);
           console.log(personalLink);
           setLoadingStatus('success');
         resetForm();

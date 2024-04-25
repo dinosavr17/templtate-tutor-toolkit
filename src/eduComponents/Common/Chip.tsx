@@ -1,4 +1,3 @@
-import React from "react";
 import { X } from "react-feather";
 import { ILabel } from "../../Interfaces/Kanban";
 interface ChipProps {
@@ -9,7 +8,7 @@ export default function Chip(props: ChipProps) {
   const { item, removeLabel } = props;
   return (
     <label style={{ backgroundColor: item.color, color: "#fff" }}>
-      {item.text}
+      {item.title}
       {removeLabel && <X onClick={() => removeLabel(item)} />}
     </label>
   );
