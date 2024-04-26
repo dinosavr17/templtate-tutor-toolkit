@@ -16,7 +16,8 @@ import {
     Stepper,
 } from "@mui/material";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
-import tutor from '../asserts/images/tutor.png'
+import tutor from '../asserts/images/tutor.png';
+import student_login from '../asserts/images/student_login.png';
 import appLogo from '../asserts/images/Logo.png'
 import Portal, {createContainer} from "../eduComponents/Board/Portal.ts";
 import Alert from "@mui/material/Alert";
@@ -249,6 +250,8 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,24}$/;
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [role, setRole] = useState('tutor');
+    // const [inviteCode, setInviteCode] = useState(null);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -281,12 +284,43 @@ const Register = () => {
     const handleReset = () => {
         setActiveStep(0);
     };
+    const getTutorData = async (inviteCode) => {
+        try {
+            const response = await axios.get(`api/education_plan/invite_info/${inviteCode}`,
+                JSON.stringify(
+                    {
+                        invite_code: inviteCode
+                    }),
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+                    },
+                    withCredentials: true
+                }
+            );
+
+            console.log(response, 'resp');
+        } catch (err) {
+        }
+    }
+
 
 
     useEffect(() => {
+        const params = new URLSearchParams(document.location.search);
+        const inviteCode = params.get('inviteCode');
+        if (inviteCode) {
+            setRole('student');
+            getTutorData(inviteCode); // Call getTutorData only if inviteCode is present
+        } else {
+            setRole('tutor');
+        }
         createContainer({id: MODAL_CONTAINER_ID});
         setMounted(true);
-    }, [])
+    }, []);
+
+
     React.useEffect(() => {
         lottie.loadAnimation({
             container: document.querySelector("#kanban"),
@@ -329,6 +363,9 @@ const Register = () => {
             // }
             // errRef.current.focus();
         }
+    }
+    const handleStudentConnect = () => {
+        console.log('подключение студента');
     }
     const steps = [
         'Старт',
@@ -377,6 +414,7 @@ const Register = () => {
     return (
         <AuthorizationWrapper>
                 <MainWrapper>
+                    {role === 'tutor' &&
                     <PaginationWrapper>
                         <StyledStepper activeStep={activeStep}>
                             {steps.map((label, index) => {
@@ -389,11 +427,15 @@ const Register = () => {
                             })}
                         </StyledStepper>
                     </PaginationWrapper>
+}
 
                 <RegistrationCard>
                     <RegistrationImageBlock>
-                        {activeStep !== 2 &&
+                        {(activeStep !== 2 && role === 'tutor') &&
                         <img src={tutor}/>
+                        }
+                        {(activeStep !== 2 && role === 'student') &&
+                            <img src={student_login}/>
                         }
                         {activeStep == 2 &&
                             <div>
@@ -405,11 +447,17 @@ const Register = () => {
                     </RegistrationImageBlock>
                 <RegistrationFormWrapper className='card'>
                     <RegistrationLabel>
-                        {activeStep !== 2 &&
+                        {(activeStep !== 2 && role === 'tutor') &&
                         <LogoWrapper>
                             <img src={appLogo}/>
                             <span>Зарегистрироваться</span>
                         </LogoWrapper>
+                        }
+                        {(activeStep !== 2 && role === 'student') &&
+                            <LogoWrapper>
+                                <img src={appLogo}/>
+                                <span>Присоединиться к преподавателю</span>
+                            </LogoWrapper>
                         }
                         {/*<label>Регистрация преподавателя</label>*/}
                     </RegistrationLabel>
@@ -485,7 +533,7 @@ const Register = () => {
                                 />
                             </FormControl>
                             }
-                            {activeStep === 1 &&
+                            {(activeStep === 1 && role === 'tutor') &&
                             <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
                                 <InputLabel htmlFor="outlined-adornment-password" sx={{color: 'black'}}>Имя</InputLabel>
                                 <OutlinedInput
@@ -503,7 +551,7 @@ const Register = () => {
                                 />
                             </FormControl>
                             }
-                            {activeStep === 1 &&
+                            {(activeStep === 1 && role === 'tutor') &&
                             <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
                                 <InputLabel htmlFor="outlined-adornment-password"
                                             sx={{color: 'black'}}>Фамилия</InputLabel>
@@ -526,6 +574,7 @@ const Register = () => {
                     {activeStep!==2 &&
                         <div>
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                        {role === 'tutor' &&
                         <RegisterButton
                             color="inherit"
                             disabled={activeStep === 0}
@@ -533,10 +582,17 @@ const Register = () => {
                         >
                             Назад
                         </RegisterButton>
+                        }
                         <Box sx={{ flex: '1 1 auto' }} />
-                        {activeStep === 1
-                            ? <RegisterButton onClick={() => {handleNext();
-                                handleSubmit();}}>Зарегистрироваться</RegisterButton>
+                        {(activeStep === 1 || role === 'student')
+                            ? <RegisterButton onClick={() => {
+                                if (role === 'tutor') {
+                                    handleNext();
+                                    handleSubmit();
+                                } else {
+                                    handleStudentConnect();
+                                }
+                            }}>Зарегистрироваться</RegisterButton>
                             : <RegisterButton onClick={handleNext}>Далее</RegisterButton>
                         }
                     </Box>

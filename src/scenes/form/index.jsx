@@ -71,8 +71,13 @@ const Form = () => {
       );
       console.log(response, 'resp');
       if (response.status === 201) {
-        const {status, tutor, discipline, invite_code} = response.data;
-          setPersonalLink(`http://localhost:3000/register/?inviteCode=${invite_code}`);
+        const {is_active, tutor, discipline, invite_code} = response.data;
+        if (is_active) {
+            setPersonalLink(`http://localhost:3000/register/?inviteCode=${invite_code}`);
+        } else {
+            setPersonalLink('Студент уже зарегистрирован на платформе. ' +
+                'Ему необходимо авторизоваться и принять приглашение.')
+        }
           console.log(personalLink);
           setLoadingStatus('success');
         resetForm();
