@@ -83,63 +83,21 @@ const CardsQuantity = styled.span`
 margin: 0 10px;
 `;
 
-export const AlertOverlay = styled.div`
-  background: rgba(73, 71, 71, 0.4);
-  
-  @media (min-width: 320px) {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    align-items: flex-start;
-    & > :first-child {
-      top: 300px;
-      margin: 0 50px;
-      width: 60%;
-    }
-  }
-  @media (min-width: 400px) {
-    & > :first-child {
-      margin: 0 50px;
-    }
-  }
-  @media (min-width: 500px) {
-    & > :first-child {
-      margin: 0 60px;
-    }
-  }
-  @media (min-width: 800px) {
-    & > :first-child {
-      margin: 0 80px;
-    }
-  }
-    
-  @media (min-width: 1024px) {
-    & > :first-child {
-      width: 70%;
-      margin: 0 30px;
-    }
-  }
-  @media (min-width: 1200px) {
-    & > :first-child {
-      width: 60%;
-      margin: 0 120px;
-    }
-  }
-  backdrop-filter: blur(10px);
-  z-index: 1030;
-  top: 0;
-  left: 0;
-  display: flex;
-  font-size: 2em;
-
-  :first-child > :first-child {
-    font-size: 2em;
-    overflow: visible;
-  } //Восклицательный знак
-`;
-
 export const AlertTitle = styled.div`
   font-size: 1.5em;
+`;
+export const StatusOverlay = styled.div`
+  background: rgba(73, 71, 71, 0.4);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  z-index: 10001;
 `;
 
 export const AlertButtonWrapper = styled.div`
@@ -217,7 +175,7 @@ const Board = (props: BoardProps) => {
           {isMounted && (
           <Portal id={MODAL_CONTAINER_ID}>
             {alertVisible &&
-          <AlertOverlay
+          <StatusOverlay
               style={(theme.palette.mode === 'dark')?
                   {backgroundColor: 'rgba(255, 255, 255, 0.4)'} : {backgroundColor:  'rgba(73, 71, 71, 0.4)'}}
           >
@@ -260,7 +218,7 @@ const Board = (props: BoardProps) => {
                 </Button>
                   </AlertButtonWrapper>
               </Alert>
-          </AlertOverlay>
+          </StatusOverlay>
             }
           </Portal>
               )}

@@ -96,8 +96,6 @@ export const EducationalPlan = ({uniquePlan}) => {
         );
         const boards: IBoard[] = uniquePlan?.modules;
         setBoards(boards);
-
-        console.log(response, 'resp');
       } catch (err) {
       }
     setBoards((prevBoards) => {
@@ -231,8 +229,6 @@ export const EducationalPlan = ({uniquePlan}) => {
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
-    console.log(type, 'resultType')
-    console.log(result, 'result');
     if (!destination) {
       return;
     }
@@ -271,7 +267,6 @@ export const EducationalPlan = ({uniquePlan}) => {
         const switchingBoard = tempBoardsList[destination.index];
         tempBoardsList[destination.index] = activeBoard;
         tempBoardsList[source.index] = switchingBoard;
-        console.log( tempBoardsList[destination.index], tempBoardsList[source.index], tempBoardsList);
        setBoards(tempBoardsList);
       }
     }
