@@ -7,6 +7,7 @@
   border-radius: 10px;
   box-shadow:rgb(0 0 0 / 9%) 0px 9px 12px, rgb(0 0 0 / 6%) 0px 6px 6px;
   cursor: pointer;
+  overflow: visible;
 }
 
 .card-top {

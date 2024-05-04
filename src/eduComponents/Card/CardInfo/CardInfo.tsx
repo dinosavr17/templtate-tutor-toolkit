@@ -151,7 +151,6 @@ function CardInfo(props: CardInfoProps) {
 
       console.log(response, 'resp');
 
-      // Обновляем состояние карточки после успешного запроса
       setCardValues({
         ...cardValues,
         status: newStatus,

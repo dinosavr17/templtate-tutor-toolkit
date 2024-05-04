@@ -169,7 +169,7 @@ function Card(props: CardProps) {
             onClick={(event) => {
               event.stopPropagation();
             }}
-            control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} lightColor={statusColors[status].light} darkColour={statusColors[status].dark}  />}
+            control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} lightColor={statusColors[status]?.light} darkColour={statusColors[status]?.dark}  />}
             label={''}
           />
         </CardBody>

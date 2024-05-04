@@ -134,13 +134,6 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Мои студенты"
-              to="/main"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
               title="Образовательный план"
               to="/edu"
               icon={<PeopleOutlinedIcon />}

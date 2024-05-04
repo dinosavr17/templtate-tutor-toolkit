@@ -168,6 +168,7 @@ export const EducationalPlan = ({uniquePlan}) => {
       date: "",
       tasks: [],
       desc: "",
+      status: "not_started",
       result: {
       draggableId: (Date.now() + Math.random() * 2).toString(),
         source: {

@@ -70,7 +70,7 @@ const Login = () => {
     }, [])
 
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async () => {
         setStatusShown(true);
         setLoadingStatus('loading');
 

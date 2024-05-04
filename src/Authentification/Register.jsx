@@ -22,29 +22,22 @@ import appLogo from '../asserts/images/Logo.png'
 import Portal, {createContainer} from "../eduComponents/Board/Portal.ts";
 import Alert from "@mui/material/Alert";
 import AlertTitle from '@mui/material/AlertTitle';
+import {useAuth} from "../context/AuthContext";
 
 export const MainWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background-image: linear-gradient(218deg,  #151632, #304080, #4774d5, #4ab8f3);
-  height: 100%;
+  height: 100vh;
   @media (min-width: 320px) {
     justify-content: flex-start;
-    margin-top: 60px;
+    margin-top: 0;
   }
   @media (min-width: 768px) {
     justify-content: center;
-    margin-top: -120px;
-  }
-  @media (min-width: 1024px) {
-    margin: -140px 20px 0 20px;
-  }
-  @media (min-width: 1440px) {
-    margin: -140px 120px 0 120px;
   }
 `;
 export const PaginationWrapper = styled.div`
-  //margin: 40px 80px;
   @media (min-width: 320px) {
     margin: 15px 40px;
     width: 50%;
@@ -54,7 +47,7 @@ export const PaginationWrapper = styled.div`
     width: 80%;
   }
   @media (min-width: 700px) {
-    margin: 40px 80px;
+    margin: 40px;
   }
 `
 
@@ -152,15 +145,15 @@ export const RegistrationCard = styled.div`
     grid-template-columns: 0fr 1fr;
   }
   @media (min-width: 768px) {
-    margin: 20px 80px 80px 80px;
+    margin: 0px 80px 20px 80px;
     grid-template-columns: 0.75fr 1fr;
   }
-  @media (min-width: 1024px) {
-    margin: 20px 120px 100px 120px;
-  }
-  @media (min-width: 1440px) {
-    margin: 20px 160px 100px 120px;
-  }
+  //@media (min-width: 1024px) {
+  //  margin: 20px 120px 100px 120px;
+  //}
+  //@media (min-width: 1440px) {
+  //  margin: 20px 160px 100px 120px;
+  //}
 `;
 
 export const RegistrationImageBlock = styled.div`
@@ -189,6 +182,22 @@ export const RegistrationFormWrapper = styled.div`
   overflow: visible;
   background-color: white;
 `;
+export const TutorInfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  font-weight: 300;
+  justify-content: center;
+  text-align: center;
+  font-style: italic;
+  & > p {
+    margin: 5px 0;
+  }
+`;
+export const TutorVitalInfo = styled.span`
+  font-weight: bold;
+  color: #304080;
+`;
 export const RegistrationLabel= styled.div`
   font-weight: bold;
   font-size: 16px;
@@ -198,15 +207,11 @@ export const RegistrationLabel= styled.div`
   align-items: center;
 `;
 export const RegistrationForm = styled.form`
-  //flex-basis: 290px;
   display: flex;
   flex-direction: column;
   overflow: visible;
 `;
-// const RegisterButton = styled(Button)`
-//   border-radius: 10px;
-//   border: solid #151632 1px;
-// ` ;
+
 export const RegisterButton = styled(Button)`
   && {
     &.Mui-disabled {
@@ -249,9 +254,11 @@ const USER_REGEX = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,24}$/;
 
 const Register = () => {
+    const { user, login } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('tutor');
-    // const [inviteCode, setInviteCode] = useState(null);
+    const [tutorData, setTutorData] = useState({});
+    const [individualCode, setIndividualCode] = useState('');
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -284,41 +291,45 @@ const Register = () => {
     const handleReset = () => {
         setActiveStep(0);
     };
-    const getTutorData = async (inviteCode) => {
-        try {
-            const response = await axios.get(`api/education_plan/invite_info/${inviteCode}`,
-                JSON.stringify(
-                    {
-                        invite_code: inviteCode
-                    }),
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
-                    },
-                    withCredentials: true
-                }
-            );
-
-            console.log(response, 'resp');
-        } catch (err) {
-        }
-    }
 
 
 
     useEffect(() => {
         const params = new URLSearchParams(document.location.search);
         const inviteCode = params.get('inviteCode');
+        setIndividualCode(inviteCode);
         if (inviteCode) {
             setRole('student');
-            getTutorData(inviteCode); // Call getTutorData only if inviteCode is present
         } else {
             setRole('tutor');
         }
         createContainer({id: MODAL_CONTAINER_ID});
         setMounted(true);
     }, []);
+
+    useEffect(() => {
+        console.log(role);
+
+        const getTutorData = async () => {
+            try {
+                const response = await axios.get(`api/education_plan/invite_info/${individualCode}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': 'http://localhost:3000',
+                    },
+                });
+                console.log(response?.data, 'данные учителя');
+                setTutorData(response?.data);
+            } catch (err) {
+                if (err.response?.status === 404) {
+                    alert('Ссылка приглашение неверна');
+                } else if (err.response?.status === 404) {
+                    alert('Ссылка приглашение уже использована');
+                }
+            }
+        };
+        getTutorData();
+    }, [role])
 
 
     React.useEffect(() => {
@@ -354,18 +365,60 @@ const Register = () => {
             else setLoadingStatus('error');
         } catch (err) {
             setLoadingStatus('error');
-            // if (!err?.response) {
-            //     setErrMsg('No Server Response');
-            // } else if (err.response?.status === 409) {
-            //     setErrMsg('Username Taken');
-            // } else {
-            //     setErrMsg('Registration Failed')
-            // }
-            // errRef.current.focus();
         }
     }
-    const handleStudentConnect = () => {
+    const handleStudentConnect = async () => {
         console.log('подключение студента');
+        setStatusShown(true);
+        setLoadingStatus('loading');
+        try {
+            const response = await axios.post('api/account/register/',
+                JSON.stringify({
+                    email: email+domain,
+                    password: password,
+                    role: 'student',
+                    invite_code: individualCode
+                }),
+                {
+                    headers: { 'Content-Type': 'application/json'},
+                    withCredentials: true
+                }
+            );
+            console.log(response, 'resp');
+            if (response.status === 201) {
+                const handleLoginStudent = async () => {
+                    try {
+                        const response = await axios.post('api/account/token/',
+                            JSON.stringify({ email: email+domain, password: password, }),
+                            {
+
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Access-Control-Allow-Origin': 'http://localhost:3000',
+                                },
+                                withCredentials: true
+                            }
+                        );
+                        console.log(JSON.stringify(response?.data));
+                        console.log(JSON.stringify(response));
+                        const accessToken = response?.data?.access;
+                        console.log('token', accessToken);
+                        login({ email, password, accessToken });
+                        setLoadingStatus('success');
+                        window.location.href = '/edu';
+                    } catch (err) {
+                        setLoadingStatus('error');
+                        if (!err?.response) {
+                            console.log(err);
+                        }
+                    }
+                }
+                handleLoginStudent();
+            }
+            else setLoadingStatus('error');
+        } catch (err) {
+            setLoadingStatus('error');
+        }
     }
     const steps = [
         'Старт',
@@ -383,27 +436,52 @@ const Register = () => {
                     color='secondary'/>
             },
             success: () => {
-                return <Alert
-                    onClose={() => {
-                        setStatusShown(false);
-                    }}
-                    severity="success">
-                    <AlertTitle>Успешно</AlertTitle>
-                    Вы  — <strong>успешно зарегистрированы!</strong>
-                </Alert>
+                if (role === 'tutor') {
+                    return <Alert
+                        onClose={() => {
+                            setStatusShown(false);
+                        }}
+                        severity="success">
+                        <AlertTitle>Успешно</AlertTitle>
+                        Вы — <strong>успешно зарегистрированы!</strong>
+                    </Alert>
+                } else {
+                    return <Alert
+                        onClose={() => {
+                            setStatusShown(false);
+                        }}
+                        severity="success">
+                        <AlertTitle>Успешно</AlertTitle>
+                        Вы — <strong>успешно подкючены к преподавателю!</strong>
+                    </Alert>
+                }
             },
             error: () => {
-                return <Alert
-                    onClose={() => {
-                        setStatusShown(false);
-                        setActiveStep(0);
-                    }}
-                    severity="error"
-                >
-                    <AlertTitle>Ошибка</AlertTitle>
-                    Произошла ошибка во время регистрации
-                    — <strong> Попробуйте еще раз!</strong>
-                </Alert>
+                if (role === 'tutor') {
+                    return <Alert
+                        onClose={() => {
+                            setStatusShown(false);
+                            setActiveStep(0);
+                        }}
+                        severity="error"
+                    >
+                        <AlertTitle>Ошибка</AlertTitle>
+                        Произошла ошибка во время регистрации
+                        — <strong> Попробуйте еще раз!</strong>
+                    </Alert>
+                } else {
+                    return <Alert
+                        onClose={() => {
+                            setStatusShown(false);
+                            setActiveStep(0);
+                        }}
+                        severity="error"
+                    >
+                        <AlertTitle>Ошибка</AlertTitle>
+                        Произошла ошибка при подключении к преподавателю
+                        — <strong> Попробуйте еще раз!</strong>
+                    </Alert>
+                }
             },
         };
 
@@ -454,12 +532,21 @@ const Register = () => {
                         </LogoWrapper>
                         }
                         {(activeStep !== 2 && role === 'student') &&
-                            <LogoWrapper>
+                            <div>
+                            <LogoWrapper style={{display: 'flex', justifyContent: 'center', marginBottom: '10px'}}>
                                 <img src={appLogo}/>
-                                <span>Присоединиться к преподавателю</span>
+                                <span>Tutor Toolkit</span>
                             </LogoWrapper>
+                                {tutorData &&
+                                <TutorInfoWrapper>
+                                    <p>Преподаватель&#160;<TutorVitalInfo>{tutorData.first_name}&#160;{tutorData.last_name}</TutorVitalInfo><br/>
+                                        приглашает вас присоединиться</p>
+                                    <p>К курсу:&#160;
+                                        <TutorVitalInfo>{tutorData.discipline}</TutorVitalInfo></p>
+                                    </TutorInfoWrapper>
+                                }
+                            </div>
                         }
-                        {/*<label>Регистрация преподавателя</label>*/}
                     </RegistrationLabel>
                         <RegistrationForm onSubmit={handleSubmit}>
                             {activeStep === 0 &&
