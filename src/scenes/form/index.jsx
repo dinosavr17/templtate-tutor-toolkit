@@ -71,8 +71,9 @@ const Form = () => {
       );
       console.log(response, 'resp');
       if (response.status === 201) {
-        const {is_active, tutor, discipline, invite_code} = response.data;
-        if (!is_active) {
+        const {user_status, tutor, discipline, invite_code} = response.data;
+        console.log('is_active')
+        if (!(user_status === 'active')) {
             setPersonalLink(`http://localhost:3000/register/?inviteCode=${invite_code}`);
         } else {
             setPersonalLink('Студент уже зарегистрирован на платформе. ' +
@@ -104,7 +105,6 @@ const Form = () => {
             }}
             severity="success">
           <AlertTitle>Успешно</AlertTitle>
-          Ссылка для подключения студента
             <br/><strong>{personalLink}</strong>
 
             <ContentCopyIcon className={classes.copyIcon} onClick={() => {handleCopyClick(personalLink)}}/>
