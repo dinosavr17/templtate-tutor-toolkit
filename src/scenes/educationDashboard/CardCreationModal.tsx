@@ -162,12 +162,6 @@ function CardCreationModal(props: CardCreationProps) {
                         <p>Сложность</p>
                     </div>
                     <SelectComponent/>
-                    {/*<CustomInput*/}
-                    {/*    defaultValue={cardValues.desc}*/}
-                    {/*    text={cardValues.desc || "Add a Description"}*/}
-                    {/*    placeholder="Enter description"*/}
-                    {/*    onSubmit={updateDesc}*/}
-                    {/*/>*/}
                 </div>
 
                 <div className="cardinfo-box">
@@ -223,42 +217,6 @@ function CardCreationModal(props: CardCreationProps) {
                         onSubmit={(value: string) =>
                             addLabel({ color: selectedColor, text: value })
                         }
-                    />
-                </div>
-
-                <div className="cardinfo-box">
-                    <div className="cardinfo-box-title">
-                        <CheckSquare />
-                        <p>Tasks</p>
-                    </div>
-                    <div className="cardinfo-box-progress-bar">
-                        <div
-                            className="cardinfo-box-progress"
-                            style={{
-                                width: `${calculatedPercent}%`,
-                                backgroundColor: calculatedPercent === 100 ? "limegreen" : "",
-                            }}
-                        />
-                    </div>
-                    <div className="cardinfo-box-task-list">
-                        {cardValues.tasks?.map((item) => (
-                            <div key={item.id} className="cardinfo-box-task-checkbox">
-                                <input
-                                    type="checkbox"
-                                    defaultChecked={item.completed}
-                                    onChange={(event) =>
-                                        updateTask(item.id, event.target.checked)
-                                    }
-                                />
-                                <p className={item.completed ? "completed" : ""}>{item.text}</p>
-                                <Trash onClick={() => removeTask(item.id)} />
-                            </div>
-                        ))}
-                    </div>
-                    <CustomInput
-                        text={"Add a Task"}
-                        placeholder="Enter task"
-                        onSubmit={addTask}
                     />
                 </div>
             </div>

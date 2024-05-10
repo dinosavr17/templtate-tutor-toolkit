@@ -20,6 +20,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import {useTheme} from "@mui/material";
 import { tokens } from "../../theme";
 import { Draggable } from "react-beautiful-dnd";
+import PrimaryModal from "../Card/CardInfo/PrimaryModal.tsx";
 
 
 
@@ -129,6 +130,7 @@ const Board = (props: BoardProps) => {
   const MODAL_CONTAINER_ID = 'modal-container-id';
   const [cardHeight, setCardHeight] = useState(0);
   const [boardHeight, setBoardHeight] = useState(0);
+  const [openPrimaryModal, setOpenPrimaryModal] = useState(false);
   const activeBoard = useRef<HTMLDivElement>(null)
   useEffect(() => {
     createContainer({ id: MODAL_CONTAINER_ID });
@@ -158,6 +160,10 @@ const Board = (props: BoardProps) => {
    provided
   } = props;
   const [alertVisible, setAlertVisible] = useState(false);
+  const handleAddPrimaryProps = (value) => {
+    setOpenPrimaryModal(true);
+    addCard(board?.id, value);
+  }
   return (
     <EducationalModule key={board?.id} {...props} ref={provided?.innerRef} {...provided?.droppableProps} style={{
       backgroundColor: colors.educationalPlan.educationalModule,
@@ -220,6 +226,7 @@ const Board = (props: BoardProps) => {
               </Alert>
           </StatusOverlay>
             }
+            {openPrimaryModal && <PrimaryModal onClose={() => setOpenPrimaryModal(false)} boardId={board.id}/>}
           </Portal>
               )}
         </Header>
@@ -255,7 +262,7 @@ const Board = (props: BoardProps) => {
             placeholder="Введите название темы"
             displayClass="board-add-card"
             editClass="board-add-card-edit"
-            onSubmit={(value: string) => addCard(board?.id, value)}
+            onSubmit={(value: string) => handleAddPrimaryProps(value)}
           />
         </CardsWrapper>
       </ModuleContent>

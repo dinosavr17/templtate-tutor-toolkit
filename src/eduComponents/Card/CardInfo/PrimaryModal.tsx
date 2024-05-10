@@ -20,6 +20,7 @@ import {
   TopicDifficulty,
   TopicDifficultyText, TopicStatus
 } from "../../../Interfaces/EducationPlanFields.ts";
+import {CheckBox} from "@mui/icons-material";
 // @ts-ignore
 import Chip from "../../Common/Chip.tsx";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -32,12 +33,12 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import {IOSSwitch} from "../../../shared/Switch";
 import {SelectChangeEvent} from "@mui/material/Select";
 import {Topic} from "@mui/icons-material";
-
+import {Button, Checkbox} from "@mui/material";
 interface CardInfoProps {
   onClose: () => void;
-  card: ICard;
+  card?: ICard;
   boardId: string;
-  updateCard: (boardId: string, cardId: string, card: ICard) => void;
+  updateCard?: (boardId: number, cardId: number, card: ICard) => void;
 }
 const ModuleContent = styled.div`
   padding: 15px;
@@ -46,29 +47,12 @@ const ModuleContent = styled.div`
   flex-direction: column;
   height: fit-content;
 `;
-function CardInfo(props: CardInfoProps) {
+function PrimaryModal(props: CardInfoProps) {
   const { onClose, card, boardId, updateCard } = props;
   const [selectedColor, setSelectedColor] = useState("");
   const [cardValues, setCardValues] = useState<ICard>({
     ...card,
   });
-  const statusColors: StatusColors = {
-    'not_started': { dark: '#7F8C8D', light: '#BDC3C7' }, // Серый
-    'in_progress': { dark: '#2ECC71', light: '#1bcd2a' }, // Зеленый
-    'done': { dark: '#F1C40F', light: '#ecb529' }, // Желтый
-    'to_repeat': { dark: '#3498DB', light: '#4496d9' } // Голубой
-  };
-  //Поля которые нужно добавить в карточку сложность, длительность по оценке репетитора (Дни часы минуты)
-  // статус:  не начато, пройдено, повторение
-
-  // data   {title
-  //   description
-  //   date_start
-  //   date_end
-  //   plan_time
-  //   result_time
-  //   status
-  // }
 
   const updateTitle = async(value: string) => {
     try {
@@ -220,94 +204,48 @@ function CardInfo(props: CardInfoProps) {
     if (updateCard) updateCard(boardId, cardValues.id, cardValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardValues]);
+  
 
-
-  const difficultyData = {
-    selectLabel: 'Сложность',
-    difficultyValue: ['easy', 'medium', 'hard', 'not_selected'] as TopicDifficulty[],
-    difficultyLabel: ['Легкая', 'Средняя', 'Сложная', 'Не выбрана'] as TopicDifficultyText[],
+  const templatesData = {
+    selectLabel: 'Мои шаблоны тем',
+    difficultyValue: ['topic1', 'topic2', 'topic3', 'topic4'] as TopicDifficulty[],
+    difficultyLabel: ['Тема1', 'Тема2', 'Тема3', 'Тема4'] as TopicDifficultyText[],
   }
-  const [currentDifficulty, setCurrentDifficulty] = React.useState(cardValues.difficulty? cardValues.difficulty : difficultyData.difficultyValue[3]);
   const handleDifficultyChange = (event: SelectChangeEvent) => {
-    setCurrentDifficulty(event.target.value as string);
-    const updateDifficulty = async(value: string) => {
-      try {
-        const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
-            JSON.stringify(
-                {
-                  difficulty: value,
-                }),
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
-              },
-              withCredentials: true
-            }
-        );
+    console.log('заменить');
+  };
+  const [checked, setChecked] = React.useState(false);
 
-        console.log(response, 'resp');
-      } catch (err) {
-      }
-      setCardValues({ ...cardValues, difficulty: value });
-    };
-    updateDifficulty(event.target.value);
+  const handleConfirm = (event) => {
+    setChecked(event.target.checked);
   };
 
   return (
     <Modal onClose={onClose}>
       <div className="cardinfo">
-        <div className="cardinfo-box">
-          <div className="cardinfo-box-title">
-            <Type />
-            <p>Название темы</p>
-          </div>
-          <CustomInput
-            defaultValue={cardValues.title}
-            text={cardValues.title}
-            placeholder="Введите название"
-            onSubmit={updateTitle}
-          />
-        </div>
-        <div className="cardinfo-box">
-          <div className="cardinfo-box-title">
-            <List />
-            <p>Описание</p>
-          </div>
-          <CustomInput
-            defaultValue={cardValues.desc}
-            text={cardValues.description || "Добавьте описание"}
-            placeholder="Добавьте описание"
-            onSubmit={updateDesc}
-          />
-        </div>
 
-        <div className="cardinfo-box">
-          <div className="cardinfo-box-title">
-            <ContentPasteOutlinedIcon/>
-            <p>Статус</p>
-          </div>
-          <FormControlLabel
-            onClick={(event) => {
-             handleStatusChange();
-            }}
-            control={<IOSSwitch sx={{marginLeft: '10px'}} lightColor={statusColors[cardValues.status].light} darkColour={statusColors[cardValues.status].dark} status={cardValues.status} />}
-            label={''}
-          />
-        </div>
 
         <div className="cardinfo-box">
           <div className="cardinfo-box-title">
             <StarBorderIcon />
-            <p>Сложность</p>
+            <p>Использовать шаблон</p>
           </div>
-          <SelectComponent data={difficultyData} handleChange={handleDifficultyChange} selectValue={currentDifficulty} label='Сложность'/>
+          <FormControlLabel
+              label="Использовать шаблон"
+              control={
+                <Checkbox
+                    checked={checked}
+                    onChange={handleConfirm}
+                />
+              }
+          />
+          <SelectComponent data={templatesData} handleChange={handleDifficultyChange} selectValue={''} label='Мои шаблоны'/>
         </div>
 
         <div className="cardinfo-box">
           <div className="cardinfo-box-title">
             <Calendar />
-            <p>Дата начала</p>
+            <p>Время на прохождение</p>
           </div>
           <input
             type="date"
@@ -317,38 +255,10 @@ function CardInfo(props: CardInfoProps) {
             lang="ru"
           />
         </div>
-
-        <div className="cardinfo-box">
-          <div className="cardinfo-box-title">
-            <Tag />
-            <p>Категории</p>
-          </div>
-          <div className="cardinfo-box-labels">
-            {cardValues.labels?.map((item, index) => (
-              <Chip key={index} item={item} removeLabel={removeLabel} />
-            ))}
-          </div>
-          <ul>
-            {colorsList.map((item, index) => (
-              <li
-                key={index}
-                style={{ backgroundColor: item }}
-                className={selectedColor === item ? "li-active" : ""}
-                onClick={() => setSelectedColor(item)}
-              />
-            ))}
-          </ul>
-          <CustomInput
-            text="Добавить категорию"
-            placeholder="Введите название категории"
-            onSubmit={(value: string) =>
-              addLabel({ color: selectedColor, title: value })
-            }
-          />
-        </div>
+        <Button>Создать тему</Button>
       </div>
     </Modal>
   );
 }
 
-export default CardInfo;
+export default PrimaryModal;

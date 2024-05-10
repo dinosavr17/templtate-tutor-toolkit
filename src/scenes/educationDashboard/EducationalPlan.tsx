@@ -166,7 +166,6 @@ export const EducationalPlan = ({uniquePlan}) => {
       title,
       labels: [],
       date: "",
-      tasks: [],
       desc: "",
       status: "not_started",
       result: {
@@ -272,15 +271,28 @@ export const EducationalPlan = ({uniquePlan}) => {
       }
     }
     updateLocalStorageBoards(boards);
-    // } else if (type === 'column') {
-    //   if (source.index !== destination.index) {
-    //   const activeBoard = tempBoardsList.find((board) => tempBoardsList.indexOf(board) === source.index);
-    //   console.log(activeBoard, 'activeBoard');
-    //   const switchingBoard = tempBoardsList[destination.index];
-    //   tempBoardsList[destination.index] = activeBoard;
-    //   tempBoardsList[source.index] = switchingBoard;
-    //   }
-    //   updateLocalStorageBoards(tempBoardsList);
+    const updatePosition = async () => {
+      try {
+        const response = await axios.post('api/education_plan/move_element',
+            JSON.stringify(
+                {
+                  element_type: type === 'column'? 'board' : 'task' ,
+                  element_id: draggableId,
+                  destination_index: destination.index,
+                  destination_id: destination.droppableId
+                }),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+              },
+              withCredentials: true
+            }
+        );
+      } catch (err) {
+      }
+    };
+    updatePosition();
     }
 
 

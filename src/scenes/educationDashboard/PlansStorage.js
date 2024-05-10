@@ -342,7 +342,7 @@ const PlansStorage = () => {
                             return acc;
                         }, [])} label='Дисциплина'/>
                         <FormControlLabel
-                            control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} defaultChecked />}
+                            control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} />}
                             label="Скрыть неактивных студентов"
                         />
                     </FiltersContainer>
