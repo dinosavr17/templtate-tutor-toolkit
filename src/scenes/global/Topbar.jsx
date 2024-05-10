@@ -16,7 +16,10 @@ import {useState} from "react";
 import styled from "styled-components";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
+import MarkChatUnreadOutlinedIcon from '@mui/icons-material/MarkChatUnreadOutlined';
+import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
+import './bars.css';
 
 export const NotificationContainer = styled.div`
   border: #a6a4a4 1px solid;
@@ -61,7 +64,7 @@ const Topbar = () => {
     }
     const handleAcceptInvite = async(code) => {
       try {
-        const response = await axios.post('api/education_plan/invite_authorized_student/',
+        const response = await axios.post('api/education_plan/invite_authorized_student',
             JSON.stringify(
                 {
                   invite_code: code
@@ -127,27 +130,42 @@ const Topbar = () => {
           >
             {userNotifications.length > 0 &&
             <NotificationsWrapper>
-              <Typography sx={{ color: 'primary', backgroundColor: '#f5f5f5 !important', padding: '10px', fontSize: '16px', border: 'none', boxShadow: '0px 5px 10px 2px rgba(34, 60, 80, 0.2)', fontWeight: '500'}}>Уведомления</Typography>
+              <Typography color={colors.grey[800]} sx={{backgroundColor: '#f5f5f5 !important', padding: '10px', fontSize: '16px', border: 'none', boxShadow: '0px 5px 10px 2px rgba(34, 60, 80, 0.2)', fontWeight: '500'}}>Уведомления</Typography>
               {userNotifications.map((notification) => (
-                  <NotificationContainer key={notification.id} style={{color: 'primary'}}>
+                  <NotificationContainer key={notification.id} color={colors.grey[800]}>
                     <NotificationsContent>
                       {notification.type === 'info' &&
                       <InfoOutlinedIcon color="secondary"/>
                       }
                       {notification.type === 'invite' &&
-                      <PersonAddOutlinedIcon color="success"/>
+                      <PersonAddOutlinedIcon sx={{ color: '#4cceac' }}/>
+                      }
+                      {notification.type === 'lesson_reminder' &&
+                      <MarkChatUnreadOutlinedIcon sx={{ color: '#4cceac' }}/>
                       }
                       {notification.type === 'canceling' &&
-                      <CancelOutlinedIcon color="error"/>
+                      <EventBusyOutlinedIcon color="error"/>
                       }
-                      <Typography sx={{ marginLeft: '8px' }}>{notification.text}</Typography>
+                      {notification.type === 'rescheduling' &&
+                      <EditCalendarOutlinedIcon sx={{ color: '#b4d4ff' }}/>
+                      }
+                      <Typography color={colors.grey[800]} sx={{ marginLeft: '8px' }}>{notification.text}</Typography>
                       {notification.type === 'invite' && <div>
-                        <Button onClick={() => {handleAcceptInvite(notification.content)}} color='success' sx={{ textTransform: 'none'}}>Принять</Button>
-                        <Button color='error' sx={{ textTransform: 'none'}}>Отклонить</Button>
+                        <Button onClick={() => {handleAcceptInvite(notification.content)}} sx={{ textTransform: 'none', backgroundColor: 'success' }}>Принять</Button>
                       </div>}
                     </NotificationsContent>
                   </NotificationContainer>
               ))}
+            </NotificationsWrapper>
+            }
+            {userNotifications.length === 0 &&
+            <NotificationsWrapper style={{width: '300px'}}>
+              <Typography color={colors.grey[800]} sx={{backgroundColor: '#f5f5f5 !important', padding: '10px', fontSize: '16px', border: 'none', boxShadow: '0px 5px 10px 2px rgba(34, 60, 80, 0.2)', fontWeight: '500'}}>Уведомления</Typography>
+                  <NotificationContainer color={colors.grey[800]} style={{display: 'flex', justifyContent: 'center'}}>
+                    <NotificationsContent>
+                      <Typography color={colors.grey[800]} sx={{ marginLeft: '8px' }}>Новых уведомлений нет</Typography>
+                    </NotificationsContent>
+                  </NotificationContainer>
             </NotificationsWrapper>
             }
           </Popover>

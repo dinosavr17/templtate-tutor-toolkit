@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import EducationalPlan from "./EducationalPlan.tsx";
 import axios from "../../api/axios";
-import {Box, CircularProgress, Select, useTheme} from "@mui/material";
+import {Box, Button, CircularProgress, IconButton, Select, useTheme} from "@mui/material";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import Portal, { createContainer } from "../../eduComponents/Board/Portal.ts";
@@ -9,7 +9,9 @@ import styled from "styled-components";
 import StudentCard from "../../components/StudentCard";
 import SchoolIcon from "@mui/icons-material/School";
 import { tokens } from "../../theme";
+import Snackbar from '@mui/material/Snackbar';
 import Slider from 'react-slick';
+import CloseIcon from "@mui/icons-material/Close";
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -22,7 +24,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 
 const StatusOverlay = styled.div`
-  background: rgba(73, 71, 71, 0.4);
+  //background: rgba(73, 71, 71, 0.4);
   position: fixed;
   top: 0;
   left: 0;
@@ -31,7 +33,7 @@ const StatusOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
+  //backdrop-filter: blur(10px);
   z-index: 10001;
 `;
 const StatusContainer = styled.div`
@@ -42,13 +44,18 @@ const FiltersContainer = styled.div`
   flex-direction: row;
 `;
 const CardContainer = styled.div`
-  margin-right: 20px;
+  margin-right: 10px;
+  width: 280px;
 `;
 const SliderContainer = styled.div`
   margin: 0 30px;
   width: 70%;
   :hover {
     cursor: pointer;
+  }
+  :nth-child(2) {
+    display: flex;
+    flex-direction: row;
   }
 `;
 
@@ -62,6 +69,21 @@ const PlansStorage = () => {
     const [studentsList, setStudentsList] = useState([]);
     const [uniqueId, setUniqueId] = useState('');
     const [uniquePlan, setUniquePlan] = useState({});
+    const action = (
+        <>
+            {/*<Button color="secondary" size="small" onClick={() => { setStatusShown(false); }}>*/}
+            {/*    UNDO*/}
+            {/*</Button>*/}
+            <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={() => { setStatusShown(false); }}
+            >
+                <CloseIcon fontSize="small" />
+            </IconButton>
+        </>
+    );
     function SampleNextArrow(props) {
         const { className, style, onClick } = props;
         return (
@@ -94,7 +116,7 @@ const PlansStorage = () => {
 
     useEffect(() => {
        if (uniqueId !== '') {
-           getPlanById(uniqueId)
+           getPlanById(uniqueId);
        }
        console.log(uniqueId);
     }, [uniqueId]);
@@ -116,6 +138,7 @@ const PlansStorage = () => {
                 withCredentials: true
             });
             setStudentsList(response?.data?.plans);
+            console.log('Все юзеры', response?.data?.plans);
             if (uniqueId === '') {
                 console.log(uniqueId, 'текущий активный пользователь');
                 setUniqueId(response?.data?.plans[0].id);
@@ -156,9 +179,19 @@ const PlansStorage = () => {
             },
             success: () => {
                 return (
-                    <Alert onClose={() => { setStatusShown(false); }} severity="success">
-                        <AlertTitle>Успешно</AlertTitle>
-                    </Alert>
+                    <div>
+                        <Snackbar
+                            open={statusShown}
+                            autoHideDuration={4000}
+                            onClose={() => { setStatusShown(false); }}
+                            // message="План загружен"
+                            action={action}
+                        >
+                        <Alert onClose={() => { setStatusShown(false); }} severity="success">
+                            <AlertTitle>Образовательный план получен</AlertTitle>
+                        </Alert>
+                        </Snackbar>
+                    </div>
                 );
             },
             error: () => {
@@ -177,54 +210,77 @@ const PlansStorage = () => {
     return (
         <div>
             <Box margin="20px">
-               <SliderContainer>
-                   <FiltersContainer>
-                   <MultipleSelectChip names={studentsList.reduce((acc, student) => {
-                       acc.push(student.first_name + ' ' + student.last_name);
-                       return acc;
-                   }, [])} label='ФИО'/>
-                       <MultipleSelectChip names={studentsList.reduce((acc, student) => {
-                           acc.push(student.discipline);
-                           return acc;
-                       }, [])} label='Дисциплина'/>
-                       <FormControlLabel
-                           control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} defaultChecked />}
-                           label="Скрыть неактивных студентов"
-                       />
-                   </FiltersContainer>
-                <Slider {...settings}>
-                    {studentsList.map((student, index) => (
+                <SliderContainer>
+                    <FiltersContainer>
+                        <MultipleSelectChip names={studentsList.reduce((acc, student) => {
+                            acc.push(student.first_name + ' ' + student.last_name);
+                            return acc;
+                        }, [])} label='ФИО'/>
+                        <MultipleSelectChip names={studentsList.reduce((acc, student) => {
+                            acc.push(student.discipline);
+                            return acc;
+                        }, [])} label='Дисциплина'/>
+                        <FormControlLabel
+                            control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} defaultChecked />}
+                            label="Скрыть неактивных студентов"
+                        />
+                    </FiltersContainer>
+                    <div>
+                    {studentsList.length >= 3 && (
+                        <Slider {...settings}>
+                            {studentsList.map((student, index) => (
+                                <div key={index}>
+                                    <CardContainer>
+                                        <Box
+                                            backgroundColor={colors.primary[400]}
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="center"
+                                            onClick={() => setUniqueId(student?.id)}
+                                        >
+                                            <StudentCard personalInfo={student} icon={<SchoolIcon sx={{ color: colors.greenAccent[600], fontSize: "26px", margin: "10px" }} />} />
+                                        </Box>
+                                    </CardContainer>
+                                </div>
+                            ))}
+                        </Slider>
+                    )}
+                    </div>
+                    <div style={{display: 'flex', flexDirection: 'row', marginLeft: '10px'}}>
+                    {studentsList.length < 3 && studentsList.map((student, index) => (
                         <div key={index}>
                             <CardContainer>
-                                    <Box
-                                        backgroundColor={colors.primary[400]}
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        onClick={() => setUniqueId(student?.id)}
-                                    >
-                                        <StudentCard personalInfo={student} icon={<SchoolIcon sx={{ color: colors.greenAccent[600], fontSize: "26px", margin: "10px" }} />} />
-                                    </Box>
+                                <Box
+                                    backgroundColor={colors.primary[400]}
+                                    display="flex"
+                                    alignItems="center"
+                                    flexDirection='row'
+                                    justifyContent="center"
+                                    onClick={() => setUniqueId(student?.id)}
+                                >
+                                    <StudentCard personalInfo={student} icon={<SchoolIcon sx={{ color: colors.greenAccent[600], fontSize: "26px", margin: "10px" }} />} />
+                                </Box>
                             </CardContainer>
                         </div>
                     ))}
-                </Slider>
-               </SliderContainer>
+                    </div>
+                </SliderContainer>
             </Box>
             {loadingStatus === 'success' && <EducationalPlan uniquePlan={uniquePlan} />}
             {isMounted &&
-                <Portal id={MODAL_CONTAINER_ID}>
-                    {statusShown &&
-                        <StatusOverlay>
-                            <StatusContainer style={{ display: 'flex' }}>
-                                {renderStatusContent()}
-                            </StatusContainer>
-                        </StatusOverlay>
-                    }
-                </Portal>
+            <Portal id={MODAL_CONTAINER_ID}>
+                {statusShown &&
+                <StatusOverlay>
+                    <StatusContainer style={{ display: 'flex' }}>
+                        {renderStatusContent()}
+                    </StatusContainer>
+                </StatusOverlay>
+                }
+            </Portal>
             }
         </div>
     );
+
 };
 
 export default PlansStorage;

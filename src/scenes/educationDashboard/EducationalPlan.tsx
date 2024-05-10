@@ -294,7 +294,7 @@ export const EducationalPlan = ({uniquePlan}) => {
   }, [boards]);
 
   return (
-      <Box m="20px">
+      <Box style={{margin: '10px 40px'}}>
         <PageTitle style={{ color: colors.blueAccent[100] }}>
           <h1>Образовательный план</h1>
         </PageTitle>

@@ -52,7 +52,6 @@ const StudentsMainPage = () => {
 
     return (
     <Box m="20px">
-      {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Caption title="Прогресс"
                 subtitle="Карточки студентов - содержат информацию о дисциплинах и статусе студента.
