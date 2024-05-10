@@ -10,8 +10,9 @@ import StudentCard from "../../components/StudentCard";
 import SchoolIcon from "@mui/icons-material/School";
 import { tokens } from "../../theme";
 import Snackbar from '@mui/material/Snackbar';
-import Slider from 'react-slick';
 import CloseIcon from "@mui/icons-material/Close";
+import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutlined';
+import ArrowBackIosOutlinedIcon from '@mui/icons-material/ArrowBackIosOutlined';
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -24,7 +25,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 
 const StatusOverlay = styled.div`
-  //background: rgba(73, 71, 71, 0.4);
   position: fixed;
   top: 0;
   left: 0;
@@ -33,7 +33,6 @@ const StatusOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  //backdrop-filter: blur(10px);
   z-index: 10001;
 `;
 const StatusContainer = styled.div`
@@ -48,16 +47,85 @@ const CardContainer = styled.div`
   width: 280px;
 `;
 const SliderContainer = styled.div`
-  margin: 0 30px;
-  width: 70%;
+  margin: 0 20px;
+  width: 80%;
   :hover {
     cursor: pointer;
   }
-  :nth-child(2) {
+`;
+
+const SliderWrapper = styled.div`
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
     display: flex;
     flex-direction: row;
-  }
 `;
+
+const SlideContainer = styled.div`
+    display: flex;
+    transition: transform 0.5s;
+    transform: translateX(-${props => props.currentIndex * (100 / 4)}%);
+`;
+
+const SlideItem = styled.div`
+    flex: 0 0 calc(100% / 4);
+`;
+const SlideArrow = styled.div`
+  border-radius: 50px;
+  width: 30px;
+  padding: 5px;
+  height: 30px;
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  background-color: #d7d2d2;
+`
+
+export const CustomSlider = ({ children, activeStudentIndex }) => {
+    const [currentIndex, setCurrentIndex] = useState(activeStudentIndex);
+
+    useEffect(() => {
+        setCurrentIndex(activeStudentIndex);
+    }, [activeStudentIndex]);
+
+    const goToSlide = (index) => {
+        setCurrentIndex(index);
+    };
+
+    const goToPrevSlide = () => {
+        const index = (currentIndex + children.length - 3) % children.length;
+        goToSlide(index);
+    };
+
+    const goToNextSlide = () => {
+        const index = (currentIndex + 3) % children.length;
+        goToSlide(index);
+    };
+
+    return (
+        <div>
+            <SlideArrow onClick={goToPrevSlide}><ArrowBackIosOutlinedIcon/></SlideArrow>
+        <SliderWrapper>
+            <SlideContainer currentIndex={currentIndex}>
+                {React.Children.map(children, (child, index) => (
+                    <SlideItem key={index}>
+                        {React.cloneElement(child, {
+                            active: index === currentIndex % children.length // Проверяем, является ли текущий индекс активным
+                        })}
+                    </SlideItem>
+                ))}
+            </SlideContainer>
+        </SliderWrapper>
+            <SlideArrow onClick={goToNextSlide}><ArrowForwardIosOutlinedIcon/></SlideArrow>
+        </div>
+    );
+};
+
+
+
+
 
 const PlansStorage = () => {
     const theme = useTheme();
@@ -69,6 +137,27 @@ const PlansStorage = () => {
     const [studentsList, setStudentsList] = useState([]);
     const [uniqueId, setUniqueId] = useState('');
     const [uniquePlan, setUniquePlan] = useState({});
+    const [activeStudentIndex, setActiveStudentIndex] = useState(-1);
+    useEffect(() => {
+        setActiveStudentIndex(() => {
+            const storedIndex = localStorage.getItem('studentIndex');
+            return storedIndex !== null ? +storedIndex : -1;
+        });
+    }, []);
+
+    const [currentIndex, setCurrentIndex] = useState(() => {
+        const storedIndex = localStorage.getItem('studentIndex');
+        return storedIndex !== null ? +storedIndex : -1;
+    });
+
+    const handleStudentClick = (id, index) => {
+        setUniqueId(id);
+        setActiveStudentIndex(index);
+        localStorage.setItem('activePlanId', id);
+        localStorage.setItem('studentIndex', index.toString());
+    };
+
+
     const action = (
         <>
             {/*<Button color="secondary" size="small" onClick={() => { setStatusShown(false); }}>*/}
@@ -122,10 +211,45 @@ const PlansStorage = () => {
     }, [uniqueId]);
 
     useEffect(() => {
+        const index = studentsList.findIndex((item) => item.id === uniqueId);
+        setActiveStudentIndex(index);
+        localStorage.setItem('studentIndex', index.toString());
+    }, [uniqueId, studentsList]);
+
+
+
+    useEffect(() => {
         getUsers();
         createContainer({ id: MODAL_CONTAINER_ID });
         setMounted(true);
     }, []);
+    useEffect(() => {
+        const activePlanId = localStorage.getItem('activePlanId');
+        const studentIndex = localStorage.getItem('studentIndex');
+
+        if (activePlanId && studentsList.some(student => student.id === activePlanId)) {
+            setUniqueId(activePlanId);
+        } else if (studentsList.length > 0) {
+            setUniqueId(studentsList[0].id);
+        }
+
+        if (studentIndex !== null && !isNaN(studentIndex) && parseInt(studentIndex) >= 0 && parseInt(studentIndex) < studentsList.length) {
+            setActiveStudentIndex(parseInt(studentIndex));
+        }
+    }, [studentsList]);
+
+    useEffect(() => {
+        const activePlanId = localStorage.getItem('activePlanId');
+        const studentIndex = localStorage.getItem('studentIndex')
+        if (activePlanId) {
+            setUniqueId(activePlanId); // Установите сохраненный id в состояние компонента
+        }
+        if (studentIndex) {
+            setActiveStudentIndex(+studentIndex);
+        }
+    }, []);
+
+
 
     const getUsers = async () => {
         try {
@@ -139,10 +263,6 @@ const PlansStorage = () => {
             });
             setStudentsList(response?.data?.plans);
             console.log('Все юзеры', response?.data?.plans);
-            if (uniqueId === '') {
-                console.log(uniqueId, 'текущий активный пользователь');
-                setUniqueId(response?.data?.plans[0].id);
-            }
         } catch (err) {
             if (!err?.response) {
                 setLoadingStatus('error');
@@ -164,6 +284,7 @@ const PlansStorage = () => {
             console.log(response?.data, 'объект с планами');
             setLoadingStatus('success');
             setUniquePlan(response?.data);
+            localStorage.setItem('activePlanId', id);
         } catch (err) {
             setLoadingStatus('error');
         }
@@ -209,7 +330,7 @@ const PlansStorage = () => {
 
     return (
         <div>
-            <Box margin="20px">
+            <Box>
                 <SliderContainer>
                     <FiltersContainer>
                         <MultipleSelectChip names={studentsList.reduce((acc, student) => {
@@ -225,25 +346,27 @@ const PlansStorage = () => {
                             label="Скрыть неактивных студентов"
                         />
                     </FiltersContainer>
-                    <div>
+                    <div style={{display: 'flex', flexDirection: 'row', marginLeft: '10px'}}>
                     {studentsList.length >= 3 && (
-                        <Slider {...settings}>
+                        <CustomSlider activeStudentIndex={activeStudentIndex} activeClassName="active-card">
                             {studentsList.map((student, index) => (
                                 <div key={index}>
                                     <CardContainer>
                                         <Box
-                                            backgroundColor={colors.primary[400]}
+                                            backgroundColor={index === activeStudentIndex ? colors.educationalPlan.card : colors.primary[400]}
                                             display="flex"
                                             alignItems="center"
                                             justifyContent="center"
-                                            onClick={() => setUniqueId(student?.id)}
+                                            onClick={() => handleStudentClick(student?.id, index)}
+                                            borderRadius='8px'
                                         >
-                                            <StudentCard personalInfo={student} icon={<SchoolIcon sx={{ color: colors.greenAccent[600], fontSize: "26px", margin: "10px" }} />} />
+                                            <StudentCard
+                                                personalInfo={student} icon={<SchoolIcon sx={{ color: colors.greenAccent[600], fontSize: "26px", margin: "10px" }} />} />
                                         </Box>
                                     </CardContainer>
                                 </div>
                             ))}
-                        </Slider>
+                        </CustomSlider>
                     )}
                     </div>
                     <div style={{display: 'flex', flexDirection: 'row', marginLeft: '10px'}}>
@@ -257,6 +380,7 @@ const PlansStorage = () => {
                                     flexDirection='row'
                                     justifyContent="center"
                                     onClick={() => setUniqueId(student?.id)}
+                                    borderRadius='8px'
                                 >
                                     <StudentCard personalInfo={student} icon={<SchoolIcon sx={{ color: colors.greenAccent[600], fontSize: "26px", margin: "10px" }} />} />
                                 </Box>

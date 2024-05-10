@@ -1,6 +1,5 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
-import ProgressCircle from "./ProgressCircle";
 
 const StudentCard = ({ personalInfo, icon }) => {
   const theme = useTheme();
