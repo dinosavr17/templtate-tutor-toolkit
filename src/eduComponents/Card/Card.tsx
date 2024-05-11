@@ -60,9 +60,10 @@ const DifficultyMarker = styled.div `
   margin-left: -16px;
   margin-top: -16px;
   margin-bottom: -16px;
-  background-color: #4774d5;
+  //background-color: #4774d5;
   border-radius: 8px;
-  background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 50%, black 50%, black 75%, transparent 75%, transparent);
+  background-image: linear-gradient(45deg, #ffffff 25%, transparent 25%, transparent 50%, #ffffff 50%, #ffffff 75%, transparent 75%);
+  background-size: 6px 6px; /* Уменьшаем размер штриха */
 `
 
 function Card(props: CardProps) {
@@ -151,7 +152,7 @@ function Card(props: CardProps) {
         }}
       >
           <div style={{display: 'flex', flexDirection: "row"}}>
-              <DifficultyMarker/>
+              <DifficultyMarker style={{backgroundColor: difficulty === 'easy' ? 'green' :  difficulty === 'medium'? 'orange' : difficulty === 'hard'? 'red' : '' }}/>
               <main>
         <div className="card-top">
           <div className="card-top-labels">
