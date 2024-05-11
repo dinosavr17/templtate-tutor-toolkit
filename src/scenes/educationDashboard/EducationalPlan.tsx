@@ -131,14 +131,15 @@ export const EducationalPlan = ({uniquePlan}) => {
     });
   };
 
-  const addCardHandler = async (boardId: string, title: string) => {
+  const addCardHandler = async (boardId: string, title: string, duration: string) => {
+    console.log(duration, 'приходит ли длительность?');
     try {
       const response = await axios.post('api/education_plan/card/',
         JSON.stringify(
           {
             title: title,
             module_id: boardId,
-            result_time: 'P4DT12H30M5S',
+            result_time: duration,
             index: 0,
             labels: [],
           }),
@@ -154,33 +155,34 @@ export const EducationalPlan = ({uniquePlan}) => {
       setBoards(boards);
 
       console.log(response, 'resp');
+      const boardIndex = boards.findIndex((item: IBoard) => item.id === boardId);
+      if (boardIndex < 0) return;
+      const tempBoardsList = [...boards];
+      tempBoardsList[boardIndex].cards.push({
+        difficulty: "",
+        id: response.data?.id,
+        title,
+        labels: [],
+        date: "",
+        desc: "",
+        status: "not_started",
+        result_time: response.data?.result_time,
+        result: {
+          draggableId: response.data.id,
+          source: {
+            boardId: boardId,
+            index: response.data?.index,
+          },
+          destination: {
+            boardId:  null,
+            index: null,
+          },
+        }
+      });
+      setBoards(tempBoardsList);
     } catch (err) {
     }
-    const boardIndex = boards.findIndex((item: IBoard) => item.id === boardId);
-    if (boardIndex < 0) return;
 
-    const tempBoardsList = [...boards];
-    tempBoardsList[boardIndex].cards.push({
-      difficulty: "",
-      id: (Date.now() + Math.random() * 2).toString(),
-      title,
-      labels: [],
-      date: "",
-      desc: "",
-      status: "not_started",
-      result: {
-      draggableId: (Date.now() + Math.random() * 2).toString(),
-        source: {
-        boardId: boardId,
-          index: boardIndex,
-      },
-      destination: {
-        boardId:  null,
-        index: null,
-      },
-    }
-    });
-    setBoards(tempBoardsList);
   };
 
   const removeCard = async (boardId: string, cardId: string) => {
@@ -355,8 +357,8 @@ export const EducationalPlan = ({uniquePlan}) => {
                           displayClass="app-boards-add-board"
                           editClass="app-boards-add-board-edit"
                           placeholder="Введите название модуля"
-                          text="Добавить модуль"
-                          buttonText="Добавить модуль"
+                          text="+ Добавить модуль"
+                          buttonText="+ Добавить модуль"
                           onSubmit={handleAddBoard}
                       />
                     </AddModuleButton>

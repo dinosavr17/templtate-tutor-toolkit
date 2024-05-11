@@ -20,13 +20,14 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import {useTheme} from "@mui/material";
 import { tokens } from "../../theme";
 import { Draggable } from "react-beautiful-dnd";
+// @ts-ignore
 import PrimaryModal from "../Card/CardInfo/PrimaryModal.tsx";
 
 
 
 interface BoardProps {
   board: IBoard;
-  addCard: (boardId: string, title: string) => void;
+  addCard: (boardId: string, title: string, duration: string) => void;
   removeBoard: (boardId: string) => void;
   removeCard: (boardId: string, cardId: string) => void;
   onDragEnd: (boardId: string, cardId: string) => void;
@@ -123,6 +124,22 @@ export const CardsWrapper = styled.div`
   //overflow-y: auto;
   //overflow: visible;
 `
+const StyledButton = styled.button`
+  background-color: #fff;
+  font-size: 14px;
+  color: #000;
+  border-radius: 10px;
+  box-shadow: 1px 1px 0 1px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+
+  :hover {
+    background-color: #767373;
+  }
+`;
 
 
 const Board = (props: BoardProps) => {
@@ -160,10 +177,10 @@ const Board = (props: BoardProps) => {
    provided
   } = props;
   const [alertVisible, setAlertVisible] = useState(false);
-  const handleAddPrimaryProps = (value) => {
-    setOpenPrimaryModal(true);
-    addCard(board?.id, value);
-  }
+  // const handleAddPrimaryProps = (value) => {
+  //   setOpenPrimaryModal(true);
+  //   addCard(board?.id, value);
+  // }
   return (
     <EducationalModule key={board?.id} {...props} ref={provided?.innerRef} {...provided?.droppableProps} style={{
       backgroundColor: colors.educationalPlan.educationalModule,
@@ -226,7 +243,7 @@ const Board = (props: BoardProps) => {
               </Alert>
           </StatusOverlay>
             }
-            {openPrimaryModal && <PrimaryModal onClose={() => setOpenPrimaryModal(false)} boardId={board.id}/>}
+            {openPrimaryModal && <PrimaryModal addCard={addCard} onClose={() => setOpenPrimaryModal(false)} boardId={board.id}/>}
           </Portal>
               )}
         </Header>
@@ -257,13 +274,14 @@ const Board = (props: BoardProps) => {
               </Draggable>
           ))}
           {provided.placeholder}
-          <CustomInput
-            text="+ Добавить Тему"
-            placeholder="Введите название темы"
-            displayClass="board-add-card"
-            editClass="board-add-card-edit"
-            onSubmit={(value: string) => handleAddPrimaryProps(value)}
-          />
+          <StyledButton onClick={() => setOpenPrimaryModal(true)}>+ Добавить Тему</StyledButton>
+          {/*<CustomInput*/}
+          {/*  text="+ Добавить Тему"*/}
+          {/*  placeholder="Введите название темы"*/}
+          {/*  displayClass="board-add-card"*/}
+          {/*  editClass="board-add-card-edit"*/}
+          {/*  onSubmit={(value: string) => handleAddPrimaryProps(value)}*/}
+          {/*/>*/}
         </CardsWrapper>
       </ModuleContent>
     </EducationalModule>

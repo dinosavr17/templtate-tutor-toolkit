@@ -53,6 +53,17 @@ const CardBody = styled.div`
   justify-items: flex-start;
   
 `
+const DifficultyMarker = styled.div `
+  width: 15px;
+  min-height: 80px;
+  margin-right: 16px;
+  margin-left: -16px;
+  margin-top: -16px;
+  margin-bottom: -16px;
+  background-color: #4774d5;
+  border-radius: 8px;
+  background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 50%, black 50%, black 75%, transparent 75%, transparent);
+`
 
 function Card(props: CardProps) {
   const { card,
@@ -66,7 +77,7 @@ function Card(props: CardProps) {
       setCardHeight
   } =
     props;
-  const { id, title, description, date, labels, status } = card;
+  const { id, title, description, date, labels, status, result_time, difficulty } = card;
   console.log(card, 'данные карточки');
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -94,6 +105,11 @@ function Card(props: CardProps) {
     'done': { dark: '#F1C40F', light: '#ecb529' }, // Желтый
     'to_repeat': { dark: '#3498DB', light: '#4496d9' } // Голубой
   };
+    console.log(result_time, 'result');
+    const displayEstimatedTime = (time) => {
+        const timeArray = time.split(':');
+        return `${timeArray[0]} ч. ` + `${timeArray[1]} мин.`
+    }
   return (
     <>
       {isMounted && (
@@ -134,6 +150,9 @@ function Card(props: CardProps) {
           ...provided.draggableProps.style
         }}
       >
+          <div style={{display: 'flex', flexDirection: "row"}}>
+              <DifficultyMarker/>
+              <main>
         <div className="card-top">
           <div className="card-top-labels">
             {labels?.map((item, index) => (
@@ -174,13 +193,15 @@ function Card(props: CardProps) {
           />
         </CardBody>
         <div className="card-footer">
-          {date && (
+          {result_time && (
             <p className="card-footer-item">
               <Clock className="card-footer-icon" />
-              {formatDate(date).toLocaleString('ru')}
+              {displayEstimatedTime(result_time)}
             </p>
           )}
         </div>
+              </main>
+          </div>
           {provided.placeholder}
       </div>
     </>
