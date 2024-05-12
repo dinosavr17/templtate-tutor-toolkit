@@ -1,11 +1,36 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import StarRoundedIcon from '@mui/icons-material/StarRounded';
+import LoopRoundedIcon from '@mui/icons-material/LoopRounded';
 
-
+const StyledIconWrapper = styled('div')(({ theme }) => ({
+    backgroundColor: 'white',
+    width: 22,
+    height: 22,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+}));
 
 export const IOSSwitch = styled(({ lightColor, darkColor, status, ...props }) => (
-    <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} checked={status !=='not_started'} />
+    <Switch
+        focusVisibleClassName=".Mui-focusVisible"
+        disableRipple
+        {...props}
+        checked={status !== 'not_started'}
+        // icon={<StyledIconWrapper><CheckCircleOutlineIcon /></StyledIconWrapper>} // Иконка, когда Switch выключен
+        checkedIcon={<StyledIconWrapper>
+            {status === 'done' &&
+            <StarRoundedIcon style={{ color: '#F1C40F' }}/>
+            }
+            {status === 'to_repeat' &&
+            <LoopRoundedIcon style={{ color: '#392c26' }}/>
+            }
+        </StyledIconWrapper>} // Иконка, когда Switch включен
+    />
 ))(({ theme, lightColor, darkColor }) => ({
     // Стили вашего Switch компонента
     width: 42,
@@ -24,7 +49,8 @@ export const IOSSwitch = styled(({ lightColor, darkColor, status, ...props }) =>
                 border: 0,
             },
             '&.Mui-disabled + .MuiSwitch-track': {
-                opacity: 0.5,
+                opacity: theme.palette.mode === 'light' ? 0.7 : 0.3,
+                backgroundColor: theme.palette.grey[700],
             },
         },
         '&.Mui-focusVisible .MuiSwitch-thumb': {
@@ -55,5 +81,3 @@ export const IOSSwitch = styled(({ lightColor, darkColor, status, ...props }) =>
         }),
     },
 }));
-
-

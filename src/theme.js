@@ -150,7 +150,7 @@ export const tokens = (mode) => ({
           // cardsWrapper: "#e1e2fe",
           // card: "#e1e2fe",
           // activeCard: "#e1e2fe",
-          educationalModule: "#8ecbe5",
+          educationalModule: "#baeaff",
           cardsWrapper: "#eee",
           card: "#daf0f6",
           activeCard: "#92c6f1",

@@ -10,7 +10,6 @@ import CustomInput from "../../CustomInput/CustomInput.tsx";
 
 import "./CardInfo.css";
 // @ts-ignore
-// @ts-ignore
 import {
   IBoard,
   ICard,
@@ -25,6 +24,8 @@ import Chip from "../../Common/Chip.tsx";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
 import styled from "styled-components";
+// @ts-ignore
+import dayjs from 'dayjs';
 // @ts-ignore
 import SelectComponent from "./SelectComponent.tsx";
 import axios from '../../../api/axios';
@@ -69,6 +70,59 @@ function CardInfo(props: CardInfoProps) {
   //   result_time
   //   status
   // }
+  const handleSetStartDate = async() => {
+      try {
+        const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
+            JSON.stringify(
+                {
+                  date_start: dayjs(),
+                }),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+              },
+              withCredentials: true
+            }
+        );
+
+        console.log(response, 'resp');
+      } catch (err) {
+      }
+
+      setCardValues({ ...cardValues, date_start: dayjs() });
+  }
+  const handleSetFinishDate = async() => {
+    try {
+      const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
+          JSON.stringify(
+              {
+                date_end: dayjs(),
+              }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true
+          }
+      );
+
+      console.log(response, 'resp');
+    } catch (err) {
+    }
+
+    setCardValues({ ...cardValues, date_end: dayjs() });
+  }
+
+  useEffect(() => {
+    if (cardValues.status === 'in_progress') {
+      handleSetStartDate();
+    }
+    if (cardValues.status === 'done') {
+      handleSetFinishDate();
+    }
+  }, [cardValues.status])
 
   const updateTitle = async(value: string) => {
     try {

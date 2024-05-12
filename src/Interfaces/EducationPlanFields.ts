@@ -30,6 +30,8 @@ export interface ICard {
   description?: string;
   difficulty: string;
   result_time: string;
+  date_start: Date;
+  date_end: Date;
   result: {
     draggableId: string,
     source: {

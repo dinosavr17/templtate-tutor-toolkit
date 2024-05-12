@@ -8,6 +8,10 @@
 button:before {
   color: #4cceac !important;
 }
+.css-j204z7-MuiFormControlLabel-root {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
 
 .app-boards-container {
   flex: 1;

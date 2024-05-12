@@ -6,7 +6,7 @@ import "./Dashboard.css";
 // @ts-ignore
 import CustomInput from "../../eduComponents/CustomInput/CustomInput.tsx";
 // @ts-ignore
-import { ICard, IBoard } from "../../Interfaces/EducationPlanFields.ts";
+import {ICard, IBoard, StatusColors} from "../../Interfaces/EducationPlanFields.ts";
 // @ts-ignore
 import { fetchBoardList, updateLocalStorageBoards } from "../../Helper/APILayers.ts";
 import {Box, colors, IconButton, Typography, useTheme} from "@mui/material";
@@ -20,6 +20,10 @@ import dayjs from 'dayjs';
 // @ts-ignore
 import Portal, { createContainer } from "../../eduComponents/Board/Portal.ts";
 import CloseIcon from '@mui/icons-material/Close';
+// @ts-ignore
+import {DifficultyMarker} from "../../eduComponents/Card/Card.tsx";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import {IOSSwitch} from "../../shared/Switch";
 
 const PageTitle = styled.div`
   padding: 5px 0px;
@@ -39,20 +43,50 @@ const PageTitle = styled.div`
 const ModulesContainer = styled.div`
   display: flex;
   flex-direction: row;
-  overflow-x: auto;
   width: 80vw;
   flex-wrap: wrap;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  width: 80vw;
   gap: 10px;
-  padding: 0 40px;
-  padding: 40px 40px;
+  padding: 20px;
   height: 70vh;
 `
 const AddModuleButton = styled.div`
   flex-basis: 290px;
   min-width: 290px;
+`;
+const DifficultyBlock = styled.div`
+    display: flex;
+  flex-direction: row;
+  margin-left: 20px;
+  & > p {
+    margin-right: 8px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  & > div {
+    margin: 0 28px;
+    min-height: 10px;
+    height: 50px;
+    width: 10px;
+    transform: rotate(90deg);
+  }
+`
+const StatusBlock = styled.div`
+    display: flex;
+  flex-direction: row;
+  margin-left: 20px;
+  & > p {
+    margin-right: 12px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+`;
+
+const AnnotationBlock = styled.div `
+  display: flex;
+  flex-direction: row;
+  & > div {
+    margin-right: 20px;
+  }
 `;
 
 export const EducationalPlan = ({uniquePlan}) => {
@@ -94,19 +128,18 @@ export const EducationalPlan = ({uniquePlan}) => {
             withCredentials: true
           }
         );
-        const boards: IBoard[] = uniquePlan?.modules;
-        setBoards(boards);
+        setBoards((prevBoards) => {
+          const tempBoardsList = [...prevBoards];
+          tempBoardsList.push({
+            id: response.data?.id,
+            title: response.data?.title,
+            index: response.data?.index,
+            cards: [],
+          });
+          return tempBoardsList;
+        });
       } catch (err) {
       }
-    setBoards((prevBoards) => {
-      const tempBoardsList = [...prevBoards];
-      tempBoardsList.push({
-        id: uniquePlan.id,
-        title: name,
-        cards: [],
-      });
-      return tempBoardsList;
-    });
   };
 
 
@@ -263,9 +296,7 @@ export const EducationalPlan = ({uniquePlan}) => {
       }
     } else if (type === 'column') {
       if (source.index !== destination.index) {
-        console.log('not equal');
         const activeBoard = tempBoardsList.find((board) => tempBoardsList.indexOf(board) === source.index);
-        console.log(activeBoard, 'activeBoard');
         const switchingBoard = tempBoardsList[destination.index];
         tempBoardsList[destination.index] = activeBoard;
         tempBoardsList[source.index] = switchingBoard;
@@ -291,6 +322,12 @@ export const EducationalPlan = ({uniquePlan}) => {
               withCredentials: true
             }
         );
+        console.log(response.data, 'перенос карточки/модуля');
+        // if (type === 'column') {
+        //   tempBoardsList[destination.index] = activeBoard;
+        //   tempBoardsList[source.index] = switchingBoard;
+        //   setBoards(tempBoardsList);
+        // }
       } catch (err) {
       }
     };
@@ -306,13 +343,64 @@ export const EducationalPlan = ({uniquePlan}) => {
     updateLocalStorageBoards(boards);
     console.log('update', uniquePlan);
   }, [boards]);
+  const difficultySample = ['easy', 'medium', 'hard'];
+  const statusSample = ['not_started', 'in_progress', 'done', 'to_repeat']
+  const statusColors: StatusColors = {
+    'not_started': { dark: '#7F8C8D', light: '#BDC3C7' }, // Серый
+    'in_progress': { dark: '#2ECC71', light: '#1bcd2a' }, // Зеленый
+    'done': { dark: '#F1C40F', light: '#ecb529' }, // Желтый
+    'to_repeat': { dark: '#3498DB', light: '#4496d9' } // Голубой
+  };
 
   return (
       <Box style={{margin: '10px 40px'}}>
         <PageTitle style={{ color: colors.blueAccent[100] }}>
           <h1>Образовательный план</h1>
         </PageTitle>
-
+        <AnnotationBlock>
+          <DifficultyBlock>
+            <p>Сложность тем:</p>
+            {difficultySample.map((item, index) => (
+                <DifficultyMarker key={index} style={{
+                  backgroundColor: item === 'easy'? '#86ED26' : item === 'medium'? '#FEDD00' : '#B30018'
+                }}>
+                  <p>{
+                    item === 'easy'
+                      ? 'Легкий'
+                      : item === 'medium'
+                          ? 'Средний'
+                          : 'Сложный'
+                  }</p>
+                </DifficultyMarker>
+            ))}
+          </DifficultyBlock>
+        <StatusBlock>
+          <p>Статус тем:</p>
+          {statusSample.map((status, index) => (
+              <FormControlLabel
+                  onClick={(event) => {
+                    event.stopPropagation();
+                  }}
+                  control={<IOSSwitch
+                      sx={{ m: 1, marginLeft: '10px' }}
+                      status={status}
+                      lightColor={statusColors[status]?.light}
+                      darkColour={statusColors[status]?.dark}
+                      checked={status !== 'not started'}
+                  />}
+                  label={
+                    status === 'not_started'
+                        ? 'Не\u00A0начата'
+                        : status === 'in_progress'
+                            ? 'В\u00A0процессе'
+                            : status === 'done'
+                                ? 'Завершена'
+                                : 'Повторение'
+                  }
+              />
+          ))}
+        </StatusBlock>
+        </AnnotationBlock>
         <Box display="grid" gridTemplateColumns="repeat(12, 0.5fr)">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="all-columns" direction="horizontal" type="column">

@@ -53,7 +53,7 @@ const CardBody = styled.div`
   justify-items: flex-start;
   
 `
-const DifficultyMarker = styled.div `
+export const DifficultyMarker = styled.div `
   width: 15px;
   min-height: 80px;
   margin-right: 16px;
@@ -61,9 +61,16 @@ const DifficultyMarker = styled.div `
   margin-top: -16px;
   margin-bottom: -16px;
   //background-color: #4774d5;
+  & > p {
+    transform: rotate(270deg);
+    margin-left: 20px;
+    margin-top: 40px;
+    font-size: 14px;
+  }
+
   border-radius: 8px;
-  background-image: linear-gradient(45deg, #ffffff 25%, transparent 25%, transparent 50%, #ffffff 50%, #ffffff 75%, transparent 75%);
-  background-size: 6px 6px; /* Уменьшаем размер штриха */
+  background-image: linear-gradient(45deg, rgb(255, 255, 255) 25%, transparent 25%, transparent 50%, rgb(255, 255, 255) 50%, rgb(255, 255, 255) 75%, transparent 75%);
+  background-size: 8px 8px; /* Уменьшаем размер штриха */
 `
 
 function Card(props: CardProps) {
@@ -152,7 +159,10 @@ function Card(props: CardProps) {
         }}
       >
           <div style={{display: 'flex', flexDirection: "row"}}>
-              <DifficultyMarker style={{backgroundColor: difficulty === 'easy' ? 'green' :  difficulty === 'medium'? 'orange' : difficulty === 'hard'? 'red' : '' }}/>
+              {(difficulty !== 'not_selected' && difficulty !== '')  &&
+                  <DifficultyMarker
+                      style={{backgroundColor: difficulty === 'easy' ? '#86ED26' : difficulty === 'medium' ? '#FEDD00' : difficulty === 'hard' ? '#B30018' : ''}}/>
+              }
               <main>
         <div className="card-top">
           <div className="card-top-labels">
@@ -189,7 +199,7 @@ function Card(props: CardProps) {
             onClick={(event) => {
               event.stopPropagation();
             }}
-            control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} lightColor={statusColors[status]?.light} darkColour={statusColors[status]?.dark}  />}
+            control={<IOSSwitch status={status} sx={{ m: 1, marginLeft: '40px' }} lightColor={statusColors[status]?.light} darkColour={statusColors[status]?.dark}  />}
             label={''}
           />
         </CardBody>
