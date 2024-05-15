@@ -1,5 +1,5 @@
 {
-  "name": "react-admin",
+  "name": "tutor-toolkit",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -29,7 +29,7 @@
     "dayjs": "^1.11.10",
     "formik": "^2.2.9",
     "lottie-web": "^5.12.2",
-    "react": "^18.2.0",
+    "react": "^17.0.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-chartjs-2": "^4.3.1",
     "react-dnd": "^16.0.1",
