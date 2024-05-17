@@ -409,7 +409,7 @@ export const EducationalPlan = ({uniquePlan}) => {
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                       style={{backgroundColor: snapshot.isDraggingOver? colors.educationalPlan.boardsWrapper : 'initial'}}>
-                    {boards.map((item, index) => (
+                    {boards && boards.length > 0 && boards.map((item, index) => (
                         <Draggable key={item.id} draggableId={item.id} index={index}>
                           {(provided) => (
                               <div

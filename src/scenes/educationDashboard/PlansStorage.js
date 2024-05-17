@@ -349,7 +349,7 @@ const PlansStorage = () => {
                     <div style={{display: 'flex', flexDirection: 'row', marginLeft: '10px'}}>
                     {studentsList.length >= 3 && (
                         <CustomSlider activeStudentIndex={activeStudentIndex} activeClassName="active-card">
-                            {studentsList.map((student, index) => (
+                            {studentsList.length > 0 && studentsList.map((student, index) => (
                                 <div key={index}>
                                     <CardContainer>
                                         <Box
@@ -370,7 +370,7 @@ const PlansStorage = () => {
                     )}
                     </div>
                     <div style={{display: 'flex', flexDirection: 'row', marginLeft: '10px'}}>
-                    {studentsList.length < 3 && studentsList.map((student, index) => (
+                    {studentsList.length < 3 && studentsList.length > 0 && studentsList.map((student, index) => (
                         <div key={index}>
                             <CardContainer>
                                 <Box
