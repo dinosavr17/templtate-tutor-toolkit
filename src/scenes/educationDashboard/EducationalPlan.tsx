@@ -25,7 +25,7 @@ import {DifficultyMarker} from "../../eduComponents/Card/Card.tsx";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {IOSSwitch} from "../../shared/Switch";
 
-const PageTitle = styled.div`
+export const PageTitle = styled.div`
   padding: 5px 0px;
   box-shadow: 0 1px 20px rgba(56, 40, 40, 0.05);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -33,7 +33,9 @@ const PageTitle = styled.div`
   top: 0;
   background: transparent;
   box-shadow: none;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
   font-size: 15px;
   margin-left: 15px;
   line-height: 36px;

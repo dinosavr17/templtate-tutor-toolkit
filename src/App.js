@@ -22,6 +22,7 @@ import Login from "./Authentification/LoginPage";
 import RequireAuth from "./RequireAuth";
 import PlansStorage from "./scenes/educationDashboard/PlansStorage";
 import PreloginPage from "./Authentification/PreloginPage";
+import CardMaterials from "./eduComponents/Card/CardInfo/CardMaterials.tsx";
 
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/edu" element={<PlansStorage />} />
               <Route path="/eduNewNew" element={<Example/>} />
+                <Route path="/topic-data" element={<CardMaterials/>}/>
               </Route>
             </Routes>
           </main>

@@ -10,6 +10,7 @@ import CustomInput from "../../CustomInput/CustomInput.tsx";
 
 import "./CardInfo.css";
 // @ts-ignore
+// @ts-ignore
 import {
   IBoard,
   ICard,
@@ -33,6 +34,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import {IOSSwitch} from "../../../shared/Switch";
 import {SelectChangeEvent} from "@mui/material/Select";
 import {Topic} from "@mui/icons-material";
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import Button from '@mui/material/Button';
+import { FormControl } from "@mui/material";
+import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface CardInfoProps {
   onClose: () => void;
@@ -59,17 +65,13 @@ function CardInfo(props: CardInfoProps) {
     'done': { dark: '#F1C40F', light: '#ecb529' }, // Желтый
     'to_repeat': { dark: '#3498DB', light: '#4496d9' } // Голубой
   };
-  //Поля которые нужно добавить в карточку сложность, длительность по оценке репетитора (Дни часы минуты)
-  // статус:  не начато, пройдено, повторение
-
-  // data   {title
-  //   description
-  //   date_start
-  //   date_end
-  //   plan_time
-  //   result_time
-  //   status
-  // }
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  // useEffect(() => {
+  //   // Пример перенаправления на URL "/new-path"
+  //   navigate("/new-path", { state: { from: location.pathname } });
+  // }, [navigate, location]);
   const handleSetStartDate = async() => {
       try {
         const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
@@ -360,16 +362,19 @@ function CardInfo(props: CardInfoProps) {
 
         <div className="cardinfo-box">
           <div className="cardinfo-box-title">
-            <Calendar />
-            <p>Дата начала</p>
+            <AttachFileIcon/>
+            <p>Материалы темы</p>
           </div>
-          <input
-            type="date"
-            defaultValue={cardValues.date}
-            min={new Date().toISOString().substr(0, 10)}
-            onChange={(event) => updateDate(event.target.value)}
-            lang="ru"
-          />
+          <FormControl sx={{width: '200px'}}>
+          <Button
+              onClick={() =>  {
+                localStorage.setItem('currentCard', card.id);
+                navigate("/topic-data", { state: { from: location.pathname } })
+              }}
+              sx={{padding: '6px 12px', textTransform: 'none', textAlign: 'left'}} variant="outlined" endIcon={<VerticalAlignBottomOutlinedIcon />}>
+            Загрузить материалы
+          </Button>
+          </FormControl>
         </div>
 
         <div className="cardinfo-box">

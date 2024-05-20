@@ -204,8 +204,12 @@ const PlansStorage = () => {
 
 
     useEffect(() => {
+        const temporaryId = localStorage.getItem('activePlanId');
+        console.log(uniqueId, temporaryId, 'получение планов');
        if (uniqueId !== '') {
            getPlanById(uniqueId);
+       } else if (temporaryId !== '') {
+           getPlanById(temporaryId);
        }
        console.log(uniqueId);
     }, [uniqueId]);

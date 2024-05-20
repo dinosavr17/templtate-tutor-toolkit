@@ -126,3 +126,15 @@
   font-size: 1rem;
   padding: 10px;
 }
+.css-1086bdv-MuiPaper-root-MuiAccordion-root:first-of-type {
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+}
+.css-1086bdv-MuiPaper-root-MuiAccordion-root::before {
+  border-top: transparent !important;
+  height: 0 !important;
+}
+.css-1086bdv-MuiPaper-root-MuiAccordion-root::after{
+  border-top: transparent !important;
+  height: 0 !important;
+}

@@ -16,7 +16,7 @@ import CardInfo from "./CardInfo/CardInfo.tsx";
 // @ts-ignore
 import Portal, {createContainer} from "../Board/Portal.ts";
 import styled from "styled-components";
-import {Switch, useTheme} from "@mui/material";
+import { useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import {IOSSwitch} from "../../shared/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
