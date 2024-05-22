@@ -9,6 +9,7 @@ import Modal from "../../Modal/Modal.tsx";
 import CustomInput from "../../CustomInput/CustomInput.tsx";
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import "./CardInfo.css";
 // @ts-ignore
 // @ts-ignore
@@ -31,7 +32,7 @@ import axios from '../../../api/axios';
 import {
     Box, colors, FormControl, useTheme, Typography, Menu, MenuItem, Accordion,
     AccordionSummary, IconButton,
-    AccordionDetails, Button, TextField, InputAdornment
+    AccordionDetails, Button, TextField, InputAdornment, CircularProgress
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
@@ -49,8 +50,15 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import CloseIcon from '@mui/icons-material/Close';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import {AddRounded} from "@mui/icons-material";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+// @ts-ignore
+import Portal, {createContainer} from "../../Board/Portal.ts";
+import './CardMaterials.css';
+import ContentTabs from './ContentTabs'
 
-const AccordionWrapper = styled.div`
+export const AccordionWrapper = styled.div`
   margin-top: 20px;
   & > div {
     margin: 10px 0;
@@ -98,8 +106,29 @@ const FilePreviewContainer = styled(Box)({
     marginBottom: '10px',
     width: "fit-content",
     textAlign: 'center',
+    '&:first-child': {
+        // ваши стили для первого дочернего элемента
+     alignItems: 'flex-end'
+    },
+    '&:nth-child(2)': {
+        alignItems: 'flex-start'
+    },
 });
-const AdditionalFieldWrapper = styled(Box)({
+const StatusOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+`;
+const StatusContainer = styled.div`
+  margin: 0 40px;
+`;
+export const AdditionalFieldWrapper = styled(Box)({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -145,9 +174,17 @@ const getFileTypeIcon = (fileType) => {
     return <InsertDriveFileIcon fontSize="large" />;
 };
 
-const FileUploadPreview = () => {
+export const FileUploadPreview = () => {
     const [files, setFiles] = useState([]);
+    const [isMounted, setMounted] = useState(false);
     const [isDragActive, setIsDragActive] = useState(false);
+    const [loadingStatus, setLoadingStatus] = useState('unset');
+    const [statusShown, setStatusShown] = useState(false);
+    const MODAL_CONTAINER_ID = 'modal-container-id';
+    useEffect(() => {
+        createContainer({ id: MODAL_CONTAINER_ID });
+        setMounted(true);
+    }, [])
 
     const handleFileChange = (event) => {
         const selectedFiles = Array.from(event.target.files);
@@ -173,11 +210,67 @@ const FileUploadPreview = () => {
         const selectedFiles = Array.from(event.dataTransfer.files);
         setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
     };
-    const uploadFile = async (files: File[]) => {
+    const action = (
+        <>
+            <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={() => { setStatusShown(false); }}
+            >
+                <CloseIcon fontSize="small" />
+            </IconButton>
+        </>
+    );
+    const renderStatusContent = () => {
+        const content = {
+            unset: () => {
+                return;
+            },
+            loading: () => {
+                return <CircularProgress sx={{ height: '100px !important', width: '100px !important' }} color='secondary' />;
+            },
+            success: () => {
+                return (
+                    <div>
+                        <Snackbar
+                            open={statusShown}
+                            autoHideDuration={4000}
+                            onClose={() => { setStatusShown(false); }}
+                            // message="План загружен"
+                            action={action}
+                        >
+                            <Alert onClose={() => { setStatusShown(false); }} severity="success">
+                                <AlertTitle>Файлы загружены</AlertTitle>
+                            </Alert>
+                        </Snackbar>
+                    </div>
+                );
+            },
+            error: () => {
+                return (
+                    <Snackbar
+                        open={statusShown}
+                        autoHideDuration={4000}
+                        onClose={() => { setStatusShown(false); }}
+                        // message="План загружен"
+                        action={action}
+                    >
+                    <Alert onClose={() => { setStatusShown(false); }} severity="error">
+                        <AlertTitle>Ошибка</AlertTitle>
+                        Произошла ошибка во время загрузки файлов — <strong> Попробуйте еще раз!</strong>
+                    </Alert>
+                    </Snackbar>
+                );
+            },
+        };
+
+        return content[loadingStatus]();
+    };
+    const uploadFile = async (files: File[], field) => {
         // const rejectedFiles: string[] = [];
-        // setStatusShown(true);
-        // setLoadingStatus('loading');
-        //
+        setStatusShown(true);
+        setLoadingStatus('loading');
         // const validationResult = validateFetchData();
             try {
                 await Promise.allSettled(files.map(async (file, index) => {
@@ -188,7 +281,7 @@ const FileUploadPreview = () => {
                     formData.append('name', file.name);
 
                     try {
-                        const response = await axios.post(`api/education_plan/card/files/`,
+                        const response = await axios.post(`api/education_plan/files`,
                                formData,
                             {
                             headers: {
@@ -198,9 +291,11 @@ const FileUploadPreview = () => {
                             withCredentials: true
                         });
 
-                        // // if (response.ok) {
-                        //     console.log(`File ${index + 1} (${file.name}) uploaded successfully!`);
-                        //     console.log(response, 'response with files');
+                        if (response.status === 201) {
+                            console.log(`File ${index + 1} (${file.name}) uploaded successfully!`);
+                            console.log(response, 'response with files');
+                            setLoadingStatus('success');
+                        }
                         // } else {
                         //     console.log(response.status, 'errr 1');
                         //     throw new Error(`Failed to upload file ${index + 1}`);
@@ -226,14 +321,14 @@ const FileUploadPreview = () => {
                             // setUploadedFiles([]);
                         }
                         else if (!isLoadingError)  {
-                            // setLoadingStatus('success');
+                            setLoadingStatus('success');
                             setFiles([]);
                         }
                     })
                 });
             } catch (error) {
                 console.error('Error during file uploads:', error);
-                // setLoadingStatus('error');
+                setLoadingStatus('error');
             }
         };
 
@@ -253,98 +348,48 @@ const FileUploadPreview = () => {
                         onChange={handleFileChange}
                     />
                     <Button variant="contained" component="span" endIcon={<FileUploadOutlinedIcon />}>
-                        Загрузить
+                        Добавьте файлы
                     </Button>
                     <Typography variant="body2" color="textSecondary">
                         или перетащите файлы сюда
                     </Typography>
                 </label>
+                <FilePreviewList>
+                    {files.map((file, index) => (
+                        <FilePreviewContainer key={index}>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleFileRemove(index)}
+                            >
+                                <CloseIcon />
+                            </IconButton>
+                            <div>
+                            <FilePreviewIcon>{getFileTypeIcon(file.type)}</FilePreviewIcon>
+                            <Typography variant="body2">{file.name}</Typography>
+                            </div>
+                        </FilePreviewContainer>
+                    ))}
+                </FilePreviewList>
             </DropZone>
-            <FilePreviewList>
-                {files.map((file, index) => (
-                    <FilePreviewContainer key={index}>
-                        <IconButton
-                            size="small"
-                            onClick={() => handleFileRemove(index)}
-                        >
-                            <CloseIcon />
-                        </IconButton>
-                        <FilePreviewIcon>{getFileTypeIcon(file.type)}</FilePreviewIcon>
-                        <Typography variant="body2">{file.name}</Typography>
-                    </FilePreviewContainer>
-                ))}
-            </FilePreviewList>
-            <Button variant="contained" component="span" onClick={() => {uploadFile(files)}} endIcon={<FileUploadOutlinedIcon />}>
+            <Button color='secondary' variant="contained" component="span" onClick={() => {uploadFile(files, 'lesson')}} endIcon={<CloudUploadOutlinedIcon />}>
                 Выгрузить на сервер
             </Button>
+            {isMounted &&
+            <Portal id={MODAL_CONTAINER_ID}>
+                {statusShown &&
+                <StatusOverlay>
+                    <StatusContainer style={{ display: 'flex' }}>
+                        {renderStatusContent()}
+                    </StatusContainer>
+                </StatusOverlay>
+                }
+            </Portal>
+            }
         </Box>
     );
 };
 
 export const AccordionList = ({props: CardContentProps}) => {
-    // const uploadFile = async (files: File[]) => {
-    //     const rejectedFiles: string[] = [];
-    //     setStatusShown(true);
-    //     setLoadingStatus('loading');
-    //
-    //     const validationResult = validateFetchData();
-    //
-    //     if (validationResult !== 'warning') {
-    //         try {
-    //             await Promise.allSettled(files.map(async (file, index) => {
-    //
-    //                 const formData = new FormData();
-    //                 formData.append('file', file);
-    //
-    //                 try {
-    //                     const response = await fetch(BackendRoutes.ADD_FILES, {
-    //                         method: 'POST',
-    //                         body: formData,
-    //                         headers: {
-    //                         },
-    //                     });
-    //
-    //                     if (response.ok) {
-    //                         console.log(`File ${index + 1} (${file.name}) uploaded successfully!`);
-    //                         console.log(response, 'response with files');
-    //                     } else {
-    //                         console.log(response.status, 'errr 1');
-    //                         throw new Error(`Failed to upload file ${index + 1}`);
-    //                     }
-    //                 } catch (error) {
-    //                     console.log(error, 'errr 2');
-    //                     console.error(`Error during file upload ${index + 1} (${files[index].name}):`, error);
-    //                     throw new Error(`${files[index].name}`);
-    //                 }
-    //             })).then((res) => {
-    //                 let isLoadingError = false;
-    //                 // res — массив результатов выполнения промисов
-    //                 res.forEach(item => {
-    //                     console.log(item, 'Результаты выполнения промисов');
-    //                     if (item.status === 'rejected') {
-    //                         const rejectedFile = (item.reason).toString().replace('Error:', '')
-    //                         rejectedFiles.push(rejectedFile.toString());
-    //                         console.log(rejectedFiles, 'Отклоненные файлы', typeof rejectedFiles);
-    //                         setRejectedFiles(rejectedFiles);
-    //                         isLoadingError = true;
-    //                         // console.log(item.reason.replace('Error:', ''), 'файл был отклонен');
-    //                         setLoadingStatus('error');
-    //                         setUploadedFiles([]);
-    //                     }
-    //                     else if (!isLoadingError)  {
-    //                         setLoadingStatus('success');
-    //                         setUploadedFiles([]);
-    //                     }
-    //                 })
-    //             });
-    //         } catch (error) {
-    //             console.error('Error during file uploads:', error);
-    //             setLoadingStatus('error');
-    //         }
-    //     } else {
-    //         setLoadingStatus('warning');
-    //     }
-    // };
     return (
         <AccordionWrapper>
             <Accordion>
@@ -353,7 +398,7 @@ export const AccordionList = ({props: CardContentProps}) => {
                     aria-controls="panel1a-content"
                     id="panel1a-header"
                 >
-                    <Typography>Материалы урока</Typography>
+                    <Typography>Загрузить материалы</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     <Typography sx={{marginBottom: '10px'}}>
@@ -400,26 +445,10 @@ export const AccordionList = ({props: CardContentProps}) => {
                     aria-controls="panel2a-content"
                     id="panel2a-header"
                 >
-                    <Typography>Домашняя работа</Typography>
+                    <Typography>Просмотреть материалы</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <Typography>
-                        Content for section 2.
-                    </Typography>
-                </AccordionDetails>
-            </Accordion>
-            <Accordion>
-                <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel3a-content"
-                    id="panel3a-header"
-                >
-                    <Typography>Повторение</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <Typography>
-                        Content for section 3.
-                    </Typography>
+                    <ContentTabs/>
                 </AccordionDetails>
             </Accordion>
         </AccordionWrapper>
@@ -434,91 +463,6 @@ export interface CardContentProps {
 function CardMaterials() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [cardData, setCardData] = useState({});
-useEffect(() => {
-    const cardId = localStorage.getItem('currentCard')
-    const getCardData = async () => {
-        try {
-            const response = await axios.get(`api/education_plan/card/${cardId}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")!).accessToken}`,
-                },
-                withCredentials: true
-            });
-
-            console.log(response.data, 'resp');
-            setCardData(response.data);
-        } catch (err) {
-            console.error(err); // Обработка ошибок
-        }
-    };
-getCardData();
-}, [])
-
-    // const uploadFile = async (files: File[]) => {
-    //     const rejectedFiles: string[] = [];
-    //     setStatusShown(true);
-    //     setLoadingStatus('loading');
-    //
-    //     const validationResult = validateFetchData();
-    //
-    //     if (validationResult !== 'warning') {
-    //         try {
-    //             await Promise.allSettled(files.map(async (file, index) => {
-    //
-    //                 const formData = new FormData();
-    //                 formData.append('file', file);
-    //
-    //                 try {
-    //                     const response = await fetch(BackendRoutes.ADD_FILES, {
-    //                         method: 'POST',
-    //                         body: formData,
-    //                         headers: {
-    //                         },
-    //                     });
-    //
-    //                     if (response.ok) {
-    //                         console.log(`File ${index + 1} (${file.name}) uploaded successfully!`);
-    //                         console.log(response, 'response with files');
-    //                     } else {
-    //                         console.log(response.status, 'errr 1');
-    //                         throw new Error(`Failed to upload file ${index + 1}`);
-    //                     }
-    //                 } catch (error) {
-    //                     console.log(error, 'errr 2');
-    //                     console.error(`Error during file upload ${index + 1} (${files[index].name}):`, error);
-    //                     throw new Error(`${files[index].name}`);
-    //                 }
-    //             })).then((res) => {
-    //                 let isLoadingError = false;
-    //                 // res — массив результатов выполнения промисов
-    //                 res.forEach(item => {
-    //                     console.log(item, 'Результаты выполнения промисов');
-    //                     if (item.status === 'rejected') {
-    //                         const rejectedFile = (item.reason).toString().replace('Error:', '')
-    //                         rejectedFiles.push(rejectedFile.toString());
-    //                         console.log(rejectedFiles, 'Отклоненные файлы', typeof rejectedFiles);
-    //                         setRejectedFiles(rejectedFiles);
-    //                         isLoadingError = true;
-    //                         // console.log(item.reason.replace('Error:', ''), 'файл был отклонен');
-    //                         setLoadingStatus('error');
-    //                         setUploadedFiles([]);
-    //                     }
-    //                     else if (!isLoadingError)  {
-    //                         setLoadingStatus('success');
-    //                         setUploadedFiles([]);
-    //                     }
-    //                 })
-    //             });
-    //         } catch (error) {
-    //             console.error('Error during file uploads:', error);
-    //             setLoadingStatus('error');
-    //         }
-    //     } else {
-    //         setLoadingStatus('warning');
-    //     }
-    // };
     return (
         <Box style={{margin: '10px 40px'}}>
             <BasicBreadcrumbs/>
@@ -526,7 +470,7 @@ getCardData();
             <h1>Материалы темы</h1>
             <FolderCopyOutlinedIcon sx={{fontSize: '22px', marginLeft: '20px'}}/>
         </PageTitle>
-            <AccordionList classworkContent={''} homeworkContent={''} repetitionContent={''}/>
+            <AccordionList />
         </Box>
     );
 }

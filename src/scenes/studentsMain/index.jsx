@@ -1,293 +1,192 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  FormControl,
+  IconButton, InputAdornment, TextField,
+  Typography,
+  useTheme
+} from "@mui/material";
 import { tokens } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import SchoolIcon from '@mui/icons-material/School';
-import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
 import StudentCard from "../../components/StudentCard";
-import {VerifiedUser} from "@mui/icons-material";
+import {
+  AddRounded,
+  DeleteForever,
+  DeleteOutlined,
+  FolderOutlined,
+  UploadOutlined,
+  VerifiedUser
+} from "@mui/icons-material";
 import Caption from "../../components/Caption";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AddLinkIcon from "@mui/icons-material/AddLink";
+import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
+import React, {useEffect, useState} from "react";
+import {
+  AccordionWrapper,
+  AdditionalFieldWrapper,
+  FileUploadPreview
+} from "../../eduComponents/Card/CardInfo/CardMaterials.tsx";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import ImageIcon from '@mui/icons-material/Image';
+import WorkIcon from '@mui/icons-material/Work';
+import BeachAccessIcon from '@mui/icons-material/BeachAccess';
+import styled from "styled-components";
+import {PageTitle} from "../educationDashboard/EducationalPlan.tsx";
+import axios from "../../api/axios";
+import dayjs from "dayjs";
+require('dayjs/locale/ru');
+dayjs.locale('ru');
+export const FilesTableWrapper = styled.div`
+  margin-top: 20px;
+  box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+  border-radius: 8px;
+  & > div {
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+`;
+export function FolderList() {
+  const [personalFiles, setPersonalFiles] = useState([])
+  const getFilesData = async (e) => {
 
-const StudentsMainPage = () => {
+    try {
+      const response = await axios.get('api/education_plan/files',
+          {
+
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': 'http://localhost:3000',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true
+          }
+      );
+      console.log(response?.data);
+      setPersonalFiles(response?.data);
+
+    } catch (err) {
+      if (!err?.response) {
+        // setLoadingStatus('error');
+      }
+    }
+  };
+  useEffect(() => {
+    getFilesData()
+  }, []);
+  const handleDownload = (url) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_self';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  const formatDate = (date) => dayjs(date).format('D MMMM YYYY года, HH:mm');
+  return (
+      <FilesTableWrapper>
+      <List sx={{bgcolor: 'background.paper' }}>
+        {personalFiles.map((file) => (
+        <ListItem secondaryAction={
+                     <div>
+                       <IconButton edge="end" aria-label="delete" onClick={() => handleDownload(file.file)}>
+                         <UploadOutlined/>
+                       </IconButton>
+                       <IconButton edge="end" aria-label="delete">
+                         <DeleteOutlined />
+                       </IconButton>
+                     </div>
+        }>
+          <ListItemAvatar>
+            <Avatar>
+              <ImageIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary={file.name} secondary={formatDate(file.upload_date)} />
+        </ListItem>
+        ))}
+      </List>
+      </FilesTableWrapper>
+  );
+}
+
+const StorageMainPage = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const studentData = [
-    {
-      name: 'Павел',
-      lastName: 'Дуров',
-      age: 9,
-      discipline: ['Python'],
-      status: 'active',
-      parent: null
-  },
-    {
-      name: 'Марк',
-      lastName: 'Цукерберг',
-      age: 60,
-      discipline: ['ЕГЭ Информатика'],
-      status: 'inactive',
-      parent: null
-    },
-    {
-      name: 'Стив',
-      lastName: 'Джобс',
-      age: 10,
-      discipline: ['ОГЭ Математика', 'ОГЭ Информатика'],
-      status: 'inactive',
-      parent: {
-        name: 'Mum Jobs',
-      }
-    },
-]
+
 
 
 
     return (
     <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Caption title="Прогресс"
-                subtitle="Карточки студентов - содержат информацию о дисциплинах и статусе студента.
-        для перехода в пространство студента - кликните по карточке" />
-        <Box>
-          {/*<Button*/}
-          {/*  sx={{*/}
-          {/*    backgroundColor: colors.blueAccent[700],*/}
-          {/*    color: colors.grey[100],*/}
-          {/*    fontSize: "14px",*/}
-          {/*    fontWeight: "bold",*/}
-          {/*    padding: "10px 20px",*/}
-          {/*  }}*/}
-          {/*>*/}
-          {/*  <DownloadOutlinedIcon sx={{ mr: "10px" }} />*/}
-          {/*  Download Reports*/}
-          {/*</Button>*/}
-        </Box>
-      </Box>
-
-      {/* GRID & CHARTS */}
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
-        gap="20px"
-      >
-        {/* ROW 1 */}
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+      <PageTitle style={{ color: colors.blueAccent[100] }}>
+        <h1>Мои материалы</h1>
+      </PageTitle>
+      <AccordionWrapper>
+      <Accordion>
+        <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
         >
-          <StudentCard personalInfo={studentData[0]} icon={
-            <SchoolIcon
-              sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-            />
-          }/>
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StudentCard personalInfo={studentData[1]} icon={
-            <SchoolIcon
-              sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-            />
-          }/>
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StudentCard personalInfo={studentData[2]} icon={
-            <SchoolIcon
-              sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-            />
-          }/>
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="1,325,134"
-            subtitle="Traffic Received"
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <TrafficIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+          <Typography>Загрузить материалы</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography sx={{marginBottom: '10px'}}>
+            Загрузка материалов для урока
+          </Typography>
+          <FileUploadPreview/>
+          <AdditionalFieldWrapper>
+            <FormControl sx={{display: 'flex', flexDirection: 'row'}}>
+              <TextField
+                  label="Ссылка"
+                  id="filled-start-adornment"
+                  sx={{ m: 1, width: '200px' }}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start"><AddLinkIcon/></InputAdornment>,
+                  }}
+                  variant="outlined"
               />
-            }
-          />
-        </Box>
-
-        {/* ROW 2 */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                Revenue Generated
-              </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                $59,342.32
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                />
-              </IconButton>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          overflow="auto"
-        >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
-            p="15px"
-          >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Recent Transactions
-            </Typography>
-          </Box>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <Box>
-                <Typography
-                  color={colors.greenAccent[500]}
-                  variant="h5"
-                  fontWeight="600"
-                >
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                </Typography>
-              </Box>
-              <Box color={colors.grey[100]}></Box>
-              <Box
-                backgroundColor={colors.greenAccent[500]}
-                p="5px 10px"
-                borderRadius="4px"
-              >
-              </Box>
-            </Box>
-          ))
-        </Box>
-
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          p="30px"
-        >
-          <Typography variant="h5" fontWeight="600">
-            Campaign
-          </Typography>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            <ProgressCircle size="125" />
-            <Typography
-              variant="h5"
-              color={colors.greenAccent[500]}
-              sx={{ mt: "15px" }}
-            >
-              $48,352 revenue generated
-            </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            Sales Quantity
-          </Typography>
-          <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          padding="30px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ marginBottom: "15px" }}
-          >
-            Geography Based Traffic
-          </Typography>
-          <Box height="200px">
-          </Box>
-        </Box>
+              <Button sx={{width: '120px', height: '40px'}} variant="contained" component="span" endIcon={<AddRounded/>}>
+                Прикрепить
+              </Button>
+            </FormControl>
+          </AdditionalFieldWrapper>
+          <AdditionalFieldWrapper>
+            <FormControl sx={{display: 'flex', flexDirection: 'row'}}>
+              <TextField
+                  label="Комментарий"
+                  id="filled-start-adornment"
+                  sx={{ m: 1, width: '200px' }}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start"><ChatBubbleOutlineRoundedIcon/></InputAdornment>,
+                  }}
+                  variant="outlined"
+              />
+              <Button sx={{width: '120px', height: '40px'}}  variant="contained" component="span" endIcon={<AddRounded/>}>
+                Добавить
+              </Button>
+            </FormControl>
+          </AdditionalFieldWrapper>
+        </AccordionDetails>
+      </Accordion>
+      </AccordionWrapper>
+      <Box>
+      <FolderList/>
       </Box>
     </Box>
   );
 };
 
-export default StudentsMainPage;
+export default StorageMainPage;

@@ -138,12 +138,6 @@ const PlansStorage = () => {
     const [uniqueId, setUniqueId] = useState('');
     const [uniquePlan, setUniquePlan] = useState({});
     const [activeStudentIndex, setActiveStudentIndex] = useState(-1);
-    useEffect(() => {
-        setActiveStudentIndex(() => {
-            const storedIndex = localStorage.getItem('studentIndex');
-            return storedIndex !== null ? +storedIndex : -1;
-        });
-    }, []);
 
     const [currentIndex, setCurrentIndex] = useState(() => {
         const storedIndex = localStorage.getItem('studentIndex');
@@ -160,9 +154,6 @@ const PlansStorage = () => {
 
     const action = (
         <>
-            {/*<Button color="secondary" size="small" onClick={() => { setStatusShown(false); }}>*/}
-            {/*    UNDO*/}
-            {/*</Button>*/}
             <IconButton
                 size="small"
                 aria-label="close"
@@ -205,13 +196,12 @@ const PlansStorage = () => {
 
     useEffect(() => {
         const temporaryId = localStorage.getItem('activePlanId');
-        console.log(uniqueId, temporaryId, 'получение планов');
        if (uniqueId !== '') {
            getPlanById(uniqueId);
        } else if (temporaryId !== '') {
            getPlanById(temporaryId);
        }
-       console.log(uniqueId);
+       console.log(uniqueId, 'Уникальный id');
     }, [uniqueId]);
 
     useEffect(() => {
@@ -246,7 +236,7 @@ const PlansStorage = () => {
         const activePlanId = localStorage.getItem('activePlanId');
         const studentIndex = localStorage.getItem('studentIndex')
         if (activePlanId) {
-            setUniqueId(activePlanId); // Установите сохраненный id в состояние компонента
+            setUniqueId(activePlanId);
         }
         if (studentIndex) {
             setActiveStudentIndex(+studentIndex);
@@ -267,7 +257,6 @@ const PlansStorage = () => {
             });
             setStudentsList(response?.data?.plans);
             console.log('Все юзеры', response?.data?.plans);
-            setUniqueId(response.data.plans[0].id);
         } catch (err) {
             if (!err?.response) {
                 setLoadingStatus('error');
@@ -286,7 +275,7 @@ const PlansStorage = () => {
                     'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
                 },
             });
-            console.log(response?.data, 'объект с планами');
+            console.log(response?.data, 'план по id');
             setLoadingStatus('success');
             setUniquePlan(response?.data);
             localStorage.setItem('activePlanId', id);
@@ -354,7 +343,7 @@ const PlansStorage = () => {
                     <div style={{display: 'flex', flexDirection: 'row', marginLeft: '10px'}}>
                     {studentsList.length >= 3 && (
                         <CustomSlider activeStudentIndex={activeStudentIndex} activeClassName="active-card">
-                            {studentsList.length > 0 && studentsList.map((student, index) => (
+                            {studentsList.map((student, index) => (
                                 <div key={index}>
                                     <CardContainer>
                                         <Box
@@ -375,7 +364,7 @@ const PlansStorage = () => {
                     )}
                     </div>
                     <div style={{display: 'flex', flexDirection: 'row', marginLeft: '10px'}}>
-                    {studentsList.length < 3 && studentsList.length > 0 && studentsList.map((student, index) => (
+                    {studentsList.length < 3 && studentsList.map((student, index) => (
                         <div key={index}>
                             <CardContainer>
                                 <Box

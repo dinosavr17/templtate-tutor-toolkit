@@ -1,0 +1,23 @@
+.css-heg063-MuiTabs-flexContainer {
+    display: flex;
+    justify-content: center !important;
+    margin-top: 30px;
+    border-radius: 8px;
+    padding: 0;
+    align-items: flex-start;
+    /*border: 1px #151632 solid;*/
+}
+.css-3dhyfe-MuiTabs-indicator {
+    height: 0 !important;
+}
+.css-1lq7soi-MuiButtonBase-root-MuiTab-root {
+    background-color: transparent !important;
+    border-radius: 8px !important;
+    text-transform: none !important;
+    width: 32%;
+    margin-right: 10px !important;
+    border: #151632 solid 1px !important;
+}
+.css-1lq7soi-MuiButtonBase-root-MuiTab-root.Mui-selected {
+    background-color: #baeaff !important;
+}

@@ -18,6 +18,8 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import axios from "../../api/axios";
+import {GifBoxOutlined} from "@mui/icons-material";
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -157,9 +159,9 @@ const Sidebar = () => {
               Основное
             </Typography>
             <Item
-              title="Прогресс"
-              to="/"
-              icon={<HomeOutlinedIcon />}
+              title="Материалы"
+              to="/main"
+              icon={<Inventory2OutlinedIcon/>}
               selected={selected}
               setSelected={setSelected}
             />

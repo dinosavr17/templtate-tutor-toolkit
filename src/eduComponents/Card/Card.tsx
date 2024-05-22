@@ -86,7 +86,6 @@ function Card(props: CardProps) {
   } =
     props;
   const { id, title, description, date, labels, status, result_time, difficulty } = card;
-  console.log(card, 'данные карточки');
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isMounted, setMounted] = useState(false);

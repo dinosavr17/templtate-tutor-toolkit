@@ -102,7 +102,7 @@ export const EducationalPlan = ({uniquePlan}) => {
   useEffect(() => {
     setMounted(true);
     fetchData();
-  }, []);
+  }, [uniquePlan]);
 
   async function fetchData() {
     const boards: IBoard[] = uniquePlan?.modules;
@@ -130,6 +130,7 @@ export const EducationalPlan = ({uniquePlan}) => {
             withCredentials: true
           }
         );
+        console.log('СОЗДАНИЕ МОДУЛЯ', response.data)
         setBoards((prevBoards) => {
           const tempBoardsList = [...prevBoards];
           tempBoardsList.push({
@@ -167,7 +168,6 @@ export const EducationalPlan = ({uniquePlan}) => {
   };
 
   const addCardHandler = async (boardId: string, title: string, duration: string) => {
-    console.log(duration, 'приходит ли длительность?');
     try {
       const response = await axios.post('api/education_plan/card/',
         JSON.stringify(
@@ -186,10 +186,10 @@ export const EducationalPlan = ({uniquePlan}) => {
           withCredentials: true
         }
       );
-      const boards: IBoard[] = uniquePlan?.modules;
-      setBoards(boards);
+      // const boards: IBoard[] = uniquePlan?.modules;
+      // setBoards(boards);
 
-      console.log(response, 'resp');
+      console.log(response.data, 'ДАННЫЕ ПОСЛЕ СОЗДАНИЯ КАРТОЧКИ');
       const boardIndex = boards.findIndex((item: IBoard) => item.id === boardId);
       if (boardIndex < 0) return;
       const tempBoardsList = [...boards];
@@ -231,6 +231,7 @@ export const EducationalPlan = ({uniquePlan}) => {
             withCredentials: true
           }
       );
+      console.log(response.data, 'ДАННЫЕ ПОСЛЕ УДАЛЕНИЯ КАРТОЧКИ');
       const boards: IBoard[] = uniquePlan?.modules;
       setBoards(boards);
     } catch (err) {

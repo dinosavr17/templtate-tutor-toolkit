@@ -14,7 +14,6 @@ import FAQ from "./scenes/faq";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
-import StudentsMainPage from "./scenes/studentsMain";
 import {EducationalPlan} from "./scenes/educationDashboard/EducationalPlan.tsx"
 import Example from "./eduComponents/Example";
 import Register from "./Authentification/Register.jsx";
@@ -23,6 +22,7 @@ import RequireAuth from "./RequireAuth";
 import PlansStorage from "./scenes/educationDashboard/PlansStorage";
 import PreloginPage from "./Authentification/PreloginPage";
 import CardMaterials from "./eduComponents/Card/CardInfo/CardMaterials.tsx";
+import StorageMainPage from "./scenes/studentsMain";
 
 
 function App() {
@@ -53,7 +53,7 @@ function App() {
               <Route path="/register" element={<Register/>} />
               <Route path="/login" element={<Login/>} />
               <Route element={<RequireAuth/>}>
-              <Route path="/main" element={<StudentsMainPage />} />
+              <Route path="/main" element={<StorageMainPage />} />
               <Route path="/" element={<Dashboard />} />
               <Route path="/team" element={<Team />} />
               <Route path="/contacts" element={<Contacts />} />

@@ -1,0 +1,16 @@
+.css-1lw178f-MuiButtonBase-root-MuiButton-root,
+.css-k2hx9u-MuiButtonBase-root-MuiButton-root,
+.css-jb29h9-MuiButtonBase-root-MuiButton-root,
+.css-1grkmjs-MuiButtonBase-root-MuiButton-root
+{
+    text-transform: none !important;
+    margin: 10px 0 !important;
+}
+.css-apjzwd-MuiFormControl-root {
+    display: flex;
+    align-items: center;
+}
+
+.css-1o9s3wi-MuiInputBase-input-MuiOutlinedInput-input {
+    padding: 12px 14px !important;
+}
