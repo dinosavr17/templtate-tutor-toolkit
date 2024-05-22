@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import {Avatar, Box, IconButton, Typography, useTheme} from "@mui/material";
 import AppIcon from "../../asserts/images/app_icon.png"
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
@@ -17,6 +17,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import axios from "../../api/axios";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -41,6 +42,32 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Прогресс");
+  const [userData, setUserData] = useState({
+      firstName: '',
+      lastName: '',
+      role: ''
+  })
+    const getUsers = async () => {
+        try {
+            const response = await axios.get('api/education_plan/get_users_data', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': 'http://localhost:3000',
+                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+                },
+                withCredentials: true
+            });
+            console.log('Данные в сайдбаре', response?.data);
+            setUserData(prevState => ({ ...prevState, firstName:  response?.data.first_name, lastName:  response?.data.last_name, role:  response?.data.role }));
+        } catch (err) {
+            if (!err?.response) {
+                // setLoadingStatus('error');
+            }
+        }
+    };
+  useEffect(() => {
+      getUsers();
+  }, [])
 
   return (
     <Box
@@ -94,25 +121,28 @@ const Sidebar = () => {
           {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
+                  <Avatar sx={{ bgcolor: colors.blueAccent[500], width: '100px', height: '100px', borderRadius: "50%" }}>{userData.firstName[0]}</Avatar>
+                {/*<img*/}
+                {/*  alt="profile-user"*/}
+                {/*  width="100px"*/}
+                {/*  height="100px"*/}
+                {/*  src={`../../assets/user.png`}*/}
+                {/*  style={{ cursor: "pointer", borderRadius: "50%" }}*/}
+                {/*/>*/}
               </Box>
               <Box textAlign="center">
                 <Typography
-                  variant="h2"
+                  variant="h3"
                   color={colors.grey[100]}
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                 Илон Маск
+                    {userData.firstName}
+                    <br/>
+                    {userData.lastName}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Персональный коуч
+                  {userData.role === 'student'? 'Студент' : 'Преподаватель'}
                 </Typography>
               </Box>
             </Box>

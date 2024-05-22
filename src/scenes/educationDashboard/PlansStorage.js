@@ -267,6 +267,7 @@ const PlansStorage = () => {
             });
             setStudentsList(response?.data?.plans);
             console.log('Все юзеры', response?.data?.plans);
+            setUniqueId(response.data.plans[0].id);
         } catch (err) {
             if (!err?.response) {
                 setLoadingStatus('error');
@@ -378,7 +379,7 @@ const PlansStorage = () => {
                         <div key={index}>
                             <CardContainer>
                                 <Box
-                                    backgroundColor={colors.primary[400]}
+                                    backgroundColor={index === activeStudentIndex ? colors.educationalPlan.card : colors.primary[400]}
                                     display="flex"
                                     alignItems="center"
                                     flexDirection='row'
