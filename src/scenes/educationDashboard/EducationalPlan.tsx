@@ -24,6 +24,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import {DifficultyMarker} from "../../eduComponents/Card/Card.tsx";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {IOSSwitch} from "../../shared/Switch";
+import {ProgressLineGraph} from './ProgressLineGraph'
 
 export const PageTitle = styled.div`
   padding: 5px 0px;
@@ -91,7 +92,7 @@ const AnnotationBlock = styled.div `
   }
 `;
 
-export const EducationalPlan = ({uniquePlan}) => {
+export const EducationalPlan = ({uniquePlan, getPlan}) => {
   const theme = useTheme();
    const colors = tokens(theme.palette.mode);
   const MODAL_CONTAINER_ID = 'modal-container-id';
@@ -141,6 +142,7 @@ export const EducationalPlan = ({uniquePlan}) => {
           });
           return tempBoardsList;
         });
+        getPlan();
       } catch (err) {
       }
   };
@@ -159,6 +161,7 @@ export const EducationalPlan = ({uniquePlan}) => {
       );
       const boards: IBoard[] = uniquePlan?.modules;
       setBoards(boards);
+      getPlan();
     } catch (err) {
     }
     setBoards((prevBoards) => {
@@ -215,6 +218,7 @@ export const EducationalPlan = ({uniquePlan}) => {
         }
       });
       setBoards(tempBoardsList);
+      getPlan();
     } catch (err) {
     }
 
@@ -234,6 +238,7 @@ export const EducationalPlan = ({uniquePlan}) => {
       console.log(response.data, 'ДАННЫЕ ПОСЛЕ УДАЛЕНИЯ КАРТОЧКИ');
       const boards: IBoard[] = uniquePlan?.modules;
       setBoards(boards);
+      getPlan();
     } catch (err) {
     }
 
@@ -263,6 +268,7 @@ export const EducationalPlan = ({uniquePlan}) => {
     tempBoardsList[boardIndex].cards[cardIndex] = card;
 
     setBoards(tempBoardsList);
+    getPlan();
   };
 
   const onDragEnd = (result) => {

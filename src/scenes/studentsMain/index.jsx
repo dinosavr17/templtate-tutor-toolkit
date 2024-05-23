@@ -78,7 +78,6 @@ export function FolderList() {
 
     } catch (err) {
       if (!err?.response) {
-        // setLoadingStatus('error');
       }
     }
   };

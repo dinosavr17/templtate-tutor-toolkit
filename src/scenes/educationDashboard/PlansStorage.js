@@ -22,7 +22,8 @@ import Switch from "@mui/material/Switch";
 import {IOSSwitch} from "../../shared/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
-
+import {ProgressLineGraph} from './ProgressLineGraph'
+import {StatusPie} from './StatusPie';
 
 const StatusOverlay = styled.div`
   position: fixed;
@@ -137,7 +138,74 @@ const PlansStorage = () => {
     const [studentsList, setStudentsList] = useState([]);
     const [uniqueId, setUniqueId] = useState('');
     const [uniquePlan, setUniquePlan] = useState({});
+    const [tempPlan, setTempPlan] = useState({});
+    const [planData, setPlanData] = useState([]);
+    const [resultData, setResultData] = useState([]);
+    const [graphData, setGraphData] = useState([]);
+    const [pieData, setPieData] = useState();
     const [activeStudentIndex, setActiveStudentIndex] = useState(-1);
+    useEffect(() => {
+        console.log('Данные об уникальном плане', uniquePlan);
+        if (tempPlan.modules && tempPlan.modules.length > 0) {
+            const modules = tempPlan.modules;
+            // Объединение всех карточек в один массив
+            const cardsData = modules.reduce((acc, module) => {
+                return acc.concat(module.cards);
+            }, []);
+            console.log(cardsData, 'дата по карточкам');
+            //TODO заполнить данные для StatusPie по статусам карточек
+            function timeToMinutes(time) {
+                if (time) {
+                    const [hours, minutes, seconds] = time.split(':').map(Number);
+                    return hours + Math.round(minutes/60);
+                }
+                else return 1
+            }
+
+            // Создание массива preparedPlanData
+            const preparedPlanData = cardsData.map(card => ({
+                x: card.title,
+                y: timeToMinutes(card.plan_time)
+            }));
+
+            // Создание массива preparedResultData
+            const preparedResultData = cardsData.map(card => ({
+                x: card.title,
+                y: timeToMinutes(card.result_time)
+            }));
+            setPlanData(preparedPlanData);
+            setResultData(preparedResultData);
+
+            console.log('preparedPlanData', preparedPlanData);
+            console.log('preparedResultData', preparedResultData);
+        }
+    }, [tempPlan]);
+    useEffect(() => {
+        setGraphData([
+            {
+                "id": "Планируемое время",
+                "color": "hsl(42, 70%, 50%)",
+                "data": planData
+            },
+            {
+                "id": "Фактическое время",
+                "color": "hsl(265, 70%, 50%)",
+                "data": resultData
+            }
+        ])
+    }, [planData,resultData])
+    // const data = [
+    //     {
+    //         "id": "Планируемое время",
+    //         "color": "hsl(42, 70%, 50%)",
+    //         "data": planData
+    //     },
+    //     {
+    //         "id": "Фактическое время",
+    //         "color": "hsl(265, 70%, 50%)",
+    //         "data": resultData
+    //     }
+    // ];
 
     const [currentIndex, setCurrentIndex] = useState(() => {
         const storedIndex = localStorage.getItem('studentIndex');
@@ -278,6 +346,7 @@ const PlansStorage = () => {
             console.log(response?.data, 'план по id');
             setLoadingStatus('success');
             setUniquePlan(response?.data);
+            setTempPlan(response.data);
             localStorage.setItem('activePlanId', id);
         } catch (err) {
             setLoadingStatus('error');
@@ -383,8 +452,13 @@ const PlansStorage = () => {
                     ))}
                     </div>
                 </SliderContainer>
+                <Box>
+                    <div style={{ height: '300px', width: '800px', marginTop: '40px'}}>
+                        <ProgressLineGraph data={graphData}/>
+                    </div>
+                </Box>
             </Box>
-            {loadingStatus === 'success' && <EducationalPlan uniquePlan={uniquePlan} />}
+            {loadingStatus === 'success' && <EducationalPlan uniquePlan={uniquePlan} getPlan={() => getPlanById(uniqueId)} />}
             {isMounted &&
             <Portal id={MODAL_CONTAINER_ID}>
                 {statusShown &&
