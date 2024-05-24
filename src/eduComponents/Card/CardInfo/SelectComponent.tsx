@@ -19,18 +19,6 @@ const MenuProps = {
     },
 };
 
-const names = [
-    'Oliver Hansen',
-    'Van Henry',
-    'April Tucker',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
-];
 
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
     return {
@@ -41,7 +29,7 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
     };
 }
 
-export function MultipleSelectChip() {
+export function MultipleSelectChip({ data, setExistedLabels }) {
     const theme = useTheme();
     const [personName, setPersonName] = React.useState<string[]>([]);
 
@@ -49,16 +37,16 @@ export function MultipleSelectChip() {
         const {
             target: { value },
         } = event;
-        setPersonName(
-            // On autofill we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
-        );
+        const selectedValues = typeof value === 'string' ? value.split(',') : value;
+        const selectedLabels = data.filter(item => selectedValues.includes(item.id));
+        setPersonName(selectedLabels.map(item => item.id));
+        setExistedLabels(selectedLabels);
     };
 
     return (
         <div>
             <FormControl sx={{ m: 1, width: 300 }}>
-                <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+                <InputLabel id="demo-multiple-chip-label">Категории</InputLabel>
                 <Select
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"
@@ -69,25 +57,33 @@ export function MultipleSelectChip() {
                             border: 'none',
                         },
                     }}
+                    multiple
                     value={personName}
                     onChange={handleChange}
                     input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                     renderValue={(selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selected.map((value) => (
-                                <Chip key={value} label={value} />
-                            ))}
+                            {selected.map((value) => {
+                                const label = data.find(item => item.id === value);
+                                return (
+                                    <Chip
+                                        key={label.id}
+                                        label={label.title}
+                                        sx={{ backgroundColor: label.color, color: '#fff' }}
+                                    />
+                                );
+                            })}
                         </Box>
                     )}
                     MenuProps={MenuProps}
                 >
-                    {names.map((name) => (
+                    {data.map((label) => (
                         <MenuItem
-                            key={name}
-                            value={name}
-                            style={getStyles(name, personName, theme)}
+                            key={label.id}
+                            value={label.id}
+                            style={getStyles(label.id, personName, theme)}
                         >
-                            {name}
+                            {label.title}
                         </MenuItem>
                     ))}
                 </Select>

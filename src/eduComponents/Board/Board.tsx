@@ -124,7 +124,7 @@ export const CardsWrapper = styled.div`
   //overflow-y: auto;
   //overflow: visible;
 `
-const StyledButton = styled.button`
+export const StyledButton = styled.button`
   background-color: #fff;
   font-size: 14px;
   color: #000;

@@ -13,6 +13,7 @@ export const ProgressLineGraph = ({ data}) => (
             reverse: false
         }}
         yFormat=" >-.2f"
+        curve="natural"
         axisTop={null}
         axisRight={null}
         axisBottom={{
@@ -34,8 +35,9 @@ export const ProgressLineGraph = ({ data}) => (
             truncateTickAt: 0
         }}
         pointSize={10}
+        colors={{ scheme: 'paired' }}
         pointColor={{ theme: 'background' }}
-        pointBorderWidth={2}
+        pointBorderWidth={3}
         pointBorderColor={{ from: 'serieColor' }}
         pointLabel="data.yFormatted"
         pointLabelYOffset={-12}

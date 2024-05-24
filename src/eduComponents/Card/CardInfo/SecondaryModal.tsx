@@ -1,7 +1,7 @@
 // @ts-ignore
 import React, { useEffect, useState } from "react";
 import { StarBorder } from "@mui/icons-material";
-import { Calendar, CheckSquare, List, Tag, Type } from "react-feather";
+import {Calendar, CheckSquare, Clock, List, Tag, Type} from "react-feather";
 import styled from "styled-components";
 // @ts-ignore
 import { ICard, ILabel, SelectChangeEvent } from "../../../Interfaces/EducationPlanFields.ts";
@@ -53,28 +53,13 @@ function SecondaryModal(props: CardInfoProps) {
       }
     }, [cardValues]);
 
-
-    const templatesData = {
-        selectLabel: 'Мои шаблоны тем',
-        difficultyValue: ['topic1', 'topic2', 'topic3', 'topic4'],
-        difficultyLabel: ['Тема1', 'Тема2', 'Тема3', 'Тема4'],
-    }
-    const handleDifficultyChange = (event: SelectChangeEvent) => {
-        console.log('заменить');
-    };
-    const [checked, setChecked] = useState(false);
     const [minutes, setMinutes] = useState(0);
     const [hours, setHours] = useState(0);
-    // const [duration, setDuration] = useState('');
-    const [title, setTitle] = useState('');
+   const [repetitionDate, setRepetitionDate] = useState(dayjs());
     const [error, setError] = useState({
         title: false,
         duration: false,
     })
-
-    const handleConfirm = (event) => {
-        setChecked(event.target.checked);
-    };
     const handleHoursChange = (event) => {
         let value = parseInt(event.target.value);
         if (isNaN(value) || value <= 0) {
@@ -94,7 +79,7 @@ function SecondaryModal(props: CardInfoProps) {
                 duration: true
             }));
         }
-        setMinutes(value); // Преобразуем в число перед установкой
+        setMinutes(value);
     };
 
     const convertToISO8601 = (inputHours: number, inputMinutes: number) => {
@@ -114,13 +99,14 @@ function SecondaryModal(props: CardInfoProps) {
         // setDuration(isoString);
         return isoString;
     };
-    const handleCompleteTopic = async(duration) => {
+    const handleCompleteTopic = async(duration, repetitionDate) => {
         try {
             const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
                 JSON.stringify(
                     {
                         result_time: duration,
                         date_end: dayjs(),
+                        repetition_date: repetitionDate
                     }),
                 {
                     headers: {
@@ -140,94 +126,32 @@ function SecondaryModal(props: CardInfoProps) {
     const handleSubmit = () => {
         const duration = convertToISO8601(hours, minutes);
         if(!error.duration) {
-            handleCompleteTopic(duration);
+            handleCompleteTopic(duration, repetitionDate);
             onClose();
         }
     }
     useEffect(() => {
-        if(title !== '') {
-            setError(prevState => ({
-                ...prevState,
-                title: false
-            }));
-        } if (hours !== 0 || minutes !== 0) {
+         if (hours !== 0 || minutes !== 0) {
             setError(prevState => ({
                 ...prevState,
                 duration: false
             }));
-        } if ((title === '') || (hours === 0 && minutes === 0)) {
-            if (title === '') {
-                setError(prevState => ({
-                    ...prevState,
-                    title: true
-                }));
-            } if (hours === 0 && minutes === 0) {
+        } if (hours === 0 && minutes === 0) {
+           if (hours === 0 && minutes === 0) {
                 setError(prevState => ({
                     ...prevState,
                     duration: true
                 }));
             }
         }
-    },[hours, minutes, title])
+    },[hours, minutes])
 
     return (
         <Modal onClose={onClose}>
             <div className="cardinfo">
                 <div className="cardinfo-box">
                     <div className="cardinfo-box-title">
-                        <Type/>
-                        <p>Название темы</p>
-                    </div>
-                    <FormControl error={error.title}>
-                        <TextField
-                            onChange={(event) => {
-                                setTitle(event.target.value)
-                            }}
-                            type='text'
-                            id="outlined-basic"
-                            label="Название"
-                            variant="outlined"
-
-                            // helperText={error.title? 'Название не может быть пустым' : ''}
-                        />
-                    </FormControl>
-                    <p style={{
-                        color: 'darkred',
-                        fontSize: '12px',
-                        marginTop: '8px'
-                    }}>{error.title ? 'Название не может быть пустым' : ''}</p>
-                    {/*<CustomInput*/}
-                    {/*    text="+ Добавить Тему"*/}
-                    {/*    placeholder="Введите название темы"*/}
-                    {/*    displayClass="board-add-card"*/}
-                    {/*    editClass="board-add-card-edit"*/}
-                    {/*    onSubmit={(value: string) => setTitle(value)}*/}
-                    {/*/>*/}
-                </div>
-
-
-                <div className="cardinfo-box">
-                    <div className="cardinfo-box-title">
-                        <StarBorder/>
-                        <p>Использовать шаблон</p>
-                    </div>
-                    <FormControlLabel
-                        label="Использовать шаблон"
-                        control={
-                            <Checkbox
-                                checked={checked}
-                                onChange={handleConfirm}
-                                color="secondary"
-                            />
-                        }
-                    />
-                    <SelectComponent data={templatesData} handleChange={handleDifficultyChange} selectValue={''}
-                                     label='Мои шаблоны'/>
-                </div>
-
-                <div className="cardinfo-box">
-                    <div className="cardinfo-box-title">
-                        <Calendar/>
+                        <Clock/>
                         <p>Фактическое время на прохождение</p>
                     </div>
                     <DurationWrapper>
@@ -269,7 +193,7 @@ function SecondaryModal(props: CardInfoProps) {
                         type="date"
                         defaultValue={cardValues.date}
                         min={new Date().toISOString().substr(0, 10)}
-                        onChange={(event) => console.log(event.target.value)}
+                        onChange={(event) => setRepetitionDate(dayjs(event.target.value)) }
                         lang="ru"
                     />
                 </div>

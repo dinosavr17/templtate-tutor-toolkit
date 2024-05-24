@@ -142,13 +142,12 @@ const PlansStorage = () => {
     const [planData, setPlanData] = useState([]);
     const [resultData, setResultData] = useState([]);
     const [graphData, setGraphData] = useState([]);
-    const [pieData, setPieData] = useState();
+    const [pieData, setPieData] = useState([]);
     const [activeStudentIndex, setActiveStudentIndex] = useState(-1);
     useEffect(() => {
         console.log('Данные об уникальном плане', uniquePlan);
         if (tempPlan.modules && tempPlan.modules.length > 0) {
             const modules = tempPlan.modules;
-            // Объединение всех карточек в один массив
             const cardsData = modules.reduce((acc, module) => {
                 return acc.concat(module.cards);
             }, []);
@@ -157,24 +156,55 @@ const PlansStorage = () => {
             function timeToMinutes(time) {
                 if (time) {
                     const [hours, minutes, seconds] = time.split(':').map(Number);
-                    return hours + Math.round(minutes/60);
+                    return hours;
                 }
-                else return 1
+                else return 0
             }
-
-            // Создание массива preparedPlanData
             const preparedPlanData = cardsData.map(card => ({
                 x: card.title,
-                y: timeToMinutes(card.plan_time)
+                y: Number(timeToMinutes(card.plan_time))
             }));
+            // const samplePieData = cardsData.map(card => ({
+            //     "id": card.status,
+            //     "label": card.status,
+            //     "value": 50,
+            //     "color": "hsl(127, 70%, 50%)"
+            // }));
+            const samplePieData = [
+                {
+                    "id": "Не начата",
+                    "label": "Не начата",
+                    "value": 165,
+                    "color": "hsl(125,6%,43%)"
+                },
+                {
+                    "id": "В процессе",
+                    "label": "В процессе",
+                    "value": 239,
+                    "color": "hsl(120, 100%, 50%)"
+                },
+                {
+                    "id": "Завершено",
+                    "label": "Завершено",
+                    "value": 596,
+                    "color": "hsl(48,100%,50%)"
+                },
+                {
+                    "id": "Повторение",
+                    "label": "Повторение",
+                    "value": 369,
+                    "color": "hsl(203,70%,50%)"
+                },
+            ];
 
             // Создание массива preparedResultData
             const preparedResultData = cardsData.map(card => ({
                 x: card.title,
-                y: timeToMinutes(card.result_time)
+                y: Number(timeToMinutes(card.result_time))
             }));
             setPlanData(preparedPlanData);
             setResultData(preparedResultData);
+            setPieData(samplePieData);
 
             console.log('preparedPlanData', preparedPlanData);
             console.log('preparedResultData', preparedResultData);
@@ -452,9 +482,12 @@ const PlansStorage = () => {
                     ))}
                     </div>
                 </SliderContainer>
-                <Box>
-                    <div style={{ height: '300px', width: '800px', marginTop: '40px'}}>
+                <Box style={{display: 'flex', flexDirection: 'row'}}>
+                    <div style={{ height: '300px', width: '700px', marginTop: '40px'}}>
                         <ProgressLineGraph data={graphData}/>
+                    </div>
+                    <div style={{ height: '300px', width: '400px', marginTop: '40px'}}>
+                        <StatusPie data={pieData}/>
                     </div>
                 </Box>
             </Box>

@@ -28,7 +28,7 @@ import styled from "styled-components";
 // @ts-ignore
 import dayjs from 'dayjs';
 // @ts-ignore
-import SelectComponent from "./SelectComponent.tsx";
+import SelectComponent, {MultipleSelectChip} from "./SelectComponent.tsx";
 import axios from '../../../api/axios';
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {IOSSwitch} from "../../../shared/Switch";
@@ -36,9 +36,10 @@ import {SelectChangeEvent} from "@mui/material/Select";
 import {Topic} from "@mui/icons-material";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Button from '@mui/material/Button';
-import { FormControl } from "@mui/material";
+import {Box, Divider, FormControl, Stack, Typography} from "@mui/material";
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
 import { useNavigate, useLocation } from 'react-router-dom';
+import {StyledButton} from "../../Board/Board.tsx";
 
 interface CardInfoProps {
   onClose: () => void;
@@ -46,12 +47,12 @@ interface CardInfoProps {
   boardId: string;
   updateCard: (boardId: string, cardId: string, card: ICard) => void;
 }
-const ModuleContent = styled.div`
-  padding: 15px;
-  border-radius: 3px;
+const LabelsBlock = styled.div`
   display: flex;
+  border-radius: 6px;
+  border: solid black 1px;
   flex-direction: column;
-  height: fit-content;
+  justify-content: center;
 `;
 function CardInfo(props: CardInfoProps) {
   const { onClose, card, boardId, updateCard } = props;
@@ -59,6 +60,7 @@ function CardInfo(props: CardInfoProps) {
   const [cardValues, setCardValues] = useState<ICard>({
     ...card,
   });
+  const [teacherLabels, setTeacherLabels] = useState([]);
   const statusColors: StatusColors = {
     'not_started': { dark: '#7F8C8D', light: '#BDC3C7' }, // Серый
     'in_progress': { dark: '#2ECC71', light: '#1bcd2a' }, // Зеленый
@@ -68,10 +70,26 @@ function CardInfo(props: CardInfoProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
-  // useEffect(() => {
-  //   // Пример перенаправления на URL "/new-path"
-  //   navigate("/new-path", { state: { from: location.pathname } });
-  // }, [navigate, location]);
+  useEffect(() => {
+    const getAllLabels = async () => {
+      try {
+        const response = await axios.get(`api/education_plan/label`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+              },
+              withCredentials: true
+            }
+        );
+
+        console.log(response, 'resp');
+        setTeacherLabels(response.data);
+      } catch (err) {
+      }
+    }
+    getAllLabels();
+  }, []);
   const handleSetStartDate = async() => {
       try {
         const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
@@ -284,6 +302,7 @@ function CardInfo(props: CardInfoProps) {
     difficultyLabel: ['Легкая', 'Средняя', 'Сложная', 'Не выбрана'] as TopicDifficultyText[],
   }
   const [currentDifficulty, setCurrentDifficulty] = React.useState(cardValues.difficulty? cardValues.difficulty : difficultyData.difficultyValue[3]);
+  const [existedLables, setExistedLabeles] = useState([]);
   const handleDifficultyChange = (event: SelectChangeEvent) => {
     setCurrentDifficulty(event.target.value as string);
     const updateDifficulty = async(value: string) => {
@@ -309,6 +328,27 @@ function CardInfo(props: CardInfoProps) {
     };
     updateDifficulty(event.target.value);
   };
+  const addExistedLabels = async () => {
+    try {
+      const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
+          JSON.stringify(
+              {
+                labels: existedLables, //Нужно складывать с существующими
+              }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true
+          }
+      );
+
+      console.log(response, 'resp');
+    } catch (err) {
+    }
+    setCardValues({ ...cardValues, labels: value });
+  }
 
   return (
     <Modal onClose={onClose}>
@@ -387,23 +427,39 @@ function CardInfo(props: CardInfoProps) {
               <Chip key={index} item={item} removeLabel={removeLabel} />
             ))}
           </div>
-          <ul>
-            {colorsList.map((item, index) => (
-              <li
-                key={index}
-                style={{ backgroundColor: item }}
-                className={selectedColor === item ? "li-active" : ""}
-                onClick={() => setSelectedColor(item)}
+          <LabelsBlock>
+            <Box sx={{ p: 2 }}>
+              <Typography gutterBottom variant="h5" component="div">
+                Выбрать из существующих
+              </Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography color="text.secondary" variant="body2">
+                  <MultipleSelectChip data={teacherLabels} setExistedLabels={(value) => setExistedLabeles(value)}/>
+                </Typography>
+                <Button sx={{textTransform: 'none', backgroundColor: '#eee', fontSize: '14px'}} type='filled' onClick={() => addExistedLabels()}>Прикрепить к карточке</Button>
+              </Stack>
+            </Box>
+            <Divider />
+            <Box sx={{ p: 2 }}>
+              <ul>
+                {colorsList.map((item, index) => (
+                    <li
+                        key={index}
+                        style={{ backgroundColor: item }}
+                        className={selectedColor === item ? "li-active" : ""}
+                        onClick={() => setSelectedColor(item)}
+                    />
+                ))}
+              </ul>
+              <CustomInput
+                  text="Добавить новую категорию"
+                  placeholder="Введите название категории"
+                  onSubmit={(value: string) =>
+                      addLabel({ color: selectedColor, title: value })
+                  }
               />
-            ))}
-          </ul>
-          <CustomInput
-            text="Добавить категорию"
-            placeholder="Введите название категории"
-            onSubmit={(value: string) =>
-              addLabel({ color: selectedColor, title: value })
-            }
-          />
+            </Box>
+          </LabelsBlock>
         </div>
       </div>
     </Modal>
