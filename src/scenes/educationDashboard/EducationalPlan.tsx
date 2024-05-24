@@ -177,7 +177,7 @@ export const EducationalPlan = ({uniquePlan, getPlan}) => {
           {
             title: title,
             module_id: boardId,
-            result_time: duration,
+            plan_time: duration,
             index: 0,
             labels: [],
           }),
@@ -204,7 +204,7 @@ export const EducationalPlan = ({uniquePlan, getPlan}) => {
         date: "",
         desc: "",
         status: "not_started",
-        result_time: response.data?.result_time,
+        plan_time: response.data?.plan_time,
         result: {
           draggableId: response.data.id,
           source: {
@@ -268,7 +268,6 @@ export const EducationalPlan = ({uniquePlan, getPlan}) => {
     tempBoardsList[boardIndex].cards[cardIndex] = card;
 
     setBoards(tempBoardsList);
-    getPlan();
   };
 
   const onDragEnd = (result) => {

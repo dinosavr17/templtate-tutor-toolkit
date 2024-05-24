@@ -20,6 +20,8 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import {IOSSwitch} from "../../shared/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
+// @ts-ignore
+import SecondaryModal from "./CardInfo/SecondaryModal.tsx";
 interface CardProps {
   card: ICard;
   boardId: string;
@@ -85,10 +87,11 @@ function Card(props: CardProps) {
       setCardHeight
   } =
     props;
-  const { id, title, description, date, labels, status, result_time, difficulty } = card;
+  const { id, title, description, date, labels, status, result_time, difficulty, plan_time } = card;
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isMounted, setMounted] = useState(false);
+  const [isCompleteCard, setIsCompleted] = useState(false);
   const MODAL_CONTAINER_ID = 'card-details-container-id';
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -96,6 +99,11 @@ function Card(props: CardProps) {
     createContainer({ id: MODAL_CONTAINER_ID });
     setMounted(true);
   }, []);
+    useEffect(() => {
+        if (status === 'done' && showModal) {
+            setIsCompleted(true);
+        }
+    }, [status]);
     const activeCardRef = useRef<HTMLDivElement>(null)
   const setRef = (ref) => {
         if (isMounted) {
@@ -131,6 +139,17 @@ function Card(props: CardProps) {
         />
           </ModalOverlay>
       )}
+              {isCompleteCard && (
+                  <ModalOverlay>
+                      <SecondaryModal
+                          onClose={() => setIsCompleted(false)}
+                          card={card}
+                          boardId={boardId}
+                          updateCard={updateCard}
+                          complete={() => setIsCompleted(true)}
+                      />
+                  </ModalOverlay>
+              )}
           </Portal>
           )}
       <div
@@ -203,10 +222,10 @@ function Card(props: CardProps) {
           />
         </CardBody>
         <div className="card-footer">
-          {result_time && (
+          {plan_time && (
             <p className="card-footer-item">
               <Clock className="card-footer-icon" />
-              {displayEstimatedTime(result_time)}
+              {displayEstimatedTime(plan_time)}
             </p>
           )}
         </div>

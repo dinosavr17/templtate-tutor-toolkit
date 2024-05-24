@@ -14,7 +14,7 @@ import Button from '@mui/material/Button';
 // @ts-ignore
 import Portal, {createContainer} from "./Portal.ts";
 import "./Board.css";
-import { IBoard, ICard } from "../../Interfaces/EducationPlanFields";
+import {IBoard, ICard, ICardCompleted} from "../../Interfaces/EducationPlanFields";
 import styled from "styled-components";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {useTheme} from "@mui/material";
@@ -275,13 +275,6 @@ const Board = (props: BoardProps) => {
           ))}
           {provided.placeholder}
           <StyledButton onClick={() => setOpenPrimaryModal(true)}>+ Добавить Тему</StyledButton>
-          {/*<CustomInput*/}
-          {/*  text="+ Добавить Тему"*/}
-          {/*  placeholder="Введите название темы"*/}
-          {/*  displayClass="board-add-card"*/}
-          {/*  editClass="board-add-card-edit"*/}
-          {/*  onSubmit={(value: string) => handleAddPrimaryProps(value)}*/}
-          {/*/>*/}
         </CardsWrapper>
       </ModuleContent>
     </EducationalModule>

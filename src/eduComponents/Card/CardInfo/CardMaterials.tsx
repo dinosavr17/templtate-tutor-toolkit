@@ -398,7 +398,7 @@ export const AccordionList = ({props: CardContentProps}) => {
                     aria-controls="panel1a-content"
                     id="panel1a-header"
                 >
-                    <Typography>Загрузить материалы</Typography>
+                    <Typography>Добавить материалы</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     <Typography sx={{marginBottom: '10px'}}>

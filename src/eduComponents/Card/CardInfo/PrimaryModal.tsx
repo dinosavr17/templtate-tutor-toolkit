@@ -21,7 +21,7 @@ interface CardInfoProps {
   onClose: () => void;
   card?: ICard;
   updateCard?: (boardId: number, cardId: number, card: ICard) => void;
-  primaryId: 'string';
+  primaryId: string;
   addCard: (boardId: string, title: string, duration: string) => void;
 }
 

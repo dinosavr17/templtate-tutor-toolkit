@@ -44,6 +44,13 @@ export interface ICard {
     },
   }
 }
+export interface ICardCompleted {
+  id: string;
+  result_time: string;
+  date_start: Date;
+  date_end: Date;
+  repetition_date: Date;
+}
 
 export interface IBoard {
   id: string;
