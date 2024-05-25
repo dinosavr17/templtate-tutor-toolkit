@@ -247,7 +247,7 @@ function CardInfo(props: CardInfoProps) {
           {
             title: label.title,
             card_id: card.id,
-            color: label.color
+            color: label.color? label.color : '#00bcd4'
           }),
         {
           headers: {
@@ -257,23 +257,49 @@ function CardInfo(props: CardInfoProps) {
           withCredentials: true
         }
       );
+      setSelectedColor("");
+      setCardValues({
+        ...cardValues,
+        labels: [...cardValues.labels, response.data],
+      });
 
       console.log(response, 'resp');
     } catch (err) {
+      console.log(err.response.data, 'Ошибка');
     }
 
 
-    setSelectedColor("");
-    setCardValues({
-      ...cardValues,
-      labels: [...cardValues.labels, label],
-    });
   };
 
   const removeLabel = (label: ILabel) => {
     const tempLabels = cardValues.labels.filter(
-      (item) => item.text !== label.text,
+      (item) => item.id !== label.id,
     );
+    const remainedLabels = tempLabels.reduce((acc, remainedLabel ) => {
+      acc.push(remainedLabel.id);
+      return acc;
+    }, [])
+    const removeRequest = async() => {
+      try {
+        const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
+            JSON.stringify(
+                {
+                  labels: remainedLabels
+                }),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+              },
+              withCredentials: true
+            }
+        );
+
+        console.log(response, 'resp');
+      } catch (err) {
+      }
+    };
+    removeRequest();
 
     setCardValues({
       ...cardValues,
@@ -329,12 +355,19 @@ function CardInfo(props: CardInfoProps) {
     updateDifficulty(event.target.value);
   };
   const addExistedLabels = async () => {
+    const existedLabelsIds = existedLables.reduce((acc, label) => {
+      acc.push(label.id)
+      return acc;
+    }, [])
+    const previousLabels = cardValues.labels.reduce((acc, previousLabel) => {
+      acc.push(previousLabel.id)
+      return acc;
+    }, [])
     try {
       const response = await axios.patch(`api/education_plan/card/${cardValues.id}/`,
-          JSON.stringify(
-              {
-                labels: existedLables, //Нужно складывать с существующими
-              }),
+          JSON.stringify({
+            labels: [...existedLabelsIds, ...previousLabels]
+          }),
           {
             headers: {
               'Content-Type': 'application/json',
@@ -345,9 +378,27 @@ function CardInfo(props: CardInfoProps) {
       );
 
       console.log(response, 'resp');
+      setCardValues({ ...cardValues, labels: response.data.labels });
     } catch (err) {
     }
-    setCardValues({ ...cardValues, labels: value });
+  }
+  const removeCommonLabels = async (label) => {
+    try {
+      const response = await axios.delete(`api/education_plan/label/${label.id}/`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true
+          }
+      );
+      const remainedLabels = cardValues.labels.filter((remainedLabel) => remainedLabel.id !== label.id);
+
+      console.log(response, 'resp');
+      setCardValues({ ...cardValues, labels: remainedLabels });
+    } catch (err) {
+    }
   }
 
   return (
@@ -434,7 +485,7 @@ function CardInfo(props: CardInfoProps) {
               </Typography>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography color="text.secondary" variant="body2">
-                  <MultipleSelectChip data={teacherLabels} setExistedLabels={(value) => setExistedLabeles(value)}/>
+                  <MultipleSelectChip data={teacherLabels} setExistedLabels={(value) => setExistedLabeles(value)} handleRemove={(removedLabel) => removeCommonLabels(removedLabel) }/>
                 </Typography>
                 <Button sx={{textTransform: 'none', backgroundColor: '#eee', fontSize: '14px'}} type='filled' onClick={() => addExistedLabels()}>Прикрепить к карточке</Button>
               </Stack>

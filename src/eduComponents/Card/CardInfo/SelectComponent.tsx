@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
+import CloseIcon from '@mui/icons-material/Close';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -29,7 +30,7 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
     };
 }
 
-export function MultipleSelectChip({ data, setExistedLabels }) {
+export function MultipleSelectChip({ data, setExistedLabels, handleRemove }) {
     const theme = useTheme();
     const [personName, setPersonName] = React.useState<string[]>([]);
 
@@ -69,7 +70,7 @@ export function MultipleSelectChip({ data, setExistedLabels }) {
                                     <Chip
                                         key={label.id}
                                         label={label.title}
-                                        sx={{ backgroundColor: label.color, color: '#fff' }}
+                                        style={{backgroundColor: `${label.color}`, color: '#fff'}}
                                     />
                                 );
                             })}
@@ -83,7 +84,12 @@ export function MultipleSelectChip({ data, setExistedLabels }) {
                             value={label.id}
                             style={getStyles(label.id, personName, theme)}
                         >
+                            <div style={{display: "flex", flexDirection: 'row'}}>
+                                <div style={{borderRadius: '300px', backgroundColor: `${label.color}`, height: '15px', width: '15px',
+                                    marginRight: '6px', justifyContent: "space-between" }}/>
                             {label.title}
+                                <CloseIcon onClick={() => handleRemove(label.id)} sx={{marginLeft: '10px'}}/>
+                            </div>
                         </MenuItem>
                     ))}
                 </Select>

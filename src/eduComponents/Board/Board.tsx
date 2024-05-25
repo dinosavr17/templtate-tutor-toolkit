@@ -252,7 +252,7 @@ const Board = (props: BoardProps) => {
           flexGrow: snapshot.isDraggingOver? '3' : 'inherit',
           height: snapshot.isDraggingOver? `${boardHeight}` + `${cardHeight}` : 'initial'
         }}>
-          {board?.cards?.map((item, index) => (
+          {board?.cards?.sort((a, b) => a.index - b.index).map((item, index) => (
               <Draggable
                   key={item.id}
                   draggableId={item.id}

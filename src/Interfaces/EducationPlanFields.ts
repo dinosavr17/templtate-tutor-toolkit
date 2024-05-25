@@ -22,6 +22,7 @@ export type TopicDifficultyText = 'легкая' | 'средняя' | 'слож�
 
 export interface ICard {
   id: string;
+  index: number;
   title: string;
   type?: string;
   status: TopicStatus;
@@ -54,6 +55,7 @@ export interface ICardCompleted {
 
 export interface IBoard {
   id: string;
+  index: number;
   title: string;
   cards: ICard[];
   type?: string;

@@ -203,6 +203,7 @@ export const EducationalPlan = ({uniquePlan, getPlan}) => {
         labels: [],
         date: "",
         desc: "",
+        index: response.data.index,
         status: "not_started",
         plan_time: response.data?.plan_time,
         result: {
@@ -336,6 +337,7 @@ export const EducationalPlan = ({uniquePlan, getPlan}) => {
         //   tempBoardsList[source.index] = switchingBoard;
         //   setBoards(tempBoardsList);
         // }
+        getPlan();
       } catch (err) {
       }
     };
@@ -417,7 +419,7 @@ export const EducationalPlan = ({uniquePlan, getPlan}) => {
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                       style={{backgroundColor: snapshot.isDraggingOver? colors.educationalPlan.boardsWrapper : 'initial'}}>
-                    {boards && boards.length > 0 && boards.map((item, index) => (
+                    {boards && boards.length > 0 && boards.sort((a, b) => a.index - b.index).map((item, index) => (
                         <Draggable key={item.id} draggableId={item.id} index={index}>
                           {(provided) => (
                               <div
