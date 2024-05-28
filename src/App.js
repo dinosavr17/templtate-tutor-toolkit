@@ -54,7 +54,7 @@ function App() {
               <Route path="/login" element={<Login/>} />
               <Route element={<RequireAuth/>}>
               <Route path="/main" element={<StorageMainPage />} />
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<PlansStorage />} />
               <Route path="/team" element={<Team />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />
