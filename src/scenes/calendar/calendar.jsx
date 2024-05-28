@@ -5,22 +5,29 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
+  Box, Button, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
   List,
-  ListItem,
+  ListItem, ListItemButton, ListItemIcon,
   ListItemText, TextField, Typography,
   useTheme,
 } from "@mui/material";
 import Header from "../../components/Header";
-import '@fullcalendar/core/locales-all'
+import '@fullcalendar/core/locales-all';
 import { tokens } from "../../theme";
 import ruLocale from '@fullcalendar/core/locales/ru';
 import Portal, { createContainer } from "../../eduComponents/Board/Portal.ts";
 import axios from "../../api/axios";
-import CustomInput from '../../eduComponents/CustomInput/CustomInput.tsx';
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import styled from "styled-components";
+import {ExpandLess, ExpandMore, StarBorder} from "@mui/icons-material";
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+
+export const EventContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 const Calendar = () => {
   const theme = useTheme();
@@ -33,12 +40,19 @@ const Calendar = () => {
   const [description, setDescription] = useState('');
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [studentsList, setStudentsList] = useState([]);
-  const [student, setStudent] = useState({});
+  const [studentId, setStudentId] = useState('');
+  const [studentData, setStudentData] = useState('');
+  const [availableTopics, setAvailableTopics] = useState([]);
 
   const handleClose = () => {
     setOpen(false);
     setTitle('');
     setDescription('');
+  };
+  const [openList, setOpenList] = React.useState(true);
+
+  const handleClick = () => {
+    setOpenList(!openList);
   };
 
   useEffect(() => {
@@ -46,8 +60,17 @@ const Calendar = () => {
     setCurrentEvents(savedEvents);
     createContainer({ id: MODAL_CONTAINER_ID });
     setMounted(true);
-    getUsers();
+      getUsers();
+
   }, []);
+  useEffect(() => {
+    const studentObject = studentsList.find((item) => item.id === studentId);
+    setStudentData(studentObject?.first_name + " " + studentObject?.last_name);
+  }, [studentId])
+  useEffect(() => {
+    getPlanById(studentId);
+    console.log(availableTopics, 'доступные темы студента');
+  }, [studentId])
 
   const getUsers = async () => {
     try {
@@ -65,12 +88,66 @@ const Calendar = () => {
       console.error('Error fetching users', err);
     }
   };
+  const getPlanById = async (id) => {
+    try {
+      const response = await axios.get(`api/education_plan/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:3000',
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+        },
+      });
+      console.log(response?.data, 'план по id');
+      const modules = response.data.modules;
+      const cardsData = modules.reduce((acc, module) => {
+        return acc.concat(module.cards);
+      }, []);
+      console.log(cardsData, 'дата по карточкам');
+      setAvailableTopics(cardsData);
+    } catch (err) {
+    }
+  };
 
   const handleDateClick = (selected) => {
     setSelectedEvent(selected);
     setOpen(true);
   };
 
+  // const handleEventData = (event) => {
+  //   event.preventDefault();
+  //
+  //   if (title === '') {
+  //     alert('Пожалуйста, введите название события');
+  //     return;
+  //   }
+  //
+  //   const calendarApi = selectedEvent.view.calendar;
+  //   calendarApi.unselect();
+  //
+  //   const newEvent = {
+  //     id: `${selectedEvent.dateStr}-${title}`,
+  //     title,
+  //     description,
+  //     studentData,
+  //     start: selectedEvent.startStr,
+  //     end: selectedEvent.endStr,
+  //     allDay: selectedEvent.allDay,
+  //   };
+  //
+  //   const isDuplicate = currentEvents.some(event => event.id === newEvent.id);
+  //   if (isDuplicate) {
+  //     alert('Событие с таким названием уже существует на эту дату');
+  //     return;
+  //   }
+  //
+  //   calendarApi.addEvent(newEvent);
+  //
+  //   const updatedEvents = [...currentEvents, newEvent];
+  //   setCurrentEvents(updatedEvents);
+  //   localStorage.setItem("calendarEvents", JSON.stringify(updatedEvents));
+  //
+  //   handleClose();
+  // };
   const handleEventData = (event) => {
     event.preventDefault();
 
@@ -86,17 +163,27 @@ const Calendar = () => {
       id: `${selectedEvent.dateStr}-${title}`,
       title,
       description,
-      student,
+      studentData,
       start: selectedEvent.startStr,
       end: selectedEvent.endStr,
       allDay: selectedEvent.allDay,
     };
 
+    const isDuplicate = currentEvents.some(event => event.id === newEvent.id);
+    if (isDuplicate) {
+      alert('Событие с таким названием уже существует на эту дату');
+      return;
+    }
+
+    // Directly add event to the calendar
     calendarApi.addEvent(newEvent);
 
-    const updatedEvents = [...currentEvents, newEvent];
-    setCurrentEvents(updatedEvents);
-    localStorage.setItem("calendarEvents", JSON.stringify(updatedEvents));
+    // Update local state and local storage
+    setCurrentEvents(prevEvents => {
+      const updatedEvents = [...prevEvents, newEvent];
+      localStorage.setItem("calendarEvents", JSON.stringify(updatedEvents));
+      return updatedEvents;
+    });
 
     handleClose();
   };
@@ -109,7 +196,16 @@ const Calendar = () => {
       localStorage.setItem("calendarEvents", JSON.stringify(updatedEvents));
     }
   };
-  //Разобраться как отображать не только название на событии - добавить выгрузку тем студентов - норм выбор студента, времени
+
+  function renderEventContent(eventInfo) {
+    return (
+        <EventContentWrapper>
+          <b>{eventInfo.event.title}</b>
+          <i>{eventInfo.event.extendedProps.studentData}</i>
+          <i>{eventInfo.event.extendedProps.description}</i>
+        </EventContentWrapper>
+    );
+  }
 
   return (
       <Box m="20px">
@@ -173,10 +269,11 @@ const Calendar = () => {
                 dayMaxEvents={true}
                 select={handleDateClick}
                 eventClick={handleEventClick}
-                eventsSet={(events) => setCurrentEvents(events)}
+                // eventsSet={(events) => setCurrentEvents(events)}
                 locale={ruLocale}
                 weekends={false}
-                initialEvents={[]}
+                eventContent={renderEventContent}
+                events={currentEvents}
             />
           </Box>
         </Box>
@@ -196,32 +293,32 @@ const Calendar = () => {
                 <DialogContentText>
                   Для создания нового события, выбреите студента и название события.
                 </DialogContentText>
-                <FormControl sx={{display: 'flex', flexDirection: 'column', marginTop: '12px'}}>
-                <TextField
-                  onChange={(event) => {setTitle(event.target.value)}}
-                  type='text'
-                  id="outlined-basic"
-                  label="Название"
-                  variant="outlined"
-                  />
-              </FormControl>
-                <FormControl sx={{display: 'flex', flexDirection: 'column', marginTop: '12px'}}>
+                <FormControl sx={{ display: 'flex', flexDirection: 'column', marginTop: '14px' }}>
                   <TextField
-                      onChange={(event) => {setDescription(event.target.value)}}
+                      onChange={(event) => { setTitle(event.target.value) }}
+                      type='text'
+                      id="outlined-basic"
+                      label="Название"
+                      variant="outlined"
+                  />
+                </FormControl>
+                <FormControl sx={{ display: 'flex', flexDirection: 'column', marginTop: '14px' }}>
+                  <TextField
+                      onChange={(event) => { setDescription(event.target.value) }}
                       type='text'
                       id="outlined-basic"
                       label="Описание"
                       variant="outlined"
                   />
                 </FormControl>
-                <FormControl fullWidth sx={{marginTop: '12px'}}>
+                <FormControl fullWidth sx={{ marginTop: '14px' }}>
                   <InputLabel id="demo-simple-select-label">Выбрать студента</InputLabel>
                   <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      value={student}
+                      value={studentId}
                       label="Студент"
-                      onChange={(event) => {setStudent(event.target.value)}}
+                      onChange={(event) => { setStudentId(event.target.value) }}
                   >
                     {studentsList.map((student, index) => (
                         <MenuItem key={student.id} value={student.id}>
@@ -229,6 +326,54 @@ const Calendar = () => {
                         </MenuItem>
                     ))}
                   </Select>
+                  {availableTopics && availableTopics.length > 0 &&
+                  // <List>
+                  //   {availableTopics.map((topic) => (
+                  //       <ListItem
+                  //           key={topic.id}
+                  //           sx={{
+                  //             backgroundColor: colors.greenAccent[500],
+                  //             margin: "10px 0",
+                  //             borderRadius: "2px",
+                  //           }}
+                  //       >
+                  //         <ListItemText
+                  //             primary={topic.title}
+                  //             // secondary={
+                  //             //   <Typography>
+                  //             //     {formatDate(event.start, {
+                  //             //       year: "numeric",
+                  //             //       month: "short",
+                  //             //       day: "numeric",
+                  //             //     }).toLocaleString('ru')}
+                  //             //   </Typography>
+                  //             // }
+                  //         />
+                  //       </ListItem>
+                  //   ))}
+                  <List>
+                    <ListItemButton onClick={handleClick}>
+                      <ListItemIcon>
+                        <SchoolOutlinedIcon/>
+                      </ListItemIcon>
+                      <ListItemText primary="Темы студента" />
+                      {openList ? <ExpandLess /> : <ExpandMore />}
+                    </ListItemButton>
+                    <Collapse in={openList} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding>
+                        {availableTopics.map((topic) => (
+                        <ListItemButton sx={{ pl: 4 }}>
+                          <ListItemIcon>
+                            <StarBorder />
+                          </ListItemIcon>
+                          <ListItemText primary={topic.title} />
+                        </ListItemButton>
+                        ))}
+                      </List>
+                    </Collapse>
+                  </List>
+
+                  }
                 </FormControl>
               </DialogContent>
               <DialogActions>
