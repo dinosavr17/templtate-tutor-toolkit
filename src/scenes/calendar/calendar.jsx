@@ -8,7 +8,7 @@ import {
   Box, Button, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
   List,
   ListItem, ListItemButton, ListItemIcon,
-  ListItemText, TextField, Typography,
+  ListItemText, Switch, TextField, Typography,
   useTheme,
 } from "@mui/material";
 import Header from "../../components/Header";
@@ -21,8 +21,10 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import styled from "styled-components";
-import {ExpandLess, ExpandMore, StarBorder} from "@mui/icons-material";
+import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material";
+import Radio from '@mui/material/Radio';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import dayjs from "dayjs";
 
 export const EventContentWrapper = styled.div`
   display: flex;
@@ -43,6 +45,79 @@ const Calendar = () => {
   const [studentId, setStudentId] = useState('');
   const [studentData, setStudentData] = useState('');
   const [availableTopics, setAvailableTopics] = useState([]);
+  const [selectedTopic, setSelectedTopic] = useState('');
+  const [selectedTopicName, setSelectedTopicName] = useState('');
+
+  const handleAddLesson = async () => {
+    try {
+      const response = await axios.post('api/schedule/',
+          JSON.stringify(
+              {
+                plan_id: studentId,
+                date_start: dayjs(),
+                date_end: dayjs(),
+                card: selectedTopic
+              }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+            },
+            withCredentials: true
+          }
+      );
+
+      console.log(response.data, 'ДАННЫЕ ПОСЛЕ СОЗДАНИЯ КАРТОЧКИ');
+    } catch (err) {
+      console.error('Ошибка при создании занятия', err);
+    }
+  }
+
+  const getLessons = async () => {
+    try {
+      const response = await axios.get('api/schedule/', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:3000',
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+        },
+        withCredentials: true
+      });
+
+      console.log('Все события', response?.data);
+
+      const filteredTopics = response?.data.reduce((acc, topic) => {
+        acc.push({
+          allDay: false,
+          end: topic.date_end,
+          start: topic.date_start,
+          description: topic.discipline,
+          studentData: topic.first_name + ' ' + topic.last_name,
+          title: topic.title,
+          selectedTopic: topic.card,
+          selectedTopicName: availableTopics.find(availableTopic => availableTopic.id === topic.card)
+              ?  availableTopics.find(availableTopic => availableTopic.id === topic.card).title
+              : '',
+          id: topic.id
+        })
+        return acc;
+      }, [])
+      setCurrentEvents(filteredTopics);
+
+    } catch (err) {
+      console.error('Error fetching lessons', err);
+    }
+  };
+
+  const handleChange = (event) => {
+    setSelectedTopic(event.target.value);
+    const topic = availableTopics.find(topic => topic.id === event.target.value);
+    if (topic) {
+      setSelectedTopicName(topic.title);
+    } else {
+      setSelectedTopicName('нет');
+    }
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -56,17 +131,18 @@ const Calendar = () => {
   };
 
   useEffect(() => {
-    const savedEvents = JSON.parse(localStorage.getItem("calendarEvents")) || [];
-    setCurrentEvents(savedEvents);
     createContainer({ id: MODAL_CONTAINER_ID });
     setMounted(true);
-      getUsers();
+    getUsers();
+    getLessons();
 
   }, []);
+
   useEffect(() => {
     const studentObject = studentsList.find((item) => item.id === studentId);
     setStudentData(studentObject?.first_name + " " + studentObject?.last_name);
   }, [studentId])
+
   useEffect(() => {
     getPlanById(studentId);
     console.log(availableTopics, 'доступные темы студента');
@@ -88,6 +164,7 @@ const Calendar = () => {
       console.error('Error fetching users', err);
     }
   };
+
   const getPlanById = async (id) => {
     try {
       const response = await axios.get(`api/education_plan/${id}`, {
@@ -105,6 +182,7 @@ const Calendar = () => {
       console.log(cardsData, 'дата по карточкам');
       setAvailableTopics(cardsData);
     } catch (err) {
+      console.error('Error fetching plan by id', err);
     }
   };
 
@@ -113,41 +191,6 @@ const Calendar = () => {
     setOpen(true);
   };
 
-  // const handleEventData = (event) => {
-  //   event.preventDefault();
-  //
-  //   if (title === '') {
-  //     alert('Пожалуйста, введите название события');
-  //     return;
-  //   }
-  //
-  //   const calendarApi = selectedEvent.view.calendar;
-  //   calendarApi.unselect();
-  //
-  //   const newEvent = {
-  //     id: `${selectedEvent.dateStr}-${title}`,
-  //     title,
-  //     description,
-  //     studentData,
-  //     start: selectedEvent.startStr,
-  //     end: selectedEvent.endStr,
-  //     allDay: selectedEvent.allDay,
-  //   };
-  //
-  //   const isDuplicate = currentEvents.some(event => event.id === newEvent.id);
-  //   if (isDuplicate) {
-  //     alert('Событие с таким названием уже существует на эту дату');
-  //     return;
-  //   }
-  //
-  //   calendarApi.addEvent(newEvent);
-  //
-  //   const updatedEvents = [...currentEvents, newEvent];
-  //   setCurrentEvents(updatedEvents);
-  //   localStorage.setItem("calendarEvents", JSON.stringify(updatedEvents));
-  //
-  //   handleClose();
-  // };
   const handleEventData = (event) => {
     event.preventDefault();
 
@@ -163,6 +206,8 @@ const Calendar = () => {
       id: `${selectedEvent.dateStr}-${title}`,
       title,
       description,
+      selectedTopic,
+      selectedTopicName,
       studentData,
       start: selectedEvent.startStr,
       end: selectedEvent.endStr,
@@ -175,15 +220,12 @@ const Calendar = () => {
       return;
     }
 
-    // Directly add event to the calendar
-    calendarApi.addEvent(newEvent);
-
-    // Update local state and local storage
     setCurrentEvents(prevEvents => {
       const updatedEvents = [...prevEvents, newEvent];
       localStorage.setItem("calendarEvents", JSON.stringify(updatedEvents));
       return updatedEvents;
     });
+    handleAddLesson();
 
     handleClose();
   };
@@ -201,62 +243,50 @@ const Calendar = () => {
     return (
         <EventContentWrapper>
           <b>{eventInfo.event.title}</b>
-          <i>{eventInfo.event.extendedProps.studentData}</i>
-          <i>{eventInfo.event.extendedProps.description}</i>
+          <i>Студент: {eventInfo.event.extendedProps.studentData}</i>
+          <i>Тема: {eventInfo.event.extendedProps.selectedTopicName}</i>
         </EventContentWrapper>
     );
   }
 
   return (
       <Box m="20px">
-        <Header title="Календарь занятий" subtitle="При отмене и переносе можно прислать уведомление на почту" />
+        <Header title="Расписание" subtitle="Расписание занятий" />
 
         <Box display="flex" justifyContent="space-between">
-          {/* CALENDAR SIDEBAR */}
-          <Box
-              flex="1 1 20%"
-              backgroundColor={colors.primary[400]}
-              p="15px"
-              borderRadius="4px"
-          >
-            <Typography variant="h5">События</Typography>
+          <Box flex="1 1 20%" bgcolor={colors.primary[400]} p="15px" borderRadius="4px">
+            <Typography variant="h5">Список занятий</Typography>
             <List>
-              {currentEvents.map((event) => (
-                  <ListItem
-                      key={event.id}
-                      sx={{
-                        backgroundColor: colors.greenAccent[500],
-                        margin: "10px 0",
-                        borderRadius: "2px",
-                      }}
-                  >
-                    <ListItemText
-                        primary={event.title}
-                        secondary={
-                          <Typography>
-                            {formatDate(event.start, {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            }).toLocaleString('ru')}
-                          </Typography>
-                        }
-                    />
-                  </ListItem>
-              ))}
+              <ListItemButton onClick={handleClick}>
+                <ListItemIcon>
+                  <SchoolOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Ученики" />
+                {openList ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={openList} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {studentsList.map((student, index) => (
+                      <ListItem key={`${student.id}-${index}`}>
+                        <Radio
+                            checked={studentId === student.id}
+                            onChange={(e) => setStudentId(student.id)}
+                            value={student.id}
+                            name="radio-buttons"
+                            inputProps={{ 'aria-label': student.id }}
+                        />
+                        <ListItemText primary={`${student.first_name} ${student.last_name}`} />
+                      </ListItem>
+                  ))}
+                </List>
+              </Collapse>
             </List>
           </Box>
-
-          {/* CALENDAR */}
-          <Box flex="1 1 100%" ml="15px">
+          <Box width='100%' ml="15px">
             <FullCalendar
+                locale={ruLocale}
                 height="75vh"
-                plugins={[
-                  dayGridPlugin,
-                  timeGridPlugin,
-                  interactionPlugin,
-                  listPlugin,
-                ]}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
                 headerToolbar={{
                   left: "prev,next today",
                   center: "title",
@@ -269,11 +299,8 @@ const Calendar = () => {
                 dayMaxEvents={true}
                 select={handleDateClick}
                 eventClick={handleEventClick}
-                // eventsSet={(events) => setCurrentEvents(events)}
-                locale={ruLocale}
-                weekends={false}
+                events={currentEvents} // updated to use currentEvents state
                 eventContent={renderEventContent}
-                events={currentEvents}
             />
           </Box>
         </Box>
@@ -338,12 +365,17 @@ const Calendar = () => {
                     <Collapse in={openList} timeout="auto" unmountOnExit>
                       <List component="div" disablePadding>
                         {availableTopics.map((topic) => (
-                        <ListItemButton sx={{ pl: 4 }}>
-                          <ListItemIcon>
-                            <StarBorder />
-                          </ListItemIcon>
-                          <ListItemText primary={topic.title} />
-                        </ListItemButton>
+                            <ListItemButton sx={{ pl: 4 }}>
+                              <ListItemText primary={topic.title} />
+                              <Radio
+                                  edge="end"
+                                  checked={selectedTopic === topic.id}
+                                  onChange={handleChange}
+                                  value={topic.id}
+                                  name="radio-buttons"
+                                  inputProps={{ 'aria-label': 'A' }}
+                              />
+                            </ListItemButton>
                         ))}
                       </List>
                     </Collapse>
