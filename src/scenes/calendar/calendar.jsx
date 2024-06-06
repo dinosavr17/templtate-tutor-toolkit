@@ -25,6 +25,9 @@ import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material";
 import Radio from '@mui/material/Radio';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import dayjs from "dayjs";
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 export const EventContentWrapper = styled.div`
   display: flex;
@@ -47,6 +50,14 @@ const Calendar = () => {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState('');
   const [selectedTopicName, setSelectedTopicName] = useState('');
+  const [timeStart, setTimeStart] = useState(dayjs());
+  const [timeEnd, setTimeEnd] = useState(dayjs());
+  const [eventDate, setEventDate] = useState(dayjs());
+  const [eventStartDate, setEventStartDate] = useState(dayjs());
+  const [eventFinishtDate, setEventFinishDate] = useState(dayjs());
+  useEffect(() => {
+    console.log(timeStart, timeEnd);
+  }, [timeStart,timeEnd])
 
   const handleAddLesson = async () => {
     try {
@@ -54,9 +65,11 @@ const Calendar = () => {
           JSON.stringify(
               {
                 plan_id: studentId,
-                date_start: dayjs(),
-                date_end: dayjs(),
-                card: selectedTopic
+                date_start: eventStartDate,
+                title: title,
+                date_end: eventFinishtDate,
+                card: selectedTopic,
+                card_title: selectedTopicName,
               }),
           {
             headers: {
@@ -95,14 +108,31 @@ const Calendar = () => {
           studentData: topic.first_name + ' ' + topic.last_name,
           title: topic.title,
           selectedTopic: topic.card,
-          selectedTopicName: availableTopics.find(availableTopic => availableTopic.id === topic.card)
-              ?  availableTopics.find(availableTopic => availableTopic.id === topic.card).title
-              : '',
+          selectedTopicName: topic.card_title,
           id: topic.id
         })
         return acc;
       }, [])
       setCurrentEvents(filteredTopics);
+
+    } catch (err) {
+      console.error('Error fetching lessons', err);
+    }
+  };
+  const removeLesson = async (lesson_id) => {
+    try {
+      const response = await axios.delete(`api/schedule/${lesson_id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:3000',
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+        },
+        withCredentials: true
+      });
+      const updatedEvents = currentEvents.filter(event => event.id !== lesson_id);
+      setCurrentEvents(updatedEvents);
+
+      console.log('Все события', response?.data);
 
     } catch (err) {
       console.error('Error fetching lessons', err);
@@ -185,15 +215,27 @@ const Calendar = () => {
       console.error('Error fetching plan by id', err);
     }
   };
+  useEffect(() => {
+    console.log('Выбранное событие', selectedEvent);
+    if (selectedEvent) {
+      setEventDate(dayjs(selectedEvent.startStr));
+    }
+  }, [selectedEvent])
 
   const handleDateClick = (selected) => {
     setSelectedEvent(selected);
     setOpen(true);
   };
+  useEffect(() => {
+    const startDateTime = eventDate.set('hour', timeStart.hour()).set('minute', timeStart.minute())
+    const finishDateTime = eventDate.set('hour', timeEnd.hour()).set('minute', timeEnd.minute())
+    console.log(startDateTime, finishDateTime, 'дата старта - дата окончания');
+    setEventStartDate(dayjs(startDateTime).format());
+    setEventFinishDate(dayjs(finishDateTime).format());
+  }, [eventDate, timeStart, timeEnd]);
 
   const handleEventData = (event) => {
     event.preventDefault();
-
     if (title === '') {
       alert('Пожалуйста, введите название события');
       return;
@@ -209,9 +251,9 @@ const Calendar = () => {
       selectedTopic,
       selectedTopicName,
       studentData,
-      start: selectedEvent.startStr,
-      end: selectedEvent.endStr,
-      allDay: selectedEvent.allDay,
+      start: eventStartDate,
+      end: eventFinishtDate,
+      allDay: false,
     };
 
     const isDuplicate = currentEvents.some(event => event.id === newEvent.id);
@@ -233,9 +275,10 @@ const Calendar = () => {
   const handleEventClick = (selected) => {
     if (window.confirm(`Вы действительно хотите отменить занятие '${selected.event.title}'`)) {
       selected.event.remove();
-      const updatedEvents = currentEvents.filter(event => event.id !== selected.event.id);
-      setCurrentEvents(updatedEvents);
-      localStorage.setItem("calendarEvents", JSON.stringify(updatedEvents));
+      removeLesson(selected.event.id);
+      // const updatedEvents = currentEvents.filter(event => event.id !== selected.event.id);
+      // setCurrentEvents(updatedEvents);
+      // localStorage.setItem("calendarEvents", JSON.stringify(updatedEvents));
     }
   };
 
@@ -336,6 +379,23 @@ const Calendar = () => {
                       id="outlined-basic"
                       label="Описание"
                       variant="outlined"
+                  />
+                </FormControl>
+                <FormControl sx={{ display: 'flex', flexDirection: 'row', marginTop: '14px' }}>
+                    <TimePicker
+                        label="Начало занятия"
+                        value={timeStart}
+                        onChange={(newValue) => setTimeStart(newValue)}
+                        sx={{marginRight: '12px'}}
+                        views={['hours', 'minutes']}
+                        ampm={false}
+                    />
+                  <TimePicker
+                      label="Окончание занятия"
+                      value={timeEnd}
+                      onChange={(newValue) => setTimeEnd(newValue)}
+                      views={['hours', 'minutes']}
+                      ampm={false}
                   />
                 </FormControl>
                 <FormControl fullWidth sx={{ marginTop: '14px' }}>
