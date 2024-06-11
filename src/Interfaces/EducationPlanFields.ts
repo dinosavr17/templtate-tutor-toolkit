@@ -18,6 +18,8 @@ export type StatusColors = {
 }
 };
 export type TopicDifficulty = 'easy' | 'medium' | 'hard' | 'not_selected';
+export type TopicDestination = 'homework' | 'lesson' | 'repetition';
+export type TopicDestinationText = 'Домашняя работа' | 'Урок' | 'Повторение';
 export type TopicDifficultyText = 'легкая' | 'средняя' | 'сложная' | 'не выбрана';
 
 export interface ICard {

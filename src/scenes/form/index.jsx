@@ -74,7 +74,7 @@ const Form = () => {
         const {user_status, tutor, discipline, invite_code} = response.data;
         console.log('is_active')
         if (!(user_status === 'active')) {
-            setPersonalLink(`http://localhost:3000/register/?inviteCode=${invite_code}`);
+            setPersonalLink(`https://tutor-toolkit.ru/register/?inviteCode=${invite_code}`);
         } else {
             setPersonalLink('Студент уже зарегистрирован на платформе. ' +
                 'Ему необходимо авторизоваться и принять приглашение.')
@@ -105,9 +105,11 @@ const Form = () => {
             }}
             severity="success">
           <AlertTitle>Успешно</AlertTitle>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
             <br/><strong>{personalLink}</strong>
 
-            <ContentCopyIcon className={classes.copyIcon} onClick={() => {handleCopyClick(personalLink)}}/>
+            <div style={{height: '30px', width: '30px'}}><ContentCopyIcon className={classes.copyIcon} onClick={() => {handleCopyClick(personalLink)}}/></div>
+            </div>
         </Alert>
       },
       error: () => {
@@ -208,7 +210,7 @@ const Form = () => {
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
-                Создать студента
+                Добавить студента
               </Button>
             </Box>
           </form>

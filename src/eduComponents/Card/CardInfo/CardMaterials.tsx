@@ -1,6 +1,6 @@
 // @ts-ignore
 import React, { useEffect, useState } from "react";
-import { Calendar, CheckSquare, List, Tag, Type } from "react-feather";
+import { Calendar, CheckSquare, Tag, Type } from "react-feather";
 // @ts-ignore
 import { colorsList } from "../../../Helper/Util.ts";
 // @ts-ignore
@@ -18,7 +18,7 @@ import {
     ICard,
     ILabel,
     ITask,
-    StatusColors,
+    StatusColors, TopicDestination, TopicDestinationText,
     TopicDifficulty,
     TopicDifficultyText, TopicStatus
 } from "../../../Interfaces/EducationPlanFields.ts";
@@ -27,12 +27,11 @@ import Chip from "../../Common/Chip.tsx";
 // @ts-ignore
 import dayjs from 'dayjs';
 // @ts-ignore
-import SelectComponent from "./SelectComponent.tsx";
 import axios from '../../../api/axios';
 import {
     Box, colors, FormControl, useTheme, Typography, Menu, MenuItem, Accordion,
     AccordionSummary, IconButton,
-    AccordionDetails, Button, TextField, InputAdornment, CircularProgress
+    AccordionDetails, Button, TextField, InputAdornment, CircularProgress, Select
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
@@ -49,7 +48,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import CloseIcon from '@mui/icons-material/Close';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
-import {AddRounded} from "@mui/icons-material";
+import {AddRounded, DeleteOutlined, UploadOutlined} from "@mui/icons-material";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
@@ -57,6 +56,13 @@ import AlertTitle from "@mui/material/AlertTitle";
 import Portal, {createContainer} from "../../Board/Portal.ts";
 import './CardMaterials.css';
 import ContentTabs from './ContentTabs'
+import SelectComponent from "./SelectComponent.tsx";
+import {SelectChangeEvent} from "@mui/material/Select";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import List from "@mui/material/List";
+import ListItemText from "@mui/material/ListItemText";
 
 export const AccordionWrapper = styled.div`
   margin-top: 20px;
@@ -66,6 +72,15 @@ export const AccordionWrapper = styled.div`
     border: none !important;
   }
 `;
+export const FilesTableWrapper = styled.div`
+  margin-top: 20px;
+  box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+  border-radius: 8px;
+  & > div {
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+`;
 
 function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     event.preventDefault();
@@ -73,7 +88,7 @@ function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     console.info('You clicked a breadcrumb.');
 }
 
-export const BasicBreadcrumbs = () => {
+export const BasicBreadcrumbs = ({title}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
@@ -90,7 +105,7 @@ export const BasicBreadcrumbs = () => {
                     underline="hover" color="inherit" href="/edu">
                     Образовательный план
                 </Link>
-                <Typography color="text.primary">Материалы темы: Имя темы</Typography>
+                <Typography color="text.primary">{title}</Typography>
             </Breadcrumbs>
         </div>
     );
@@ -267,10 +282,79 @@ export const FileUploadPreview = () => {
 
         return content[loadingStatus]();
     };
+    const attachToCard = async (fileIds) => {
+        // setStatusShown(true);
+        // setLoadingStatus('loading');
+        // const validationResult = validateFetchData();
+        try {
+            await Promise.allSettled(files.map(async (file, index) => {
+                console.log('file', file);
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('name', file.name);
+                const fileDestination = localStorage.getItem('fileDestination');
+                const currentCard = localStorage.getItem('currentCard');
+
+                try {
+                    const response = await axios.patch(`api/education_plan/card_content/${currentCard}/update-section/${fileDestination}/`,
+                        {
+                           files: [...fileIds],
+                        },
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")!).accessToken}`,
+                            },
+                            withCredentials: true
+                        });
+
+                    if (response.status === 201) {
+                        console.log(`File ${index + 1} (${file.name}) uploaded successfully!`);
+                        console.log(response, 'response with files');
+
+                        setLoadingStatus('success');
+                    }
+                    // } else {
+                    //     console.log(response.status, 'errr 1');
+                    //     throw new Error(`Failed to upload file ${index + 1}`);
+                    // }
+                } catch (error) {
+                    // console.log(error, 'errr 2');
+                    // console.error(`Error during file upload ${index + 1} (${files[index].name}):`, error);
+                    // throw new Error(`${files[index].name}`);
+                }
+            })).then((res) => {
+                let isLoadingError = false;
+                // res — массив результатов выполнения промисов
+                res.forEach(item => {
+                    console.log(item, 'Результаты выполнения промисов');
+                    if (item.status === 'rejected') {
+                        // const rejectedFile = (item.reason).toString().replace('Error:', '')
+                        // rejectedFiles.push(rejectedFile.toString());
+                        // console.log(rejectedFiles, 'Отклоненные файлы', typeof rejectedFiles);
+                        // setRejectedFiles(rejectedFiles);
+                        // isLoadingError = true;
+                        // // console.log(item.reason.replace('Error:', ''), 'файл был отклонен');
+                        // // setLoadingStatus('error');
+                        // setUploadedFiles([]);
+                    }
+                    else if (!isLoadingError)  {
+                        // setLoadingStatus('success');
+                        setFiles([]);
+                    }
+                })
+            });
+        } catch (error) {
+            console.error('Error during file uploads:', error);
+            setLoadingStatus('error');
+        }
+    }
     const uploadFile = async (files: File[], field) => {
         // const rejectedFiles: string[] = [];
         setStatusShown(true);
         setLoadingStatus('loading');
+        const fileIds = [];
         // const validationResult = validateFetchData();
             try {
                 await Promise.allSettled(files.map(async (file, index) => {
@@ -294,6 +378,8 @@ export const FileUploadPreview = () => {
                         if (response.status === 201) {
                             console.log(`File ${index + 1} (${file.name}) uploaded successfully!`);
                             console.log(response, 'response with files');
+                            fileIds.push(response?.data.id);
+
                             setLoadingStatus('success');
                         }
                         // } else {
@@ -321,8 +407,9 @@ export const FileUploadPreview = () => {
                             // setUploadedFiles([]);
                         }
                         else if (!isLoadingError)  {
+                            attachToCard(fileIds);
                             setLoadingStatus('success');
-                            setFiles([]);
+                            // setFiles([]);
                         }
                     })
                 });
@@ -371,7 +458,9 @@ export const FileUploadPreview = () => {
                     ))}
                 </FilePreviewList>
             </DropZone>
-            <Button color='secondary' variant="contained" component="span" onClick={() => {uploadFile(files, 'lesson')}} endIcon={<CloudUploadOutlinedIcon />}>
+            <Button color='secondary' variant="contained" component="span" onClick={() => {
+                uploadFile(files, 'lesson');
+            }} endIcon={<CloudUploadOutlinedIcon />}>
                 Выгрузить на сервер
             </Button>
             {isMounted &&
@@ -389,7 +478,27 @@ export const FileUploadPreview = () => {
     );
 };
 
-export const AccordionList = ({props: CardContentProps}) => {
+export const AccordionList = ({setDestination, destination, cardMaterials }) => {
+    const formatDate = (date) => dayjs(date).format('D MMMM YYYY года, HH:mm');
+    const handleDestinationChange = (event: SelectChangeEvent) => {
+        setDestination(event.target.value as string);
+    }
+
+    const destinationData = {
+        selectLabel: 'Раздел',
+        difficultyValue: ['homework', 'lesson', 'repetition'] as TopicDestination[],
+        difficultyLabel: ['Домашняя работа', 'Урок', 'Повторение'] as TopicDestinationText[],
+    }
+    console.log(cardMaterials, 'Материалы в аккордеоне');
+    const handleDownload = (url) => {
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_self';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+    // @ts-ignore
     return (
         <AccordionWrapper>
             <Accordion>
@@ -404,6 +513,9 @@ export const AccordionList = ({props: CardContentProps}) => {
                     <Typography sx={{marginBottom: '10px'}}>
                         Загрузка материалов для урока
                     </Typography>
+                    <div style={{margin: '16px 0'}}>
+                    <SelectComponent data={destinationData} handleChange={handleDestinationChange} selectValue={destination}/>
+                    </div>
                     <FileUploadPreview/>
                     <AdditionalFieldWrapper>
                     <FormControl sx={{display: 'flex', flexDirection: 'row'}}>
@@ -448,7 +560,30 @@ export const AccordionList = ({props: CardContentProps}) => {
                     <Typography>Просмотреть материалы</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <ContentTabs/>
+                    <ContentTabs />
+                    <FilesTableWrapper>
+                        <List>
+                            {cardMaterials.homework.files.map((file) => (
+                                <ListItem secondaryAction={
+                                    <div>
+                                        <IconButton edge="end" aria-label="delete" onClick={() => handleDownload(file.file)}>
+                                            <UploadOutlined/>
+                                        </IconButton>
+                                        <IconButton edge="end" aria-label="delete">
+                                            <DeleteOutlined />
+                                        </IconButton>
+                                    </div>
+                                }>
+                                    <ListItemAvatar>
+                                        <Avatar>
+                                            <ImageIcon />
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText primary={file.name} secondary={formatDate(file.upload_date)} />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </FilesTableWrapper>
                 </AccordionDetails>
             </Accordion>
         </AccordionWrapper>
@@ -463,14 +598,52 @@ export interface CardContentProps {
 function CardMaterials() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const [cardMaterials, setCardMaterials] = useState(null);
+    const [destination, setDestination] = useState('');
+    const [currentTopicId, setCurrentTopicId] = useState('');
+    const getCardMaterials = async () => {
+        try {
+            const response = await axios.get(`api/education_plan/card_content/${currentTopicId}/`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': 'http://localhost:3000',
+                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+                },
+            });
+            console.log(response?.data, 'данные темы');
+           setCardMaterials(response?.data);
+        } catch (err) {
+        }
+    };
+    useEffect(() => {
+        setCurrentTopicId(localStorage.getItem('currentCard'));
+    }, []);
+    useEffect(() => {
+        if (currentTopicId !== '') {
+            getCardMaterials();
+        }
+    }, [currentTopicId])
+    useEffect(() => {
+        console.log(cardMaterials, 'материалы');
+    }, [cardMaterials])
+    useEffect(() => {
+        if (destination !== '') {
+            localStorage.setItem('fileDestination', destination);
+        }
+    }, [destination])
     return (
         <Box style={{margin: '10px 40px'}}>
-            <BasicBreadcrumbs/>
+            {cardMaterials &&
+            <BasicBreadcrumbs title={cardMaterials?.card_title}/>
+            }
         <PageTitle style={{ color: colors.blueAccent[100] }}>
             <h1>Материалы темы</h1>
             <FolderCopyOutlinedIcon sx={{fontSize: '22px', marginLeft: '20px'}}/>
         </PageTitle>
-            <AccordionList />
+            {cardMaterials &&
+            <AccordionList setDestination={(value) => setDestination(value)} destination={destination}
+                           cardMaterials={cardMaterials}/>
+            }
         </Box>
     );
 }

@@ -38,17 +38,11 @@ export const MainWrapper = styled.div`
   }
 `;
 export const PaginationWrapper = styled.div`
-  @media (min-width: 320px) {
-    margin: 15px 40px;
-    width: 50%;
-  }
-  @media (min-width: 400px) {
-    margin: 20px 40px;
-    width: 80%;
-  }
-  @media (min-width: 700px) {
-    margin: 40px;
-  }
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  height: 100vh;
+  width: 100vw;
 `
 
 export const StyledStepper = styled(Stepper)`
@@ -492,18 +486,12 @@ const Register = () => {
     return (
         <AuthorizationWrapper>
                 <MainWrapper>
-                    {role === 'tutor' &&
+                    {role === 'tutor' && activeStep === 2 &&
                     <PaginationWrapper>
-                        <StyledStepper activeStep={activeStep}>
-                            {steps.map((label, index) => {
-                                return (
-                                    <Step color='secondary' key={label}>
-                                        <StepLabel
-                                        >{label}</StepLabel>
-                                    </Step>
-                                );
-                            })}
-                        </StyledStepper>
+                        <Alert severity="info">
+                            <AlertTitle>Ваш запрос на регистрацию отправлен!</AlertTitle>
+                            {`Проверьте почту - ${email + domain}, вам придет письмо с ссылкой на активацию аккаунта.`}
+                        </Alert>
                     </PaginationWrapper>
 }
 

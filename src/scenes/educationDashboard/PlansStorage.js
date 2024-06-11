@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import EducationalPlan from "./EducationalPlan.tsx";
 import axios from "../../api/axios";
 import {Box, Button, CircularProgress, IconButton, Select, useTheme} from "@mui/material";
@@ -41,7 +41,7 @@ const StatusContainer = styled.div`
 `;
 const FiltersContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 `;
 const CardContainer = styled.div`
   margin-right: 10px;
@@ -66,11 +66,13 @@ const SliderWrapper = styled.div`
 const SlideContainer = styled.div`
     display: flex;
     transition: transform 0.5s;
-    transform: translateX(-${props => props.currentIndex * (100 / 4)}%);
+    transform: translateX(-${props => props.currentIndex * (100)}%);
 `;
 
 const SlideItem = styled.div`
-    flex: 0 0 calc(100% / 4);
+    //flex: 0 0 calc(100% / 4);
+  width: 280px;
+  margin-right: 10px;
 `;
 const SlideArrow = styled.div`
   border-radius: 50px;
@@ -85,11 +87,21 @@ const SlideArrow = styled.div`
 `
 
 export const CustomSlider = ({ children, activeStudentIndex }) => {
+    const sliderRef = useRef(null);
     const [currentIndex, setCurrentIndex] = useState(activeStudentIndex);
 
     useEffect(() => {
         setCurrentIndex(activeStudentIndex);
     }, [activeStudentIndex]);
+    useEffect(() => {
+        if (sliderRef.current) {
+            const scrollAmount = sliderRef.current.offsetWidth * currentIndex / 4; // Уменьшаем количество видимых карточек до 4
+            sliderRef.current.scrollTo({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    }, [currentIndex]);
 
     const goToSlide = (index) => {
         setCurrentIndex(index);
@@ -107,19 +119,19 @@ export const CustomSlider = ({ children, activeStudentIndex }) => {
 
     return (
         <div>
-            <SlideArrow onClick={goToPrevSlide}><ArrowBackIosOutlinedIcon/></SlideArrow>
-        <SliderWrapper>
-            <SlideContainer currentIndex={currentIndex}>
-                {React.Children.map(children, (child, index) => (
-                    <SlideItem key={index}>
-                        {React.cloneElement(child, {
-                            active: index === currentIndex % children.length // Проверяем, является ли текущий индекс активным
-                        })}
-                    </SlideItem>
-                ))}
-            </SlideContainer>
-        </SliderWrapper>
-            <SlideArrow onClick={goToNextSlide}><ArrowForwardIosOutlinedIcon/></SlideArrow>
+            <SlideArrow onClick={goToPrevSlide}><ArrowBackIosOutlinedIcon /></SlideArrow>
+            <SliderWrapper ref={sliderRef}>
+                <SlideContainer style={{ transform: `translateX(-${currentIndex * 290}px)` }}> {/* Ширина карточки + отступ */}
+                    {React.Children.map(children, (child, index) => (
+                        <SlideItem key={index}>
+                            {React.cloneElement(child, {
+                                active: index === currentIndex
+                            })}
+                        </SlideItem>
+                    ))}
+                </SlideContainer>
+            </SliderWrapper>
+            <SlideArrow onClick={goToNextSlide}><ArrowForwardIosOutlinedIcon /></SlideArrow>
         </div>
     );
 };
@@ -435,7 +447,7 @@ const PlansStorage = () => {
                             return acc;
                         }, [])} label='Дисциплина'/>
                         <FormControlLabel
-                            control={<IOSSwitch sx={{ m: 1, marginLeft: '40px' }} />}
+                            control={<IOSSwitch sx={{ m: 1, marginLeft: '50px' }} />}
                             label="Скрыть неактивных студентов"
                         />
                     </FiltersContainer>
