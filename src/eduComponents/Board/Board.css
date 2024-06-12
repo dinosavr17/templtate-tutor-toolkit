@@ -45,6 +45,7 @@
   padding: 10px;
   width: 150px !important;
   cursor: default;
+  z-index: 999;
 }
 .board-dropdown p {
   border-bottom: 1px solid #f8f8f8;

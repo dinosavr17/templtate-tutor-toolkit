@@ -189,7 +189,7 @@ const getFileTypeIcon = (fileType) => {
     return <InsertDriveFileIcon fontSize="large" />;
 };
 
-export const FileUploadPreview = ({cardMaterials}) => {
+export const FileUploadPreview = ({cardMaterials, getCardMaterials}) => {
     const [files, setFiles] = useState([]);
     const [isMounted, setMounted] = useState(false);
     const [isDragActive, setIsDragActive] = useState(false);
@@ -347,6 +347,7 @@ export const FileUploadPreview = ({cardMaterials}) => {
                     }
                     else if (!isLoadingError)  {
                         // setLoadingStatus('success');
+                        getCardMaterials();
                         setFiles([]);
                     }
                 })
@@ -484,7 +485,7 @@ export const FileUploadPreview = ({cardMaterials}) => {
     );
 };
 
-export const AccordionList = ({setDestination, destination, cardMaterials }) => {
+export const AccordionList = ({setDestination, destination, cardMaterials, getCardMaterials }) => {
     const formatDate = (date) => dayjs(date).format('D MMMM YYYY года, HH:mm');
     const handleDestinationChange = (event: SelectChangeEvent) => {
         setDestination(event.target.value as string);
@@ -523,7 +524,7 @@ export const AccordionList = ({setDestination, destination, cardMaterials }) => 
                     <div style={{margin: '16px 0'}}>
                     <SelectComponent data={destinationData} handleChange={handleDestinationChange} selectValue={destination}/>
                     </div>
-                    <FileUploadPreview cardMaterials={cardMaterials}/>
+                    <FileUploadPreview cardMaterials={cardMaterials} getCardMaterials={getCardMaterials}/>
                     <AdditionalFieldWrapper>
                     <FormControl sx={{display: 'flex', flexDirection: 'row'}}>
                     <TextField
@@ -649,7 +650,7 @@ function CardMaterials() {
         </PageTitle>
             {cardMaterials &&
             <AccordionList setDestination={(value) => setDestination(value)} destination={destination}
-                           cardMaterials={cardMaterials}/>
+                           cardMaterials={cardMaterials} getCardMaterials={getCardMaterials}/>
             }
         </Box>
     );

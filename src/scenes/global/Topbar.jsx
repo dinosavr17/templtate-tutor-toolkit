@@ -20,6 +20,7 @@ import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import MarkChatUnreadOutlinedIcon from '@mui/icons-material/MarkChatUnreadOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
 import './bars.css';
+import Badge from '@mui/material/Badge';
 
 export const NotificationContainer = styled.div`
   border: #a6a4a4 1px solid;
@@ -42,6 +43,16 @@ export const NotificationsContent = styled.div`
   padding: 16px;
   flex-wrap: wrap;
 `;
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  '& .MuiBadge-badge': {
+    right: -3,
+    top: 13,
+    border: `1px solid #6870fa`,
+    padding: '0 1px',
+    fontSize: '10px',
+    backgroundColor: '#6870fa'
+  },
+}));
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -115,7 +126,9 @@ const Topbar = () => {
         </IconButton>
         <div>
           <IconButton aria-describedby={id} variant="contained" onClick={handleClick}>
+            <StyledBadge badgeContent={userNotifications.length}>
             <NotificationsOutlinedIcon />
+            </StyledBadge>
           </IconButton>
           <Popover
               id={id}

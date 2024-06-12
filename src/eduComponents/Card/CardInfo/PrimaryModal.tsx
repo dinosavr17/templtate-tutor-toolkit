@@ -1,11 +1,11 @@
 // @ts-ignore
 import React, { useEffect, useState } from "react";
 import { StarBorder } from "@mui/icons-material";
-import { Calendar, CheckSquare, List, Tag, Type } from "react-feather";
+import {Calendar, CheckSquare, Clock, List, MoreHorizontal, Tag, Type} from "react-feather";
 import styled from "styled-components";
 // @ts-ignore
-import { ICard, ILabel, SelectChangeEvent } from "../../../Interfaces/EducationPlanFields.ts";
-import {Button, Checkbox, FormControl, TextField} from "@mui/material";
+import {ICard, ILabel, SelectChangeEvent, StatusColors} from "../../../Interfaces/EducationPlanFields.ts";
+import {Button, Checkbox, FormControl, Popover, TextField, useTheme} from "@mui/material";
 // @ts-ignore
 import Modal from "../../Modal/Modal.tsx";
 // @ts-ignore
@@ -16,6 +16,10 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import "./CardInfo.css";
 // @ts-ignore
 import CustomInput from "../../CustomInput/CustomInput.tsx";
+import Chip from "../../Common/Chip";
+import { IOSSwitch } from "../../../shared/Switch";
+import {CardBody, DifficultyMarker} from "../Card.tsx";
+import { tokens } from "../../../theme";
 
 interface CardInfoProps {
   onClose: () => void;
@@ -41,9 +45,19 @@ const DurationWrapper = styled.div`
   }
 `;
 
+const CustomFormControlLabel = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
 function PrimaryModal(props: CardInfoProps) {
   const { onClose, card, primaryId, addCard, boardId} = props;
   const [cardValues, setCardValues] = useState<ICard>({ ...card });
+  const [templateData, setTemplateData] = useState([]);
+  const [selectData, setSelectData] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState('')
+  const [displayPrimaryCard, setDisplayPrimaryCard] = useState(true);
 
   // useEffect(() => {
   //   if (updateCard) updateCard(boardId, cardValues.id, cardValues);
@@ -56,8 +70,11 @@ function PrimaryModal(props: CardInfoProps) {
     difficultyLabel: ['Тема1', 'Тема2', 'Тема3', 'Тема4'],
   }
   const handleDifficultyChange = (event: SelectChangeEvent) => {
-    console.log('заменить');
+    setSelectedTemplate(templateData.find((template) => template.id === event.target.value));
   };
+  useEffect(() => {
+    setDisplayPrimaryCard(true);
+  }, [selectedTemplate])
   const [checked, setChecked] = useState(false);
   const [minutes, setMinutes] = useState(0);
   const [hours, setHours] = useState(0);
@@ -111,10 +128,14 @@ function PrimaryModal(props: CardInfoProps) {
     return isoString;
   };
   const handleSubmit = () => {
-   const duration = convertToISO8601(hours, minutes);
-    if(!error.duration && !error.title && duration) {
-      addCard(boardId, title, duration);
-      onClose();
+    if (!checked) {
+      const duration = convertToISO8601(hours, minutes);
+      if (!error.duration && !error.title && duration) {
+        addCard(boardId, title, duration);
+        onClose();
+      }
+    } else {
+      console.log('Создание темы по шаблону');
     }
   }
   useEffect(() => {
@@ -142,6 +163,45 @@ function PrimaryModal(props: CardInfoProps) {
       }
     }
   },[hours, minutes, title])
+  const getTemplatesData = async () => {
+    try {
+      const response = await axios.get('api/education_plan/card/templates', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:3000',
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userData")).accessToken}`,
+        },
+        withCredentials: true
+      });
+      console.log(response.data, 'шаблоны препода');
+      setTemplateData(response.data);
+    } catch (err) {
+      if (!err?.response) {
+      }
+    }
+  };
+  useEffect(() => {
+    getTemplatesData();
+  }, [checked])
+  useEffect(() => {
+    // const templatesData = {
+    //   selectLabel: 'Мои шаблоны тем',
+    //   difficultyValue: ['topic1', 'topic2', 'topic3', 'topic4'],
+    //   difficultyLabel: ['Тема1', 'Тема2', 'Тема3', 'Тема4'],
+    // }
+    const dataForSelect = templateData.reduce((acc, template) => {
+      acc.push({difficultyValue: template.id, difficultyLabel: template.title})
+      return acc}, []);
+    setSelectData(dataForSelect);
+  }, [templateData])
+  const statusColors: StatusColors = {
+    not_started: { dark: "#7F8C8D", light: "#BDC3C7" }, // Серый
+    in_progress: { dark: "#2ECC71", light: "#1bcd2a" }, // Зеленый
+    done: { dark: "#F1C40F", light: "#ecb529" }, // Желтый
+    to_repeat: { dark: "#3498DB", light: "#4496d9" }, // Голубой
+  };
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
   return (
       <Modal onClose={onClose}>
@@ -178,17 +238,67 @@ function PrimaryModal(props: CardInfoProps) {
               <StarBorder />
               <p>Использовать шаблон</p>
             </div>
-            <FormControlLabel
-                label="Использовать шаблон"
-                control={
+            <CustomFormControlLabel>
                   <Checkbox
                       checked={checked}
                       onChange={handleConfirm}
                       color="secondary"
                   />
-                }
-            />
-            <SelectComponent data={templatesData} handleChange={handleDifficultyChange} selectValue={''} label='Мои шаблоны'/>
+              <span>Использовать шаблон</span>
+            </CustomFormControlLabel>
+            {selectData && selectData.length > 0 &&
+            <SelectComponent data={selectData} handleChange={handleDifficultyChange} selectValue={''} label='Мои шаблоны'/>
+            }
+            {displayPrimaryCard && (
+                <div><p>Так будет выглядеть тема, созданная по шаблону:</p>
+                <div
+                    className="card"
+                    style={{
+                      userSelect: "none",
+                      width: '240px',
+                      padding: 16,
+                      margin: "0 0 8px 0",
+                      minHeight: "50px",
+                      backgroundColor: `${colors.educationalPlan.card}`,
+                      color: "white",
+                    }}
+                >
+                  <div style={{ display: "flex", flexDirection: "row" }}>
+                    <main>
+                      <div className="card-top">
+                        <div className="card-top-labels">
+                          {/*{labels?.map((item, index) => (*/}
+                          {/*    <Chip key={index} item={item} />*/}
+                          {/*))}*/}
+                        </div>
+                      </div>
+                      <div className="card-title" style={{ color: "black" }}>
+                        {'Название'}
+                      </div>
+                      <CardBody>
+                        <p style={{ color: "black" }} title={'Описание'}>
+                          {'Описание'}
+                        </p>
+                        {/*<FormControlLabel*/}
+                        {/*    onClick={(event) => {*/}
+                        {/*      event.stopPropagation();*/}
+                        {/*    }}*/}
+                        {/*    control={*/}
+                        {/*      <IOSSwitch*/}
+                        {/*          status={'not_started'}*/}
+                        {/*          sx={{ m: 1, marginLeft: "40px" }}*/}
+                        {/*          lightColor={statusColors[status]?.light}*/}
+                        {/*          darkColour={statusColors[status]?.dark}*/}
+                        {/*      />*/}
+                        {/*    }*/}
+                        {/*    label={""}*/}
+                        {/*/>*/}
+                      </CardBody>
+                    </main>
+                  </div>
+                </div>
+                </div>
+            )}
           </div>
 
           <div className="cardinfo-box">
