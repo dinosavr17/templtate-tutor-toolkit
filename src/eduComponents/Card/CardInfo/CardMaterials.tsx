@@ -286,7 +286,6 @@ export const FileUploadPreview = ({cardMaterials}) => {
         // setStatusShown(true);
         // setLoadingStatus('loading');
         // const validationResult = validateFetchData();
-        console.log(cardMaterials, 'Материалы уже существующие для карточки');
         try {
             await Promise.allSettled(files.map(async (file, index) => {
                 console.log('file', file);
@@ -296,11 +295,17 @@ export const FileUploadPreview = ({cardMaterials}) => {
                 formData.append('name', file.name);
                 const fileDestination = localStorage.getItem('fileDestination');
                 const currentCard = localStorage.getItem('currentCard');
+                const existingFiles = cardMaterials[fileDestination].files.reduce((acc, file) => {
+                    if (file) {
+                        acc.push(file.id)
+                    }
+                    return acc;
+                }, [])
 
                 try {
                     const response = await axios.patch(`api/education_plan/card_content/${currentCard}/update-section/${fileDestination}/`,
                         {
-                           files: [...fileIds],
+                           files: [...existingFiles,...fileIds],
                         },
                         {
                             headers: {
