@@ -64,7 +64,28 @@ const Login = () => {
 
     const [password, setPassword] = useState('');
     const [domain, setDomain] = useState('@gmail.com');
+
+    const activateAccount = async (uid, token) => {
+        try {
+            const response = await axios.get(`api/account/activate/`,
+                JSON.stringify({ uid: uid, token: token, }),
+                {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': 'http://localhost:3000',
+                },
+            });
+        } catch (err) {
+        }
+    };
     useEffect(() => {
+            // 'ACTIVATION_URL': 'login/?uid={uid}&token={token}'
+            const params = new URLSearchParams(document.location.search);
+            const uid = params.get('uid');
+            const token = params.get('token');
+            if (uid && token) {
+                activateAccount(uid, token);
+            }
         createContainer({id: MODAL_CONTAINER_ID});
         setMounted(true);
     }, [])

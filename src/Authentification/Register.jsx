@@ -41,8 +41,9 @@ export const PaginationWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-content: center;
-  height: 100vh;
-  width: 100vw;
+  height: 200px;
+  margin: 40px;
+  align-items: center;
 `
 
 export const StyledStepper = styled(Stepper)`
@@ -322,7 +323,9 @@ const Register = () => {
                 }
             }
         };
-        getTutorData();
+        if (role === 'student') {
+            getTutorData();
+        }
     }, [role])
 
 
@@ -494,207 +497,203 @@ const Register = () => {
                         </Alert>
                     </PaginationWrapper>
 }
-
-                <RegistrationCard>
-                    <RegistrationImageBlock>
-                        {(activeStep !== 2 && role === 'tutor') &&
-                        <img src={tutor}/>
-                        }
-                        {(activeStep !== 2 && role === 'student') &&
+<>
+                    {activeStep !== 2 &&
+                    <RegistrationCard>
+                        <RegistrationImageBlock>
+                            {(activeStep !== 2 && role === 'tutor') &&
+                            <img src={tutor}/>
+                            }
+                            {(activeStep !== 2 && role === 'student') &&
                             <img src={student_login}/>
-                        }
-                        {activeStep == 2 &&
-                            <div>
-                                <label>Учебный план</label>
-                        <div id='kanban' onMouseEnter={() => lottie.play("animationOne")}
-                             onMouseLeave={() => lottie.pause("animationOne")}></div>
-                                </div>
-                        }
-                    </RegistrationImageBlock>
-                <RegistrationFormWrapper className='card'>
-                    <RegistrationLabel>
-                        {(activeStep !== 2 && role === 'tutor') &&
-                        <LogoWrapper>
-                            <img src={appLogo}/>
-                            <span>Зарегистрироваться</span>
-                        </LogoWrapper>
-                        }
-                        {(activeStep !== 2 && role === 'student') &&
-                            <div>
-                            <LogoWrapper style={{display: 'flex', justifyContent: 'center', marginBottom: '10px'}}>
-                                <img src={appLogo}/>
-                                <span>Tutor Toolkit</span>
-                            </LogoWrapper>
-                                {tutorData &&
-                                <TutorInfoWrapper>
-                                    <p>Преподаватель&#160;<TutorVitalInfo>{tutorData.first_name}&#160;{tutorData.last_name}</TutorVitalInfo><br/>
-                                        приглашает вас присоединиться</p>
-                                    <p>К курсу:&#160;
-                                        <TutorVitalInfo>{tutorData.discipline}</TutorVitalInfo></p>
+                            }
+                        </RegistrationImageBlock>
+                        <RegistrationFormWrapper className='card'>
+                            <RegistrationLabel>
+                                {(activeStep !== 2 && role === 'tutor') &&
+                                <LogoWrapper>
+                                    <img src={appLogo}/>
+                                    <span>Зарегистрироваться</span>
+                                </LogoWrapper>
+                                }
+                                {(activeStep !== 2 && role === 'student') &&
+                                <div>
+                                    <LogoWrapper
+                                        style={{display: 'flex', justifyContent: 'center', marginBottom: '10px'}}>
+                                        <img src={appLogo}/>
+                                        <span>Tutor Toolkit</span>
+                                    </LogoWrapper>
+                                    {tutorData &&
+                                    <TutorInfoWrapper>
+                                        <p>Преподаватель&#160;
+                                            <TutorVitalInfo>{tutorData.first_name}&#160;{tutorData.last_name}</TutorVitalInfo><br/>
+                                            приглашает вас присоединиться</p>
+                                        <p>К курсу:&#160;
+                                            <TutorVitalInfo>{tutorData.discipline}</TutorVitalInfo></p>
                                     </TutorInfoWrapper>
-                                }
-                            </div>
-                        }
-                    </RegistrationLabel>
-                        <RegistrationForm onSubmit={handleSubmit}>
-                            {activeStep === 0 &&
-                            <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
-                                <InputLabel htmlFor="outlined-adornment-email"
-                                            sx={{paddingRight: '0'}}>Email</InputLabel>
-                                <OutlinedInput
-                                    id="outlined-adornment-email"
-                                    sx={{
-                                        "& .MuiOutlinedInput-notchedOutline": {
-                                            borderColor: 'black',
-                                            padding: '0',
-                                        },
-                                        "& .MuiOutlinedInput-root": {
-                                            paddingRight: '0',
-                                        },
-                                        "& .MuiInputAdornment-root": {
-                                            padding: '0',
-                                        },
-                                        paddingRight: '0 !important'
-                                    }}
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    inputProps={{style: {color: 'black'}}}
-                                    label="Email"
-                                    endAdornment={
-                                        <InputAdornment position="end" sx={{padding: 0}}>
-                                            <Select
-                                                label="Domain"
-                                                value={domain}
-                                                onChange={(e) => setDomain(e.target.value)}
-                                                color='secondary'
-                                            >
-                                                <MenuItem value="@gmail.com">@gmail.com</MenuItem>
-                                                <MenuItem value="@mail.ru">@mail.ru</MenuItem>
-                                                <MenuItem value="@yandex.ru">@yandex.ru</MenuItem>
-                                            </Select>
-                                        </InputAdornment>
                                     }
-                                />
-                            </FormControl>
-                            }
-                            {activeStep === 0 &&
-                            <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
-                                <InputLabel htmlFor="outlined-adornment-password"
-                                            sx={{color: 'black'}}>Пароль</InputLabel>
-                                <OutlinedInput
-                                    id="outlined-adornment-password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    sx={{
-                                        "& .MuiOutlinedInput-notchedOutline": {
-                                            borderColor: 'black',
-                                        },
-                                    }}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    inputProps={{style: {color: 'black'}}}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                                edge="end"
-                                            >
-                                                {showPassword ? <VisibilityOff/> : <Visibility/>}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                    label="Пароль"
-                                />
-                            </FormControl>
-                            }
-                            {(activeStep === 1 && role === 'tutor') &&
-                            <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
-                                <InputLabel htmlFor="outlined-adornment-password" sx={{color: 'black'}}>Имя</InputLabel>
-                                <OutlinedInput
-                                    id="outlined-adornment-password"
-                                    type="text"
-                                    sx={{
-                                        "& .MuiOutlinedInput-notchedOutline": {
-                                            borderColor: 'black',
-                                        },
-                                    }}
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    value={firstName}
-                                    inputProps={{style: {color: 'black'}}}
-                                    label="Имя"
-                                />
-                            </FormControl>
-                            }
-                            {(activeStep === 1 && role === 'tutor') &&
-                            <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
-                                <InputLabel htmlFor="outlined-adornment-password"
-                                            sx={{color: 'black'}}>Фамилия</InputLabel>
-                                <OutlinedInput
-                                    id="outlined-adornment-password"
-                                    type="text"
-                                    sx={{
-                                        "& .MuiOutlinedInput-notchedOutline": {
-                                            borderColor: 'black',
-                                        },
-                                    }}
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    value={lastName}
-                                    inputProps={{style: {color: 'black'}}}
-                                    label="Фамилия"
-                                />
-                            </FormControl>
-                            }
-                        </RegistrationForm>
-                    {activeStep!==2 &&
-                        <div>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                        {role === 'tutor' &&
-                        <RegisterButton
-                            color="inherit"
-                            disabled={activeStep === 0}
-                            onClick={handleBack}
-                        >
-                            Назад
-                        </RegisterButton>
-                        }
-                        <Box sx={{ flex: '1 1 auto' }} />
-                        {(activeStep === 1 || role === 'student')
-                            ? <RegisterButton onClick={() => {
-                                if (role === 'tutor') {
-                                    handleNext();
-                                    handleSubmit();
-                                } else {
-                                    handleStudentConnect();
+                                </div>
                                 }
-                            }}>Зарегистрироваться</RegisterButton>
-                            : <RegisterButton onClick={handleNext}>Далее</RegisterButton>
-                        }
-                    </Box>
-                    <p>
-                        Уже зарегистрированы?<br/>
-                        <span className="line">
+                            </RegistrationLabel>
+                            <RegistrationForm onSubmit={handleSubmit}>
+                                {activeStep === 0 &&
+                                <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
+                                    <InputLabel htmlFor="outlined-adornment-email"
+                                                sx={{paddingRight: '0'}}>Email</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-email"
+                                        sx={{
+                                            "& .MuiOutlinedInput-notchedOutline": {
+                                                borderColor: 'black',
+                                                padding: '0',
+                                            },
+                                            "& .MuiOutlinedInput-root": {
+                                                paddingRight: '0',
+                                            },
+                                            "& .MuiInputAdornment-root": {
+                                                padding: '0',
+                                            },
+                                            paddingRight: '0 !important'
+                                        }}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        inputProps={{style: {color: 'black'}}}
+                                        label="Email"
+                                        endAdornment={
+                                            <InputAdornment position="end" sx={{padding: 0}}>
+                                                <Select
+                                                    label="Domain"
+                                                    value={domain}
+                                                    onChange={(e) => setDomain(e.target.value)}
+                                                    color='secondary'
+                                                >
+                                                    <MenuItem value="@gmail.com">@gmail.com</MenuItem>
+                                                    <MenuItem value="@mail.ru">@mail.ru</MenuItem>
+                                                    <MenuItem value="@yandex.ru">@yandex.ru</MenuItem>
+                                                </Select>
+                                            </InputAdornment>
+                                        }
+                                    />
+                                </FormControl>
+                                }
+                                {activeStep === 0 &&
+                                <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
+                                    <InputLabel htmlFor="outlined-adornment-password"
+                                                sx={{color: 'black'}}>Пароль</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        sx={{
+                                            "& .MuiOutlinedInput-notchedOutline": {
+                                                borderColor: 'black',
+                                            },
+                                        }}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        inputProps={{style: {color: 'black'}}}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff/> : <Visibility/>}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }
+                                        label="Пароль"
+                                    />
+                                </FormControl>
+                                }
+                                {(activeStep === 1 && role === 'tutor') &&
+                                <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
+                                    <InputLabel htmlFor="outlined-adornment-password"
+                                                sx={{color: 'black'}}>Имя</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-password"
+                                        type="text"
+                                        sx={{
+                                            "& .MuiOutlinedInput-notchedOutline": {
+                                                borderColor: 'black',
+                                            },
+                                        }}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        value={firstName}
+                                        inputProps={{style: {color: 'black'}}}
+                                        label="Имя"
+                                    />
+                                </FormControl>
+                                }
+                                {(activeStep === 1 && role === 'tutor') &&
+                                <FormControl sx={{m: 1}} variant="outlined" color='secondary'>
+                                    <InputLabel htmlFor="outlined-adornment-password"
+                                                sx={{color: 'black'}}>Фамилия</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-password"
+                                        type="text"
+                                        sx={{
+                                            "& .MuiOutlinedInput-notchedOutline": {
+                                                borderColor: 'black',
+                                            },
+                                        }}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        value={lastName}
+                                        inputProps={{style: {color: 'black'}}}
+                                        label="Фамилия"
+                                    />
+                                </FormControl>
+                                }
+                            </RegistrationForm>
+                            {activeStep !== 2 &&
+                            <div>
+                                <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
+                                    {role === 'tutor' &&
+                                    <RegisterButton
+                                        color="inherit"
+                                        disabled={activeStep === 0}
+                                        onClick={handleBack}
+                                    >
+                                        Назад
+                                    </RegisterButton>
+                                    }
+                                    <Box sx={{flex: '1 1 auto'}}/>
+                                    {(activeStep === 1 || role === 'student')
+                                        ? <RegisterButton onClick={() => {
+                                            if (role === 'tutor') {
+                                                handleNext();
+                                                handleSubmit();
+                                            } else {
+                                                handleStudentConnect();
+                                            }
+                                        }}>Зарегистрироваться</RegisterButton>
+                                        : <RegisterButton onClick={handleNext}>Далее</RegisterButton>
+                                    }
+                                </Box>
+                                <p>
+                                    Уже зарегистрированы?<br/>
+                                    <span className="line">
                                 <a href="login">Войти</a>
                         </span>
-                    </p>
-                        </div>
+                                </p>
+                            </div>
+                            }
+                            {isMounted &&
+                            <Portal id={MODAL_CONTAINER_ID}>
+                                {statusShown &&
+                                <StatusOverlay>
+                                    <StatusContainer style={{display: 'flex'}}>
+                                        {renderStatusContent()}
+                                    </StatusContainer>
+                                </StatusOverlay>
+                                }
+                            </Portal>
+                            }
+                        </RegistrationFormWrapper>
+                    </RegistrationCard>
                     }
-                    {activeStep === 2 &&
-                    <Pagination count={5} variant="outlined" color="secondary" />
-                    }
-                    {isMounted &&
-                    <Portal id={MODAL_CONTAINER_ID}>
-                        {statusShown &&
-                        <StatusOverlay>
-                            <StatusContainer style={{display: 'flex'}}>
-                                {renderStatusContent()}
-                            </StatusContainer>
-                        </StatusOverlay>
-                        }
-                    </Portal>
-                    }
-                </RegistrationFormWrapper>
-                </RegistrationCard>
+                    </>
                 </MainWrapper>
         </AuthorizationWrapper>
 
