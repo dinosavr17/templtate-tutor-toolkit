@@ -67,7 +67,7 @@ const Login = () => {
 
     const activateAccount = async (uid, token) => {
         try {
-            const response = await axios.get(`api/account/activate/`,
+            const response = await axios.post(`api/account/activate/`,
                 JSON.stringify({ uid: uid, token: token, }),
                 {
                 headers: {

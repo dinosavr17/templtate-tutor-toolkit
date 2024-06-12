@@ -9,18 +9,19 @@ import LoopOutlinedIcon from '@mui/icons-material/LoopOutlined';
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
 import FilePresentOutlinedIcon from '@mui/icons-material/FilePresentOutlined';
 
-export default function IconLabelTabs() {
-    const [value, setValue] = React.useState(0);
+export default function IconLabelTabs({onChange, activeTab }) {
+    const [value, setValue] = React.useState('homework');
 
     const handleChange = (event, newValue) => {
+        onChange(newValue);
         setValue(newValue);
     };
 
     return (
         <Tabs value={value} onChange={handleChange} aria-label="icon label tabs example">
-            <Tab icon={<AutoStoriesOutlinedIcon />} label="Материалы урока" />
-            <Tab icon={<FilePresentOutlinedIcon />} label="Домашняя работа" />
-            <Tab icon={<LoopOutlinedIcon />} label="Повторение" />
+            <Tab value="lesson" icon={<AutoStoriesOutlinedIcon />} label="Материалы урока" />
+            <Tab value="homework" icon={<FilePresentOutlinedIcon />} label="Домашняя работа" />
+            <Tab value="repetition" icon={<LoopOutlinedIcon />} label="Повторение" />
         </Tabs>
     );
 }

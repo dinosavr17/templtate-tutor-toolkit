@@ -189,7 +189,7 @@ const getFileTypeIcon = (fileType) => {
     return <InsertDriveFileIcon fontSize="large" />;
 };
 
-export const FileUploadPreview = () => {
+export const FileUploadPreview = ({cardMaterials}) => {
     const [files, setFiles] = useState([]);
     const [isMounted, setMounted] = useState(false);
     const [isDragActive, setIsDragActive] = useState(false);
@@ -286,6 +286,7 @@ export const FileUploadPreview = () => {
         // setStatusShown(true);
         // setLoadingStatus('loading');
         // const validationResult = validateFetchData();
+        console.log(cardMaterials, 'Материалы уже существующие для карточки');
         try {
             await Promise.allSettled(files.map(async (file, index) => {
                 console.log('file', file);
@@ -483,6 +484,7 @@ export const AccordionList = ({setDestination, destination, cardMaterials }) => 
     const handleDestinationChange = (event: SelectChangeEvent) => {
         setDestination(event.target.value as string);
     }
+    const [activeGroup, setActiveGroup] = useState('homework');
 
     const destinationData = {
         selectLabel: 'Раздел',
@@ -516,7 +518,7 @@ export const AccordionList = ({setDestination, destination, cardMaterials }) => 
                     <div style={{margin: '16px 0'}}>
                     <SelectComponent data={destinationData} handleChange={handleDestinationChange} selectValue={destination}/>
                     </div>
-                    <FileUploadPreview/>
+                    <FileUploadPreview cardMaterials={cardMaterials}/>
                     <AdditionalFieldWrapper>
                     <FormControl sx={{display: 'flex', flexDirection: 'row'}}>
                     <TextField
@@ -560,10 +562,10 @@ export const AccordionList = ({setDestination, destination, cardMaterials }) => 
                     <Typography>Просмотреть материалы</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <ContentTabs />
+                    <ContentTabs onChange={(value) => setActiveGroup(value)} activeTab={activeGroup} />
                     <FilesTableWrapper>
                         <List>
-                            {cardMaterials.homework.files.map((file) => (
+                            {cardMaterials[activeGroup].files.map((file) => (
                                 <ListItem secondaryAction={
                                     <div>
                                         <IconButton edge="end" aria-label="delete" onClick={() => handleDownload(file.file)}>
