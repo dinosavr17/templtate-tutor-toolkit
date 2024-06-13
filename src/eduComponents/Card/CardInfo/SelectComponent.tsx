@@ -112,7 +112,7 @@ const SelectComponent = ({data, handleChange, selectValue}) => {
                     label="Сложность"
                     onChange={handleChange}
                 >
-                    {data.difficultyValue.map((value, index) => (
+                    {data?.difficultyValue?.map((value, index) => (
                         <MenuItem key={value} value={value}>
                             {data.difficultyLabel[index]}
                         </MenuItem>

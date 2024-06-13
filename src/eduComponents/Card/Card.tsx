@@ -14,7 +14,7 @@ import { tokens } from "../../theme";
 import { IOSSwitch } from "../../shared/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import SecondaryModal from "./CardInfo/SecondaryModal.tsx";
-import axios from "axios";
+import axios from '../../api/axios'
 
 const ModalOverlay = styled.div`
   background: rgba(255, 255, 255, 0.4);

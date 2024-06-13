@@ -27,6 +27,7 @@ import PrimaryModal from "../Card/CardInfo/PrimaryModal.tsx";
 
 interface BoardProps {
   board: IBoard;
+  getPlan: () => void;
   addCard: (boardId: string, title: string, duration: string) => void;
   removeBoard: (boardId: string) => void;
   removeCard: (boardId: string, cardId: string) => void;
@@ -166,6 +167,7 @@ const Board = (props: BoardProps) => {
   const colors = tokens(theme.palette.mode);
   console.log(theme.palette.mode, 'тема');
   const {
+    getPlan,
     board,
     addCard,
     removeBoard,
@@ -243,7 +245,7 @@ const Board = (props: BoardProps) => {
               </Alert>
           </StatusOverlay>
             }
-            {openPrimaryModal && <PrimaryModal addCard={addCard} onClose={() => setOpenPrimaryModal(false)} boardId={board.id}/>}
+            {openPrimaryModal && <PrimaryModal getPlan={getPlan} addCard={addCard} onClose={() => setOpenPrimaryModal(false)} boardId={board.id}/>}
           </Portal>
               )}
         </Header>
@@ -261,6 +263,7 @@ const Board = (props: BoardProps) => {
                 {(provided, snapshot) => {
                   return (
             <Card
+                getPlan={getPlan}
                provided={provided}
                snapshot={snapshot}
               key={item.id}

@@ -430,6 +430,7 @@ export const EducationalPlan = ({uniquePlan, getPlan}) => {
                                 <Droppable droppableId={item.id} key={item.id} type="task">
                                   {(provided, snapshot) => (
                                       <Board
+                                          getPlan={getPlan}
                                           provided={provided}
                                           snapshot={snapshot}
                                           key={item.id}
