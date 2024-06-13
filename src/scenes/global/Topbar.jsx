@@ -94,10 +94,10 @@ const Topbar = () => {
       }
 
     }
+    useEffect(() => {getNotificationsData()}, [])
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
-    getNotificationsData();
   };
 
   const handleClose = () => {
