@@ -15,6 +15,9 @@ import { IOSSwitch } from "../../shared/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import SecondaryModal from "./CardInfo/SecondaryModal.tsx";
 import axios from '../../api/axios'
+import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
+import ContentPasteGoRoundedIcon from '@mui/icons-material/ContentPasteGoRounded';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
 const ModalOverlay = styled.div`
   background: rgba(255, 255, 255, 0.4);
@@ -65,18 +68,18 @@ export const DifficultyMarker = styled.div`
 const StyledDropdown = styled.div `
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 8px;
+  border-radius: 8px;
   & > p {
+    display: flex;
+    align-items: center;
     background-color: lightblue;
-    text-align: center;
-    margin-top: 8px;
-    border: 1px solid black;
+    text-align: left;
+    margin-top: 4px;
+    margin-bottom: 4px;
     padding: 2px 8px;
     border-radius: 8px;
     cursor: pointer;
-    :hover {
-      background-color: #4774d5;
-    }
   }
   
 `
@@ -92,6 +95,7 @@ function Card(props: CardProps) {
         provided,
         snapshot,
         setCardHeight,
+        getPlan
     } = props;
     const {
         id,
@@ -173,7 +177,6 @@ function Card(props: CardProps) {
                     withCredentials: true
                 }
             );
-            // getPlan();
         } catch (err) {
         }
     }
@@ -185,7 +188,7 @@ function Card(props: CardProps) {
                     {showModal && (
                         <ModalOverlay>
                             <CardInfo
-                                onClose={() => setShowModal(false)}
+                                onClose={() => {setShowModal(false); getPlan()}}
                                 card={card}
                                 boardId={boardId}
                                 updateCard={updateCard}
@@ -257,7 +260,7 @@ function Card(props: CardProps) {
                                     handleShow(event);
                                 }}
                             >
-                                <MoreHorizontal style={{ color: colors.blueAccent[500] }} />
+                                <ExpandMoreRoundedIcon style={{ color: 'black' }} />
                                 {showDropdown && (
                                     <Popover
                                         id={id}
@@ -270,8 +273,14 @@ function Card(props: CardProps) {
                                         }}
                                     >
                                         <StyledDropdown>
-                                        <p onClick={() => {removeCard(boardId, id)}}>Удалить тему</p>
-                                        <p onClick={() => {saveTemplate(id)}}>Сохранить тему как шаблон</p>
+                                        <p onClick={() => {removeCard(boardId, id)}}>
+                                            Удалить тему
+                                            <span style={{marginLeft: '4px'}}>
+                                                <DeleteOutlinedIcon/>
+                                            </span>
+                                        </p>
+                                        <p onClick={() => {saveTemplate(id)}}>
+                                            Сохранить тему как шаблон<span style={{marginLeft: '4px'}}><ContentPasteGoRoundedIcon/></span></p>
                                         </StyledDropdown>
                                     </Popover>
                                 )}

@@ -38,13 +38,14 @@
   transform: translateX(15px);
   flex: 1;
   cursor: pointer;
-  opacity: 0;
+  opacity: 1;
   transition: 200ms;
+  justify-self: flex-end;
 }
 
-.card:hover .card-top-more {
-  opacity: 1;
-}
+/*.card:hover .card-top-more {*/
+/*  opacity: 1;*/
+/*}*/
 
 .card-title {
   flex: 1;

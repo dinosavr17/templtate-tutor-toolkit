@@ -176,37 +176,38 @@ const PlansStorage = () => {
                 x: card.title,
                 y: Number(timeToMinutes(card.plan_time))
             }));
-            // const samplePieData = cardsData.map(card => ({
-            //     "id": card.status,
-            //     "label": card.status,
-            //     "value": 50,
-            //     "color": "hsl(127, 70%, 50%)"
-            // }));
+            // Подсчет количества статусов
+            const statusCounts = cardsData.reduce((acc, item) => {
+                acc[item.status] = (acc[item.status] || 0) + 1;
+                return acc;
+            }, {});
+
+// Формирование данных для графика
             const samplePieData = [
                 {
-                    "id": "Не начата",
-                    "label": "Не начата",
-                    "value": 165,
-                    "color": "hsl(125,6%,43%)"
+                    id: "Не начата",
+                    label: "Не начата",
+                    value: statusCounts['not_started'] || 0,
+                    color: "hsl(125,6%,43%)"
                 },
                 {
-                    "id": "В процессе",
-                    "label": "В процессе",
-                    "value": 239,
-                    "color": "hsl(120, 100%, 50%)"
+                    id: "В процессе",
+                    label: "В процессе",
+                    value: statusCounts['in_progress'] || 0,
+                    color: "hsl(120, 100%, 50%)"
                 },
                 {
-                    "id": "Завершено",
-                    "label": "Завершено",
-                    "value": 596,
-                    "color": "hsl(48,100%,50%)"
+                    id: "Завершено",
+                    label: "Завершено",
+                    value: statusCounts['done'] || 0,
+                    color: "hsl(48,100%,50%)"
                 },
                 {
-                    "id": "Повторение",
-                    "label": "Повторение",
-                    "value": 369,
-                    "color": "hsl(203,70%,50%)"
-                },
+                    id: "Повторение",
+                    label: "Повторение",
+                    value: statusCounts['to_repeat'] || 0,
+                    color: "hsl(203,70%,50%)"
+                }
             ];
 
             // Создание массива preparedResultData
@@ -494,14 +495,16 @@ const PlansStorage = () => {
                     ))}
                     </div>
                 </SliderContainer>
+                {uniquePlan.modules && uniquePlan.modules.length > 0 &&
                 <Box style={{display: 'flex', flexDirection: 'row'}}>
-                    <div style={{ height: '300px', width: '700px', marginTop: '40px'}}>
+                    <div style={{ height: '300px', width: '50%', marginTop: '40px'}}>
                         <ProgressLineGraph data={graphData}/>
                     </div>
-                    <div style={{ height: '300px', width: '400px', marginTop: '40px'}}>
+                    <div style={{ height: '300px', width: '50%', marginTop: '40px'}}>
                         <StatusPie data={pieData}/>
                     </div>
                 </Box>
+                }
             </Box>
             {loadingStatus === 'success' && <EducationalPlan uniquePlan={uniquePlan} getPlan={() => getPlanById(uniqueId)} />}
             {isMounted &&
